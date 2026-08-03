@@ -1,0 +1,157 @@
+{
+  "host": "10.239.84.44",
+  "user": "debug",
+  "remoteRoot": "C:\\Users\\debug\\Desktop\\BKC",
+  "capturedAt": "2026-07-13 15:47:07",
+  "purpose": "Remote BKC binary inventory for firmware flashing automation",
+  "selectionRules": {
+    "fullIfwiSizeBytes": 134217728,
+    "splitIfwiSizeBytes": 67108864,
+    "twoSocketPattern": "_2s",
+    "oneSocketHintPatterns": [
+      "1P0",
+      "IBL1P0"
+    ],
+    "note": "Files without _2s are treated as 1S/1P candidates only when the version folder also provides a paired _2s image or the filename has an explicit 1P/IBL1P0 hint."
+  },
+  "bkcVersions": [
+    {
+      "version": "35.D23",
+      "folder": "35D23",
+      "candidates": [
+        {
+          "socket": "1S/1P",
+          "imageType": "128MB full IFWI",
+          "relativePath": "35D23\\OKSDCRB1.IPC.0035.D23.2605132239_D1A800009a1_D2A5200020c_D1B5100030e_NA_DMR_IBL_X64.bin"
+        },
+        {
+          "socket": "2S/2P",
+          "imageType": "128MB full IFWI",
+          "relativePath": "35D23\\OKSDCRB1.IPC.0035.D23.2605132239_D1A800009a1_D2A5200020c_D1B5100030e_NA_DMR_IBL_X64_2s.bin"
+        },
+        {
+          "socket": "1S/1P",
+          "imageType": "64MB split/half IFWI",
+          "relativePath": "35D23\\OKSDCRB1.IPC.0035.D23.2605132239_D1A800009a1_D2A5200020c_D1B5100030e_NA_DMR_IBL_X64_64MB.bin"
+        },
+        {
+          "socket": "2S/2P",
+          "imageType": "64MB split/half IFWI",
+          "relativePath": "35D23\\OKSDCRB1.IPC.0035.D23.2605132239_D1A800009a1_D2A5200020c_D1B5100030e_NA_DMR_IBL_X64_64MB_2s.bin"
+        }
+      ]
+    },
+    {
+      "version": "30.D61",
+      "folder": "up982_bkc",
+      "candidates": [
+        {
+          "socket": "1S/1P",
+          "imageType": "128MB full IFWI",
+          "relativePath": "up982_bkc\\OKSDCRB1.JEN.0030.D61.2512170251_DA50000A02_NA_NA_NA_DMR_IBL1P0_X64_Simics.bin"
+        },
+        {
+          "socket": "1S/1P",
+          "imageType": "128MB full IFWI",
+          "relativePath": "up982_bkc\\OKSDCRB1.JEN.0030.D61.2512170251_DA80000983_NA_NA_NA_DMR_IBL1P0_X64.bin"
+        },
+        {
+          "socket": "1S/1P",
+          "imageType": "64MB split/half IFWI part 1",
+          "relativePath": "up982_bkc\\OKSDCRB1.JEN.0030.D61.2512170251_DA50000A02_NA_NA_NA_DMR_IBL1P0_X64_Simics_1.bin"
+        },
+        {
+          "socket": "1S/1P",
+          "imageType": "64MB split/half IFWI part 2",
+          "relativePath": "up982_bkc\\OKSDCRB1.JEN.0030.D61.2512170251_DA50000A02_NA_NA_NA_DMR_IBL1P0_X64_Simics_2.bin"
+        },
+        {
+          "socket": "1S/1P",
+          "imageType": "64MB split/half IFWI part 1",
+          "relativePath": "up982_bkc\\OKSDCRB1.JEN.0030.D61.2512170251_DA80000983_NA_NA_NA_DMR_IBL1P0_X64_1.bin"
+        },
+        {
+          "socket": "1S/1P",
+          "imageType": "64MB split/half IFWI part 2",
+          "relativePath": "up982_bkc\\OKSDCRB1.JEN.0030.D61.2512170251_DA80000983_NA_NA_NA_DMR_IBL1P0_X64_2.bin"
+        }
+      ],
+      "supportBinaries": [
+        "up982_bkc\\IFWIStitch20.bin",
+        "up982_bkc\\PRM_CAPSULES_0030.D61.zip.bin",
+        "up982_bkc\\SDU_CAPSULE_0030.D61.bin",
+        "up982_bkc\\binaries\\mmc_pkg_0.699.0_sign-test_unencrypted.bin",
+        "up982_bkc\\binaries\\mmc_pkg_0.699.0_unsigned_unencrypted.bin",
+        "up982_bkc\\flashable_images\\base_code.bin",
+        "up982_bkc\\flashable_images\\base_data.bin",
+        "up982_bkc\\flashable_images\\swap*.bin",
+        "up982_bkc\\0P8\\GoldScripts\\Bios\\*.bin",
+        "up982_bkc\\1P0\\GoldScripts\\Bios\\*.bin"
+      ]
+    },
+    {
+      "version": "30.D59",
+      "folder": "OKSDCRB1.CHA.0030.D59.2512161602_DA80000982_NA_NA_NA_DMR_IBL1P0_X64_stitched_IMH1_A0_DMRAP_Unified_Patch_stitched",
+      "candidates": [
+        {
+          "socket": "1S/1P",
+          "imageType": "128MB full IFWI",
+          "relativePath": "OKSDCRB1.CHA.0030.D59.2512161602_DA80000982_NA_NA_NA_DMR_IBL1P0_X64_stitched_IMH1_A0_DMRAP_Unified_Patch_stitched\\OKSDCRB1.CHA.0030.D59.2512161602_DA80000982_NA_NA_NA_DMR_IBL1P0_X64_stitched_IMH1_A0_DMRAP_Unified_Patch_stitched.bin"
+        }
+      ]
+    },
+    {
+      "version": "30.D43",
+      "folder": "OKSDCRB1_86B_2025.50.5.01_0030.D43_80000983_0.688.0_1P0_NonIPClean_Trace_DebugSigned_VIS_stitched",
+      "candidates": [
+        {
+          "socket": "1S/1P",
+          "imageType": "128MB full IFWI",
+          "relativePath": "OKSDCRB1_86B_2025.50.5.01_0030.D43_80000983_0.688.0_1P0_NonIPClean_Trace_DebugSigned_VIS_stitched\\OKSDCRB1_86B_2025.50.5.01_0030.D43_80000983_0.688.0_1P0_NonIPClean_Trace_DebugSigned_VIS_stitched.bin"
+        }
+      ]
+    },
+    {
+      "version": "29.D60",
+      "folder": "OKSDCRB1_86B_2025.47.4.01_0029.D60_8000097E_0.662.0_1P0_NonIPClean_Trace_DebugSigned_VIS",
+      "candidates": [
+        {
+          "socket": "1S/1P",
+          "imageType": "128MB full IFWI",
+          "relativePath": "OKSDCRB1_86B_2025.47.4.01_0029.D60_8000097E_0.662.0_1P0_NonIPClean_Trace_DebugSigned_VIS\\OKSDCRB1_86B_2025.47.4.01_0029.D60_8000097E_0.662.0_1P0_NonIPClean_Trace_DebugSigned_VIS.bin"
+        }
+      ]
+    },
+    {
+      "version": "WW46BKC / 29.Dxx generation",
+      "folder": "stitched_C41AE.0.BS.1A03.GN.1_WW46BKC_CoVal_8000097E",
+      "candidates": [
+        {
+          "socket": "unspecified",
+          "imageType": "128MB full IFWI",
+          "relativePath": "stitched_C41AE.0.BS.1A03.GN.1_WW46BKC_CoVal_8000097E\\stitched_C41AE.0.BS.1A03.GN.1_WW46BKC_CoVal_8000097E.bin"
+        }
+      ]
+    }
+  ],
+  "rootLevelBins": [
+    {
+      "version": "29.D50",
+      "socket": "unspecified",
+      "imageType": "128MB full IFWI",
+      "relativePath": "CRB_29D50_VIS_UP982.bin"
+    },
+    {
+      "version": "29.D60",
+      "socket": "1S/1P",
+      "imageType": "128MB full IFWI",
+      "relativePath": "OKSDCRB1_86B_2025.47.4.01_0029.D60_8000097E_0.662.0_1P0_NonIPClean_Trace_DebugSigned_VIS.bin"
+    },
+    {
+      "version": "29.D50",
+      "socket": "unspecified",
+      "imageType": "64MB split/half IFWI",
+      "relativePath": "po_29d50_up982.bin"
+    }
+  ]
+}

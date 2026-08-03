@@ -1,0 +1,26 @@
+{
+  "ssh": {
+    "user": "debug",
+    "host": "10.239.84.44",
+    "connectTimeoutSeconds": 10
+  },
+  "remote": {
+    "emulator": {
+      "dir": "C:\\Program Files (x86)\\DediProg\\Emulator",
+      "exe": "C:\\Program Files (x86)\\DediProg\\Emulator\\smucmd.exe",
+      "shortcut": "C:\\Users\\debug\\Desktop\\smucmd.exe - Shortcut.lnk",
+      "manual": "C:\\Program Files (x86)\\DediProg\\EM100\\help.pdf",
+      "defaultChip": "M25P80"
+    },
+    "powerSplitter": {
+      "dir": "C:\\Users\\debug\\Desktop\\PowerSplitterWithCycleScript 1\\PowerSplitterWithCycleScript",
+      "exe": "C:\\Users\\debug\\Desktop\\PowerSplitterWithCycleScript 1\\PowerSplitterWithCycleScript\\PowerSplitterCL.exe",
+      "config": "C:\\Users\\debug\\Desktop\\PowerSplitterWithCycleScript 1\\PowerSplitterWithCycleScript\\psconfig.xml"
+    }
+  },
+  "flow": {
+    "verifyDownload": true,
+    "powerOffBeforeProgram": true,
+    "powerOnAfterProgram": true
+  }
+}

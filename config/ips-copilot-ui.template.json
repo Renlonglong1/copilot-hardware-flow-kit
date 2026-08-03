@@ -1,0 +1,83 @@
+{
+  "server": {
+    "host": "10.239.79.61",
+    "port": 8765,
+    "reportBaseUrl": "http://10.239.79.61:8765",
+    "openBrowser": true
+  },
+  "copilot": {
+    "mode": "subprocess",
+    "stage2Mode": "subprocess",
+    "handoffDirectory": "inbox\\ui_tasks",
+    "prependCommands": [],
+    "command": [
+      "copilot",
+      "--allow-all"
+    ],
+    "passPrompt": "stdin",
+    "timeoutSeconds": 7200,
+    "workingDirectory": ".",
+    "promptFileEncoding": "utf-8",
+    "notes": "Use command flags such as --allow-all for permissions; slash commands like /allow-all may not execute when sent through subprocess stdin. mode controls Copilot execution. stage2Mode=subprocess shows live output in the UI; stage2Mode=handoff saves a task file for the current Copilot CLI session. passPrompt supports stdin, argument, or promptFile. If command contains {prompt_file}, passPrompt is treated as promptFile."
+  },
+  "defaults": {
+    "uiMode": "simple",
+    "sshHost": "debug@10.239.84.53",
+    "autoMachineMatch": false,
+    "taskType": "debug_repro",
+    "permissionLevel": "standard",
+    "searchSimilarIps": false,
+    "downloadAttachments": false,
+    "notifyAutoSend": false,
+    "outputDirectory": "out",
+    "planOnlyNoHardwareText": "阶段1只能根据UI表单字段生成执行计划，严禁访问HSD database、SSH连接、读取BKC、烧录、power cycle、串口控制或任何硬件动作。"
+  },
+  "automation": {
+    "minimumIntervalMinutes": 60,
+    "defaultManagerRecipients": "",
+    "taskDatabasePath": "out\\ui_task_manager.sqlite3",
+    "cancellationGraceSeconds": 15,
+    "retentionDays": 90,
+    "machineLockWaitSeconds": 3600,
+    "perMachineConcurrency": {
+      "default": 1
+    }
+  },
+  "machineMatching": {
+    "inventoryPath": "config\\lab-machine-inventory.json"
+  },
+  "permissionLevels": [
+    {
+      "id": "standard",
+      "label": "标准授权",
+      "description": "执行前对高风险动作保持谨慎确认。"
+    },
+    {
+      "id": "trusted_plan",
+      "label": "信任已确认计划",
+      "description": "对用户确认计划内的低风险命令尽量不反复询问。"
+    },
+    {
+      "id": "maximum",
+      "label": "最高授权",
+      "description": "对用户确认计划内的命令尽量自主连续执行；不能绕过 Copilot CLI/OS/SSH/硬件安全限制。"
+    }
+  ],
+  "taskTypes": [
+    {
+      "id": "extract_ips",
+      "label": "提取 IPS",
+      "description": "只提取 HSD/IPS 信息并生成分析，不执行硬件动作。"
+    },
+    {
+      "id": "consult",
+      "label": "问题咨询",
+      "description": "基于 HSD 内容和备注给出分析建议，不执行硬件动作。"
+    },
+    {
+      "id": "debug_repro",
+      "label": "Debug / 验证",
+      "description": "生成执行计划，用户确认后才允许烧录、抓日志、MLC 和报告。"
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+﻿<mxfile host="app.diagrams.net" modified="2026-06-18T09:51:52.301+08:00" agent="Copilot CLI" version="24.7.17" type="device">
+  <diagram id="bhs-uplr2-flow" name="BHS uPLR2 Power-Flash-OS Flow">
+    <mxGraphModel dx="1600" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="2200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="BHS uPLR2 Robust Flow: Power Off → Flash → Boot → COM3 OS Interaction" style="text;html=1;strokeColor=none;fillColor=none;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="20" width="1240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="start" value="Start\nUser provides server, bin path, chip, serial capture time" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="90" width="360" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="precheck" value="Precheck\n• SSH reachable\n• bin exists + SHA256\n• DediProg USB present\n• smucmd path exists\n• PowerSplitterCL path exists\n• COM3/COM4 present" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="480" y="200" width="440" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="guiDecision" value="EM100.exe / Emulator.exe GUI running?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="535" y="370" width="330" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="closeGui" value="Close GUI conflict\nThen rerun smucmd device check" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="970" y="390" width="300" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="deviceVisible" value="smucmd sees EM100 device?\nExpected: Device 1 (EM143479)" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="535" y="530" width="330" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="abortDevice" value="Abort before hardware action\nReport USB/process/smucmd state" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="110" y="555" width="300" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="stopEmu" value="smucmd --stop\nMove EM100 from Emulation mode to STOP mode" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="480" y="700" width="440" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="powerOff" value="PowerSplitter poweroff\nTurn all power outputs off" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="480" y="820" width="440" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="flash" value="Flash EM100\nsmucmd --stop --set MX66U1G45G -d &lt;bin&gt; -v --start" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="480" y="940" width="440" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="flashOk" value="FLASH_OK?\nRequired:\nDownload Complete\nVerify Pass\nEmulation mode\nAuthentication Pass" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="520" y="1070" width="360" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="diagnoseFlash" value="Diagnose flash failure immediately\nDo NOT start 10-min serial capture\nCheck: GUI conflict, USB device, smucmd output" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="970" y="1110" width="330" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="recoverable" value="Recoverable?\nExample: GUI conflict caused\nNo device is connected!" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="990" y="1260" width="290" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="retryFlash" value="Recover + retry flash\nMax 1-2 retries" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="980" y="1460" width="310" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="abortFlash" value="Terminate flow\nReport failure reason + logs\nNo power-on / no serial wait" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="990" y="1580" width="300" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="openSerial" value="Open serial ports before power-on\nCOM3 = GNR CPU\nCOM4 = BMC\n115200 8N1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="480" y="1280" width="440" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="com3Denied" value="COM3/COM4 access denied?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="535" y="1420" width="330" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="serialDiag" value="Diagnose serial conflict\nClose terminal tools or retry after handle release\nDo not power on until COM ports open" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="110" y="1425" width="310" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="powerOn" value="PowerSplitter poweron\nStart board boot" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="1580" width="440" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="capture" value="Capture full raw logs first\nCOM3_GNR_CPU_full_10m.log\nCOM4_BMC_full_10m.log\nDuration: about 10 min" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="480" y="1700" width="440" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="loginPrompt" value="COM3 reaches OS login?\nExpected: gnr-bkc login:" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="535" y="1850" width="330" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="serialFail" value="Report boot issue\nKeep full COM3/COM4 logs for analysis" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="110" y="1870" width="310" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="login" value="Login to OS via COM3\nUse documented root credential\nDo not print secret unnecessarily" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="480" y="2010" width="440" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="commands" value="Run OS validation commands\nlscpu\nlsmem\nip addr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="2140" width="440" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="analyze" value="Analyze saved logs and command outputs\nReport: FLASH_OK, FLOW_OK, COM3/COM4 bytes, CPU, memory, IP" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="480" y="2270" width="440" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="end" value="End\nFLOW_OK=True when flash + boot + OS interaction all pass" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="2400" width="360" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note" value="Known good evidence:\nLog root: C:\\Users\\debug\\Desktop\\flow_logs\\YYYYMMDD_HHMMSS\nGood run: 20260617_150451 / 20260617_154554\nCOM3 eventually reaches CentOS / gnr-bkc login; COM4 reaches OpenBMC login." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="965" y="1750" width="330" height="170" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" edge="1" parent="1" source="start" target="precheck" style="endArrow=block;html=1;rounded=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="precheck" target="guiDecision" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" value="Yes" edge="1" parent="1" source="guiDecision" target="closeGui" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" value="Recheck" edge="1" parent="1" source="closeGui" target="deviceVisible" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" value="No" edge="1" parent="1" source="guiDecision" target="deviceVisible" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6" value="No" edge="1" parent="1" source="deviceVisible" target="abortDevice" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7" value="Yes" edge="1" parent="1" source="deviceVisible" target="stopEmu" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="stopEmu" target="powerOff" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="powerOff" target="flash" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="flash" target="flashOk" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e11" value="No" edge="1" parent="1" source="flashOk" target="diagnoseFlash" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e12" edge="1" parent="1" source="diagnoseFlash" target="recoverable" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e13" value="Yes" edge="1" parent="1" source="recoverable" target="retryFlash" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e14" value="Retry" edge="1" parent="1" source="retryFlash" target="flash" style="endArrow=block;html=1;rounded=0;exitX=0;exitY=0.5;entryX=1;entryY=0.5;"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="940" y="1500"/><mxPoint x="940" y="985"/></Array></mxGeometry></mxCell>
+        <mxCell id="e15" value="No" edge="1" parent="1" source="recoverable" target="abortFlash" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e16" value="Yes" edge="1" parent="1" source="flashOk" target="openSerial" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e17" edge="1" parent="1" source="openSerial" target="com3Denied" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e18" value="Yes" edge="1" parent="1" source="com3Denied" target="serialDiag" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e19" value="Retry open" edge="1" parent="1" source="serialDiag" target="openSerial" style="endArrow=block;html=1;rounded=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="450" y="1475"/><mxPoint x="450" y="1330"/></Array></mxGeometry></mxCell>
+        <mxCell id="e20" value="No" edge="1" parent="1" source="com3Denied" target="powerOn" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e21" edge="1" parent="1" source="powerOn" target="capture" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e22" edge="1" parent="1" source="capture" target="loginPrompt" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e23" value="No" edge="1" parent="1" source="loginPrompt" target="serialFail" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e24" value="Yes" edge="1" parent="1" source="loginPrompt" target="login" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e25" edge="1" parent="1" source="login" target="commands" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e26" edge="1" parent="1" source="commands" target="analyze" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e27" edge="1" parent="1" source="analyze" target="end" style="endArrow=block;html=1;rounded=0;"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

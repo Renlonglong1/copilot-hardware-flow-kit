@@ -1,0 +1,106 @@
+{
+  "platform": "Oak Stream Platform",
+  "referencePlatform": "Johnson City",
+  "sourceDocument": {
+    "file": "820238_OKS_MoW_WW28_2026.pdf",
+    "documentNumber": "820238",
+    "revision": "WW28-2026",
+    "date": "July 2026"
+  },
+  "mappingType": "customer_bkc_ww_to_internal_crb_bios",
+  "defaultYear": 2026,
+  "mappings": [
+    {
+      "customerBkc": "WW28",
+      "customerBkcYear": 2026,
+      "internalCrbBios": "36.D54",
+      "sourcePage": 19,
+      "sourceTable": "Table 2. Table Johnson City WW28'26 BKC"
+    },
+    {
+      "customerBkc": "WW24",
+      "customerBkcYear": 2026,
+      "internalCrbBios": "35.D61",
+      "sourcePage": 34,
+      "sourceTable": "Table 9. Johnson City WW24'26 BKC"
+    },
+    {
+      "customerBkc": "WW22",
+      "customerBkcYear": 2026,
+      "internalCrbBios": "34.D68",
+      "sourcePage": 37,
+      "sourceTable": "Table 11. Johnson City BKC"
+    },
+    {
+      "customerBkc": "WW20",
+      "customerBkcYear": 2026,
+      "internalCrbBios": "34.D68",
+      "sourcePage": 49,
+      "sourceTable": "Table 14. Table Johnson City BKC"
+    },
+    {
+      "customerBkc": "WW18",
+      "customerBkcYear": 2026,
+      "internalCrbBios": "34.D25",
+      "sourcePage": 60,
+      "sourceTable": "Table 18. Johnson City BKC"
+    },
+    {
+      "customerBkc": "WW16",
+      "customerBkcYear": 2026,
+      "internalCrbBios": "33.D87",
+      "sourcePage": 68,
+      "sourceTable": "Table 23. Johnson City BKC"
+    },
+    {
+      "customerBkc": "WW14",
+      "customerBkcYear": 2026,
+      "internalCrbBios": "33.D41",
+      "sourcePage": 78,
+      "sourceTable": "Table 27. Johnson City BKC"
+    },
+    {
+      "customerBkc": "WW12 Silicon",
+      "customerBkcYear": 2026,
+      "internalCrbBios": "32.D91",
+      "sourcePage": 91,
+      "sourceTable": "Table 31. Johnson City BKC"
+    },
+    {
+      "customerBkc": "WW10",
+      "customerBkcYear": 2026,
+      "internalCrbBios": "32.D57",
+      "sourcePage": 100,
+      "sourceTable": "Table 36. Johnson City BKC"
+    },
+    {
+      "customerBkc": "WW06 Silicon",
+      "customerBkcYear": 2026,
+      "internalCrbBios": "31.D94",
+      "sourcePage": 129,
+      "sourceTable": "Table 40. Johnson City BKC"
+    }
+  ],
+  "aliases": {
+    "WW28_26": "36.D54",
+    "WW28-2026": "36.D54",
+    "WW24_26": "35.D61",
+    "WW24-2026": "35.D61",
+    "WW22_26": "34.D68",
+    "WW22-2026": "34.D68",
+    "WW20_26": "34.D68",
+    "WW20-2026": "34.D68",
+    "WW18_26": "34.D25",
+    "WW18-2026": "34.D25",
+    "WW16_26": "33.D87",
+    "WW16-2026": "33.D87",
+    "WW14_26": "33.D41",
+    "WW14-2026": "33.D41",
+    "WW12_26 Silicon": "32.D91",
+    "WW12-2026 Silicon": "32.D91",
+    "WW10_26": "32.D57",
+    "WW10-2026": "32.D57",
+    "WW06_26 Silicon": "31.D94",
+    "WW06-2026 Silicon": "31.D94"
+  }
+}

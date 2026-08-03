@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-24",
+  "purpose": "Platform-aware control-server selection for IPS/HSD diagnostics and reproduction",
+  "machines": [
+    {
+      "id": "dbgsh05",
+      "ssh": {
+        "user": "debug",
+        "host": "10.239.84.53"
+      },
+      "platformFamily": "GNR",
+      "platformAliases": [
+        "GNR",
+        "GNR-SP",
+        "GNRSP",
+        "BHS",
+        "Birch Stream"
+      ],
+      "capabilities": {
+        "flashControl": true,
+        "powerControl": true,
+        "serialPorts": [
+          "COM3",
+          "COM4"
+        ],
+        "mlc": {
+          "status": "validated-on-attached-host-os",
+          "path": "/root/mlc_v3.11b"
+        }
+      },
+      "paths": {
+        "bkcRoot": "C:\\Users\\debug\\Desktop\\BKC",
+        "cscriptsRoots": [
+          "C:\\Users\\debug\\Desktop\\CScripts\\686308 BHS CScripts 2431.6000",
+          "C:\\Users\\debug\\Desktop\\CScripts\\686308_BHS_CScripts_GNR2515.6001"
+        ],
+        "emulator": "C:\\Program Files (x86)\\DediProg\\Emulator\\smucmd.exe",
+        "powerSplitter": "C:\\Users\\debug\\Desktop\\PowerSplitterWithCycleScript 1\\PowerSplitterWithCycleScript\\PowerSplitterCL.exe",
+        "flowLogs": "C:\\Users\\debug\\Desktop\\flow_logs"
+      }
+    },
+    {
+      "id": "dbgsh12",
+      "ssh": {
+        "user": "debug",
+        "host": "10.239.84.44"
+      },
+      "platformFamily": "DMR",
+      "platformAliases": [
+        "DMR",
+        "Oak Stream",
+        "OKS",
+        "Johnson City"
+      ],
+      "capabilities": {
+        "flashControl": true,
+        "powerControl": true,
+        "serialPorts": [
+          "COM8",
+          "COM9",
+          "COM10",
+          "COM11"
+        ],
+        "mlc": {
+          "status": "not-inventoried-on-attached-host-os"
+        }
+      },
+      "paths": {
+        "bkcRoot": "C:\\Users\\debug\\Desktop\\BKC",
+        "cscriptsRoot": "C:\\Users\\debug\\Desktop\\CScripts\\821387_Oak_Stream_CScripts_Rev_2615_2000\\cscripts",
+        "emulator": "C:\\Program Files (x86)\\DediProg\\Emulator\\smucmd.exe",
+        "powerSplitter": "C:\\Users\\debug\\Desktop\\PowerSplitterWithCycleScript 1\\PowerSplitterWithCycleScript\\PowerSplitterCL.exe"
+      }
+    },
+    {
+      "id": "dbgsh16",
+      "ssh": {
+        "user": "debug",
+        "host": "10.238.12.230"
+      },
+      "platformFamily": "DMR",
+      "platformAliases": [
+        "DMR",
+        "Oak Stream",
+        "OKS",
+        "Johnson City"
+      ],
+      "capabilities": {
+        "flashControl": false,
+        "powerControl": false,
+        "em100Cli": {
+          "status": "installed-and-cli-verified; hardware-unverified",
+          "path": "C:\\Program Files (x86)\\DediProg\\Emulator\\smucmd.exe"
+        },
+        "powerSplitterCli": {
+          "status": "copied-and-cli-verified; hardware-unverified",
+          "path": "C:\\Users\\debug\\Desktop\\PowerSplitterWithCycleScript 1\\PowerSplitterWithCycleScript\\PowerSplitterCL.exe"
+        },
+        "serialPorts": [
+          "COM27",
+          "COM28",
+          "COM29",
+          "COM30"
+        ],
+        "mlc": {
+          "status": "not-inventoried-on-attached-host-os"
+        }
+      },
+      "paths": {
+        "bkcRoot": "C:\\Users\\debug\\Desktop\\BKC",
+        "cscriptsRoot": "C:\\Users\\debug\\Desktop\\CScripts\\821387_Oak_Stream_CScripts_Rev_2615_2000\\cscripts",
+        "emulator": "C:\\Program Files (x86)\\DediProg\\Emulator\\smucmd.exe",
+        "powerSplitter": "C:\\Users\\debug\\Desktop\\PowerSplitterWithCycleScript 1\\PowerSplitterWithCycleScript\\PowerSplitterCL.exe"
+      }
+    }
+  ],
+  "selectionRules": [
+    "Select dbgsh05 only when the IPS/HSD platform evidence identifies GNR, GNR-SP, GNRSP, BHS, or Birch Stream.",
+    "Select a DMR machine only when the platform evidence identifies DMR, Oak Stream, OKS, or Johnson City.",
+    "For DMR flashing or power-cycle work, prefer dbgsh12 because its EM100 and PowerSplitter paths are present.",
+    "Use dbgsh16 for DMR diagnosis or CScripts work when its BKC version and serial-port mapping fit the request; it is not a flashing target until flash-control hardware is installed and verified.",
+    "After choosing a platform-compatible machine, require a BKC filename/version/socket match before flashing. Do not substitute a GNR image for DMR or a DMR image for GNR.",
+    "Treat an unknown or conflicting platform/model as a blocking condition: collect additional IPS/HSD evidence instead of selecting a machine by BKC version alone.",
+    "MLC availability is a property of the attached host OS, not the Windows control server. Confirm it through the approved serial or host-OS path before scheduling MLC."
+  ]
+}

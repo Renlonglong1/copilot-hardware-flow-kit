@@ -1,0 +1,32 @@
+# Generated execution artifacts and reports
+out/
+inbox/ui_tasks/
+
+# Python bytecode and test caches
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local editor and environment files
+.env
+.venv/
+venv/
+.vscode/
+
+# SSH private keys and per-machine trust state
+.ssh/
+id_rsa
+id_ed25519
+id_ecdsa
+*.pem
+*.key
+known_hosts
+known_hosts.*
+
+# Operating-system files
+Thumbs.db
+Desktop.ini
+
+# Temporary Office backups
+docs/.$*.bkp

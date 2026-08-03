@@ -1,0 +1,28 @@
+{
+  "purpose": "Minimal task-to-skill router to reduce context and token usage.",
+  "defaultFirstRead": "docs\\AI_QUICK_INDEX.md",
+  "routes": [
+    {
+      "match": ["ui", "stage1", "plan", "执行计划"],
+      "skill": ".github\\skills\\ips-ui-plan-stage\\SKILL.md"
+    },
+    {
+      "match": ["consult", "问题咨询", "extract_ips", "提取 IPS"],
+      "skill": ".github\\skills\\ips-consult-flow\\SKILL.md"
+    },
+    {
+      "match": ["debug_repro", "复现", "烧录", "MLC", "boot capture"],
+      "skill": ".github\\skills\\ips-hsd-repro-flow\\SKILL.md"
+    },
+    {
+      "match": ["BHS", "EM100", "PowerSplitter", "COM3", "COM4"],
+      "skill": ".github\\skills\\bhs-hardware-flow\\SKILL.md"
+    },
+    {
+      "match": ["PowerShell", "Python", "command", "命令"],
+      "skill": ".github\\skills\\common-ps-py-commands\\SKILL.md"
+    }
+  ],
+  "commonCommands": "docs\\common_ps_py_commands.md",
+  "uiConfig": "config\\ips-copilot-ui.template.json"
+}

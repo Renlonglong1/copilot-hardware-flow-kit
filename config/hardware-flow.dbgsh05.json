@@ -1,0 +1,78 @@
+﻿{
+  "ssh": {
+    "user": "debug",
+    "host": "10.239.84.53",
+    "connectTimeoutSeconds": 10
+  },
+  "remote": {
+    "emulator": {
+      "dir": "C:\\Program Files (x86)\\DediProg\\Emulator",
+      "exe": "C:\\Program Files (x86)\\DediProg\\Emulator\\smucmd.exe",
+      "shortcut": "C:\\Users\\debug\\Desktop\\smucmd.exe - Shortcut.lnk",
+      "manual": "C:\\Program Files (x86)\\DediProg\\EM100\\help.pdf",
+      "defaultChip": "MX66U1G45G",
+      "expectedDeviceSerial": "EM143479",
+      "guiProcessNamesToAvoid": ["EM100.exe", "Emulator.exe"]
+    },
+    "powerSplitter": {
+      "dir": "C:\\Users\\debug\\Desktop\\PowerSplitterWithCycleScript 1\\PowerSplitterWithCycleScript",
+      "exe": "C:\\Users\\debug\\Desktop\\PowerSplitterWithCycleScript 1\\PowerSplitterWithCycleScript\\PowerSplitterCL.exe",
+      "config": "C:\\Users\\debug\\Desktop\\PowerSplitterWithCycleScript 1\\PowerSplitterWithCycleScript\\psconfig.xml"
+    },
+    "serial": {
+      "baudRate": 115200,
+      "dataBits": 8,
+      "parity": "None",
+      "stopBits": "One",
+      "ports": {
+        "cpu": "COM3",
+        "bmc": "COM4"
+      }
+    }
+  },
+  "flow": {
+    "verifyDownload": true,
+    "powerOffBeforeProgram": true,
+    "powerOnAfterProgram": true,
+    "defaultBinFile": "C:\\Users\\debug\\Desktop\\BKC\\uPLR2\\BHSDCRB1.IPC.3545.P03.2511062122_GB01000405_GA10000680_SC03000393_RB0A000133_SP_IP_Clean_Debug_PRQ_DAM_Enabled_1.bin",
+    "defaultBinSha256": "04D1BC0DDB572504FF1D4E54E29C2733C5E702306D68D1D39EC6E17DD8B77587",
+    "captureSeconds": 600,
+    "logRoot": "C:\\Users\\debug\\Desktop\\flow_logs",
+    "failFastBeforeSerialCapture": true,
+    "maxRecoverableFlashRetries": 2,
+    "knownGoodRun": "C:\\Users\\debug\\Desktop\\flow_logs\\20260623_093722",
+    "requiredFlashSuccessKeywords": [
+      "Download Complete",
+      "Verify Pass",
+      "Emulator is in Emulation mode",
+      "Authentication Pass"
+    ],
+    "flashFailureKeywords": [
+      "No device is connected!",
+      "Verify Fail",
+      "Authentication Fail",
+      "Download failed",
+      "ERROR"
+    ],
+    "cpuSuccessKeywords": [
+      "CentOS Stream 9",
+      "gnr-bkc login",
+      "ScktId",
+      "Training"
+    ],
+    "bmcSuccessKeywords": [
+      "U-Boot",
+      "Linux",
+      "OpenBMC",
+      "login:"
+    ]
+  },
+  "hostOs": {
+    "serialLoginUser": "root",
+    "mlcDir": "/root/mlc_v3.11b",
+    "validatedMlcResultDirs": [
+      "/root/mlc_v3.11b/copilot_mlc_results_20260623_094808",
+      "/root/mlc_v3.11b/copilot_mlc_results_20260623_094928"
+    ]
+  }
+}

@@ -1,0 +1,174 @@
+<mxfile host="Electron" agent="GitHub Copilot CLI">
+  <diagram id="copilot-hsd-hw-chain" name="Copilot HSD Hardware Debug Chain">
+    <mxGraphModel dx="1010" dy="601" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1f4e79;fontColor=#ffffff;strokeColor=#17365d;fontStyle=1;fontSize=18;align=center;verticalAlign=middle;" value="Copilot CLI Assisted HSD Analysis + Internal Hardware Reproduction Flow&#xa;Team PAE FW | Author: Li Renlong | Nickname: longlin" vertex="1">
+          <mxGeometry height="70" width="1080" x="360" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_hsd" parent="1" style="swimlane;html=1;startSize=32;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" value="HSD / Issue Intake" vertex="1">
+          <mxGeometry height="900" width="390" x="60" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_ai" parent="1" style="swimlane;html=1;startSize=32;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" value="Copilot CLI + AI Reasoning" vertex="1">
+          <mxGeometry height="900" width="430" x="500" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_kit" parent="1" style="swimlane;html=1;startSize=32;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" value="Portable Flow Kit" vertex="1">
+          <mxGeometry height="900" width="350" x="980" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_hw" parent="1" style="swimlane;html=1;startSize=32;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="Internal Hardware Reproduction" vertex="1">
+          <mxGeometry height="900" width="360" x="1380" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="hsd_new" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="New HSD Issue / Bug&#xa;Article ID, customer config, logs, symptom" vertex="1">
+          <mxGeometry height="80" width="300" x="100" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="hsd_fetch" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="Fetch HSD Article&#xa;scripts\\Invoke-HsdArticleFetch.ps1&#xa;Kerberos + curl direct fallback" vertex="1">
+          <mxGeometry height="95" width="300" x="100" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="hsd_fields" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="Extract Key Fields&#xa;title / status / description&#xa;comments / ext_cust_blog_hist&#xa;attachments / config hints" vertex="1">
+          <mxGeometry height="105" width="300" x="100" y="485" as="geometry" />
+        </mxCell>
+        <mxCell id="ai_summary" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="AI Summary&#xa;Problem statement&#xa;Customer ask&#xa;Known facts&#xa;Missing info" vertex="1">
+          <mxGeometry height="100" width="300" x="560" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="ai_hypothesis" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Initial Hypothesis&#xa;Likely component / config risk&#xa;Suggested debug direction&#xa;Evidence to collect" vertex="1">
+          <mxGeometry height="100" width="300" x="560" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="decision_repro" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" value="Need internal&#xa;reproduction?" vertex="1">
+          <mxGeometry height="130" width="200" x="610" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="ai_feedback_only" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="No: Feedback to developer / HSD&#xa;summary + recommendation + missing data request" vertex="1">
+          <mxGeometry height="90" width="330" x="550" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="ai_plan" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Yes: Generate Repro Plan&#xa;Map HSD config to test config&#xa;Select BIOS / IFWI / DIMM / CPU / logs" vertex="1">
+          <mxGeometry height="90" width="330" x="550" y="915" as="geometry" />
+        </mxCell>
+        <mxCell id="kit_docs" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Knowledge Docs&#xa;README.md&#xa;USER_QUICK_START.md&#xa;docs\\*.md" vertex="1">
+          <mxGeometry height="90" width="260" x="1025" y="225" as="geometry" />
+        </mxCell>
+        <mxCell id="kit_config" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Server Config&#xa;config\\hardware-flow.&lt;server&gt;.json&#xa;SSH, tools, serial, bin, MLC path" vertex="1">
+          <mxGeometry height="100" width="260" x="1025" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="kit_scripts" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Automation Scripts&#xa;Invoke-BhsUplr2ValidatedFlow.ps1&#xa;Invoke-HsdArticleFetch.ps1&#xa;Invoke-RemoteMlcSerial.ps1" vertex="1">
+          <mxGeometry height="110" width="260" x="1025" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="kit_memory" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Validated Lessons&#xa;EM100 GUI conflict&#xa;smucmd keyword validation&#xa;HSD 403 curl fallback&#xa;COM3 marker echo pitfall" vertex="1">
+          <mxGeometry height="120" width="260" x="1025" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="hw_prepare" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" value="Prepare Internal Machine&#xa;SSH to Windows server&#xa;Check DediProg / PowerSplitter&#xa;Check target bin / device" vertex="1">
+          <mxGeometry height="105" width="280" x="1420" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="hw_flash" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" value="Flash + Power Flow&#xa;Power off&#xa;smucmd --stop --set -d -v --start&#xa;Require flash success keywords" vertex="1">
+          <mxGeometry height="115" width="280" x="1420" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="hw_boot" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" value="Boot Capture&#xa;Open COM3/COM4 first&#xa;Power on&#xa;Capture full raw logs" vertex="1">
+          <mxGeometry height="105" width="280" x="1420" y="565" as="geometry" />
+        </mxCell>
+        <mxCell id="hw_mlc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" value="Host OS Tests&#xa;COM3 root login&#xa;MLC baseline&#xa;Save EXIT:0 logs" vertex="1">
+          <mxGeometry height="105" width="280" x="1420" y="725" as="geometry" />
+        </mxCell>
+        <mxCell id="hw_results" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="Results Back to AI&#xa;COM3/COM4 logs&#xa;MLC logs&#xa;Boot evidence&#xa;Failure signatures" vertex="1">
+          <mxGeometry height="105" width="280" x="1420" y="895" as="geometry" />
+        </mxCell>
+        <mxCell id="final" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1f4e79;fontColor=#ffffff;strokeColor=#17365d;fontStyle=1;" value="Developer Output&#xa;Issue summary + repro result + suspected root cause + recommended fix / next debug action" vertex="1">
+          <mxGeometry height="70" width="600" x="600" y="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="hsd_new" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" target="hsd_fetch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="hsd_fetch" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" target="hsd_fields">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="hsd_fields" style="endArrow=block;html=1;rounded=0;strokeWidth=2;exitX=0.465;exitY=1.018;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ai_summary" value="extracted article JSON/text">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="240" y="640" />
+              <mxPoint x="420" y="640" />
+              <mxPoint x="420" y="190" />
+              <mxPoint x="710" y="190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="ai_summary" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" target="ai_hypothesis">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="ai_hypothesis" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" target="decision_repro">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="decision_repro" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" target="ai_feedback_only" value="No">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="decision_repro" style="endArrow=block;html=1;rounded=0;strokeWidth=2;dashed=1;dashPattern=8 4;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="ai_plan" value="Yes / Future linkage">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="510" y="625" />
+              <mxPoint x="510" y="960" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="ai_plan" style="endArrow=block;html=1;rounded=0;strokeWidth=2;dashed=1;" target="kit_config" value="uses">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="ai_plan" style="endArrow=block;html=1;rounded=0;strokeWidth=2;dashed=1;" target="kit_scripts" value="uses">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="ai_plan" style="endArrow=block;html=1;rounded=0;strokeWidth=2;dashed=1;" target="kit_docs" value="guided by">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="1" source="kit_config" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" target="hw_prepare">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" edge="1" parent="1" source="kit_scripts" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" target="hw_flash">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" edge="1" parent="1" source="hw_prepare" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" target="hw_flash">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" edge="1" parent="1" source="hw_flash" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" target="hw_boot" value="only if FLASH_OK">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" edge="1" parent="1" source="hw_boot" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" target="hw_mlc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" edge="1" parent="1" source="hw_mlc" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" target="hw_results">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" edge="1" parent="1" source="hw_results" style="endArrow=block;html=1;rounded=0;strokeWidth=2;dashed=1;dashPattern=8 4;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ai_hypothesis" value="logs + evidence">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1560" y="1060" />
+              <mxPoint x="470" y="1060" />
+              <mxPoint x="470" y="780" />
+              <mxPoint x="470" y="440" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e18" edge="1" parent="1" source="ai_feedback_only" style="endArrow=block;html=1;rounded=0;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.519;entryY=-0.024;entryDx=0;entryDy=0;entryPerimeter=0;" target="final">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="910" y="805" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e19" edge="1" parent="1" source="ai_plan" style="endArrow=block;html=1;rounded=0;strokeWidth=2;dashed=1;entryX=0.179;entryY=0.036;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.479;exitY=1.009;exitDx=0;exitDy=0;exitPerimeter=0;" target="final">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e20" edge="1" parent="1" source="final" style="endArrow=block;html=1;rounded=0;strokeWidth=2;dashed=1;" target="kit_memory" value="update after new learning">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1250" y="1115" />
+              <mxPoint x="1250" y="1000" />
+              <mxPoint x="1150" y="1000" />
+              <mxPoint x="1155" y="880" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note_current" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" value="Current status:&#xa;1. HSD fetch / summary flow validated&#xa;2. Hardware flash / boot / MLC flow validated&#xa;3. Future work: automatic linkage from HSD config to internal repro plan" vertex="1">
+          <mxGeometry height="100" width="430" x="70" y="1060" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

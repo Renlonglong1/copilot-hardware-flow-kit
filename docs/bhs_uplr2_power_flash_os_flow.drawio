@@ -1,0 +1,188 @@
+<mxfile host="Electron" agent="Copilot CLI">
+  <diagram id="bhs-uplr2-flow-v2" name="BHS uPLR2 Robust Flow">
+    <mxGraphModel dx="1414" dy="841" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="2300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;whiteSpace=wrap;" value="BHS uPLR2 Robust Flow: Power Off - Flash - Boot - OS Interaction" vertex="1">
+          <mxGeometry height="40" width="1040" x="80" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="start" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="Start&#xa;Input: server, BIN path, chip, capture time" vertex="1">
+          <mxGeometry height="70" width="360" x="420" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="precheck" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Precheck&#xa;SSH reachable&#xa;BIN exists and SHA256 saved&#xa;DediProg USB present&#xa;smucmd and PowerSplitterCL exist&#xa;COM3 and COM4 present" vertex="1">
+          <mxGeometry height="130" width="440" x="380" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="gui" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="EM100.exe or Emulator.exe running?" vertex="1">
+          <mxGeometry height="110" width="330" x="435" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="closeGui" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Close GUI conflict&#xa;Then rerun smucmd check" vertex="1">
+          <mxGeometry height="80" width="280" x="850" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="visible" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="smucmd sees EM100?&#xa;Expected: Device 1 (EM143479)" vertex="1">
+          <mxGeometry height="120" width="330" x="435" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="abortDevice" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" value="Abort before hardware action&#xa;Report USB, process, smucmd state" vertex="1">
+          <mxGeometry height="80" width="280" x="80" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="stop" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="smucmd --stop&#xa;Move EM100 to STOP mode" vertex="1">
+          <mxGeometry height="80" width="440" x="380" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="off" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="PowerSplitter poweroff&#xa;Turn all power outputs off" vertex="1">
+          <mxGeometry height="80" width="440" x="380" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="flash" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Flash EM100&#xa;smucmd --stop --set MX66U1G45G -d &lt;bin&gt; -v --start" vertex="1">
+          <mxGeometry height="90" width="440" x="380" y="930" as="geometry" />
+        </mxCell>
+        <mxCell id="flashOk" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="FLASH_OK?&#xa;Required:&#xa;Download Complete&#xa;Verify Pass&#xa;Emulation mode&#xa;Authentication Pass" vertex="1">
+          <mxGeometry height="150" width="360" x="420" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="diag" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Diagnose flash failure immediately&#xa;Do not start serial capture&#xa;Check GUI conflict, USB, smucmd output" vertex="1">
+          <mxGeometry height="100" width="300" x="850" y="1085" as="geometry" />
+        </mxCell>
+        <mxCell id="rec" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Recoverable?&#xa;Example: GUI conflict caused No device is connected" vertex="1">
+          <mxGeometry height="120" width="270" x="865" y="1240" as="geometry" />
+        </mxCell>
+        <mxCell id="retry" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Recover and retry flash&#xa;Max 1-2 retries" vertex="1">
+          <mxGeometry height="80" width="300" x="850" y="1410" as="geometry" />
+        </mxCell>
+        <mxCell id="abortFlash" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" value="Terminate flow&#xa;Report failure reason and logs&#xa;No power-on, no serial wait" vertex="1">
+          <mxGeometry height="90" width="300" x="850" y="1530" as="geometry" />
+        </mxCell>
+        <mxCell id="openSerial" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Open serial ports before power-on&#xa;COM3 = GNR CPU&#xa;COM4 = BMC&#xa;115200 8N1" vertex="1">
+          <mxGeometry height="100" width="440" x="380" y="1270" as="geometry" />
+        </mxCell>
+        <mxCell id="denied" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="COM3 or COM4 access denied?" vertex="1">
+          <mxGeometry height="110" width="330" x="435" y="1410" as="geometry" />
+        </mxCell>
+        <mxCell id="serialDiag" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Diagnose serial conflict&#xa;Close terminal tools or retry after handle release&#xa;Do not power on until COM ports open" vertex="1">
+          <mxGeometry height="100" width="300" x="80" y="1415" as="geometry" />
+        </mxCell>
+        <mxCell id="on" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="PowerSplitter poweron&#xa;Start board boot" vertex="1">
+          <mxGeometry height="80" width="440" x="380" y="1570" as="geometry" />
+        </mxCell>
+        <mxCell id="capture" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Save full raw logs first&#xa;COM3_GNR_CPU_full_10m.log&#xa;COM4_BMC_full_10m.log&#xa;Duration: about 10 minutes" vertex="1">
+          <mxGeometry height="110" width="440" x="380" y="1690" as="geometry" />
+        </mxCell>
+        <mxCell id="prompt" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="COM3 reaches OS login?&#xa;Expected: gnr-bkc login:" vertex="1">
+          <mxGeometry height="120" width="330" x="435" y="1840" as="geometry" />
+        </mxCell>
+        <mxCell id="bootFail" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Report boot issue&#xa;Keep full COM3 and COM4 logs" vertex="1">
+          <mxGeometry height="80" width="300" x="80" y="1860" as="geometry" />
+        </mxCell>
+        <mxCell id="login" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Login to OS via COM3&#xa;Use documented root credential" vertex="1">
+          <mxGeometry height="80" width="440" x="380" y="2000" as="geometry" />
+        </mxCell>
+        <mxCell id="cmds" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" value="Run OS validation commands&#xa;lscpu&#xa;lsmem&#xa;ip addr" vertex="1">
+          <mxGeometry height="90" width="440" x="380" y="2120" as="geometry" />
+        </mxCell>
+        <mxCell id="analysis" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Analyze saved logs and command outputs&#xa;Report FLASH_OK, FLOW_OK, COM3/COM4 bytes, CPU, memory, IP" vertex="1">
+          <mxGeometry height="90" width="440" x="380" y="2250" as="geometry" />
+        </mxCell>
+        <mxCell id="end" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="End&#xa;FLOW_OK=True when flash, boot, and OS interaction pass" vertex="1">
+          <mxGeometry height="70" width="360" x="420" y="2380" as="geometry" />
+        </mxCell>
+        <mxCell id="note" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Known good evidence&#xa;Good runs: 20260617_150451 and 20260617_154554&#xa;COM3 reaches CentOS / gnr-bkc login&#xa;COM4 reaches OpenBMC login" vertex="1">
+          <mxGeometry height="150" width="300" x="850" y="1700" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="start" style="endArrow=block;html=1;" target="precheck">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="precheck" style="endArrow=block;html=1;" target="gui">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="gui" style="endArrow=block;html=1;" target="closeGui" value="Yes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="closeGui" style="endArrow=block;html=1;" target="visible" value="Recheck">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="gui" style="endArrow=block;html=1;" target="visible" value="No">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="visible" style="endArrow=block;html=1;" target="abortDevice" value="No">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="visible" style="endArrow=block;html=1;" target="stop" value="Yes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="stop" style="endArrow=block;html=1;" target="off">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="off" style="endArrow=block;html=1;" target="flash">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="flash" style="endArrow=block;html=1;" target="flashOk">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="1" source="flashOk" style="endArrow=block;html=1;" target="diag" value="No">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" edge="1" parent="1" source="diag" style="endArrow=block;html=1;" target="rec">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" edge="1" parent="1" source="rec" style="endArrow=block;html=1;" target="retry" value="Yes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" edge="1" parent="1" source="retry" style="endArrow=block;html=1;" target="flash" value="Retry">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="830" y="1450" />
+              <mxPoint x="830" y="975" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e15" edge="1" parent="1" source="rec" style="endArrow=block;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="abortFlash" value="No">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1180" y="1300" />
+              <mxPoint x="1180" y="1510" />
+              <mxPoint x="1000" y="1510" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e16" edge="1" parent="1" source="flashOk" style="endArrow=block;html=1;" target="openSerial" value="Yes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" edge="1" parent="1" source="openSerial" style="endArrow=block;html=1;" target="denied">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e18" edge="1" parent="1" source="denied" style="endArrow=block;html=1;" target="serialDiag" value="Yes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e19" edge="1" parent="1" source="serialDiag" style="endArrow=block;html=1;" target="openSerial" value="Retry open">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="1465" />
+              <mxPoint x="360" y="1320" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e20" edge="1" parent="1" source="denied" style="endArrow=block;html=1;" target="on" value="No">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e21" edge="1" parent="1" source="on" style="endArrow=block;html=1;" target="capture">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e22" edge="1" parent="1" source="capture" style="endArrow=block;html=1;" target="prompt">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e23" edge="1" parent="1" source="prompt" style="endArrow=block;html=1;" target="bootFail" value="No">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e24" edge="1" parent="1" source="prompt" style="endArrow=block;html=1;" target="login" value="Yes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e25" edge="1" parent="1" source="login" style="endArrow=block;html=1;" target="cmds">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e26" edge="1" parent="1" source="cmds" style="endArrow=block;html=1;" target="analysis">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e27" edge="1" parent="1" source="analysis" style="endArrow=block;html=1;" target="end">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
