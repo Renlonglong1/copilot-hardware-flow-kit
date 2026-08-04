@@ -1,0 +1,8 @@
+# Example OpenEmbedded environment bootstrap for an OpenBMC workspace.
+# Adjust TEMPLATECONF and the build directory to match the target project.
+
+export TEMPLATECONF=openbmc-meta-intel/meta-oks/conf/templates/default/
+source oe-init-build-env
+
+# or
+# source setup ast2700-a1-dcscm

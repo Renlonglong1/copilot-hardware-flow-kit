@@ -1,0 +1,9 @@
+# 用户本地真实路径配置，不上传
+config.json
+
+# 运行中间产物
+_video_work__*/
+*.pptx
+key_frames/
+transcript.json
+summary.json

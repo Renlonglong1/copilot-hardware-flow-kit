@@ -1,0 +1,7 @@
+{
+  "platform": "DMR",
+  "pythonsv_directory": "C:\\pythonsv\\diamondrapids",
+  "python_interpreter": "C:\\pythonsv\\.venv\\diamondrapids_python3.10\\Scripts\\python.exe",
+  "start_script": "startdmr.py",
+  "start_args": "-a ipc -p DMR"
+}

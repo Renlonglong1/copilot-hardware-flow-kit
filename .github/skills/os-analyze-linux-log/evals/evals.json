@@ -1,0 +1,30 @@
+{
+  "skill_name": "os-analyze-linux-log",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Analyze this kernel log line: WARNING: CPU: 3 PID: 0 at drivers/acpi/acpica/nsprepkg.c:94 acpi_ns_check_package+0x4a/0xc0",
+      "expected_output": "The skill should activate (inline string branch), and BEFORE doing anything else, ask the user for the absolute path to the Linux source tree via vscode_askQuestions (Step 0). It must not call view_image, must not guess a source path, and must not start resolving symbols until the user supplies and the skill validates a source tree.",
+      "files": [],
+      "expectations": [
+        "Skill os-analyze-linux-log is triggered (not bios-analyze-log)",
+        "First action is vscode_askQuestions with header 'source-tree' asking for the absolute source path",
+        "No symbol resolution, no file opening, no fabricated file:line is produced before the user answers",
+        "The verbatim log line is preserved (will be placed in the Transcribed Log section as 'inline')"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Help me understand this dmesg line for learning: [    0.512345] Linux agpgart interface v0.103",
+      "expected_output": "The skill should activate in Learning mode (no error markers, user says 'understand ... for learning'). It must first ask via vscode_askQuestions for the absolute path to the Linux source tree (Step 0) before searching for the format string emission site. It must not skip Step 0 and must not guess a path.",
+      "files": [],
+      "expectations": [
+        "Skill os-analyze-linux-log is triggered",
+        "Mode is classified as 'Learn the code path' (learning mode), not debug",
+        "First action is vscode_askQuestions for the source tree path",
+        "Skill plans to grep for the literal format string \"Linux agpgart interface v%d.%d\" only after the source tree is confirmed",
+        "No Root-Cause Hypothesis section will be produced (learning mode replaces it with 'What This Code Does')"
+      ]
+    }
+  ]
+}

@@ -4,6 +4,30 @@ This document describes the portable local UI for starting IPS/HSD analysis and 
 
 The UI is intentionally implemented with the Python standard library only. No Streamlit, Flask, Node.js, or browser framework is required.
 
+## Enterprise Workbench Layout
+
+The UI uses an enterprise workbench layout without external frontend dependencies:
+
+- Persistent left navigation for the task workspace, new task, Query task queue, execution console, and reports.
+- A top service-status bar plus a dashboard showing the selected mode and loaded Query task counts.
+- Card-based forms, consistent status colors, focused output consoles, and responsive behavior for narrow browser windows.
+- A light/dark theme toggle. The selected theme and UI mode are saved only in the current browser's local storage.
+
+The visual redesign does not change the existing Stage 1/Stage 2 safety boundary, task APIs, task persistence, or hardware execution behavior.
+
+## Workbench Pages
+
+| URL | Purpose |
+| --- | --- |
+| `/` | Manual task workbench for simple and detailed IPS/HSD workflows. |
+| `/tasks` | Shared Query task center: create tasks, filter all users' tasks, inspect task details, cancel active tasks, and view automatic hardware resource locks. |
+| `/reports` | Historical Query rounds, report summaries, and IPS result details. |
+| `/guide` | User guide covering modes, setup, safe operation, Query coordination, and documentation locations. |
+
+When a user creates an automatic Query task, the server checks for the same numeric Query ID in `queued`, `running`, `waiting_resource`, or `cancelling` state. A duplicate is rejected with the existing task information, so users can open that task instead of starting a second worker. Terminal tasks do not block a new Query task.
+
+The manual workbench includes reusable templates for IPS extraction, consultation, boot validation, and cross-NUMA MLC validation. Form input is automatically saved as a draft in the current browser's local storage and can be explicitly saved or cleared; drafts are not sent to the UI server until a task is started.
+
 ## Files
 
 ```text
@@ -72,9 +96,9 @@ Detailed mode keeps the original review flow:
 2. Edit/confirm the plan.
 3. Start Stage 2.
 
-### 全自动模式：多用户 Query 任务
+### Query 任务中心：多用户自动任务
 
-选择 `全自动模式` 后，填写 **创建人姓名**、HSD saved Query ID、轮询间隔和可选的管理汇总收件人，再点击“创建并启动 Query 任务”。每次提交创建一个独立的持久化任务；不同浏览器会话看到相同的任务列表和实时输出，多个 Query 任务可以并行执行。没有全局 Query 并发上限。
+在工作台选择 **全自动模式** 可快速创建 Query 任务并查看共享任务概览；在左侧导航打开 `/tasks` 可使用筛选、资源状态和完整任务详情。填写 **创建人姓名**、HSD saved Query ID、轮询间隔和可选的管理汇总收件人，再点击“创建并启动任务”。每次提交创建一个独立的持久化任务；不同浏览器会话看到相同的任务列表和实时输出，多个 Query 任务可以并行执行。没有全局 Query 并发上限。相同活动 Query 会被服务端拒绝重复创建，并引导用户查看已有任务。
 
 任务状态包括 `queued`、`running`、`waiting_resource`、`cancelling`、`completed`、`failed`、`cancelled` 和 `interrupted`。任务元数据、创建人、轮次、当前 IPS、输出、报告入口和取消原因保存在标准库 SQLite 数据库，默认位置为：
 
@@ -86,7 +110,7 @@ out\ui_task_manager.sqlite3
 
 点击任务卡片上的“取消”可提供持久化取消原因。排队任务立即变为 `cancelled`。运行中任务先变为 `cancelling`，停止轮询和新 IPS，并对当前 Copilot 子进程发送终止信号；超过 `automation.cancellationGraceSeconds` 后仍未退出则强制结束。取消并不能撤销已经完成的硬件动作，任务输出会记录状态和原因。
 
-每个任务只处理本任务生命周期内首次发现的 Open IPS，随后按指定间隔继续轮询。全自动模式仍要求 `copilot.mode` 和 `copilot.stage2Mode` 都为 `subprocess`。
+每个任务只处理本任务生命周期内首次发现的 Open IPS，随后按指定间隔继续轮询。自动 Query 仍要求 `copilot.mode` 和 `copilot.stage2Mode` 都为 `subprocess`。
 
 ### 硬件资源协调
 

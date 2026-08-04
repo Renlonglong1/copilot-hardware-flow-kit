@@ -1,0 +1,64 @@
+{
+  "skill_name": "bios-analyze-log",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Analyze the attached BIOS log file: GNRSP_9 DIMM fallback to 4 DIMM - 1.txt",
+      "expected_output": "The skill should detect 'GNRSP' in the filename, suggest BHS as the platform, and ASK the user to confirm before running the decoder. It should NOT silently pick EGS or any other platform.",
+      "files": ["c:\\Users\\wenweita\\OneDrive - Intel Corporation\\Documents\\My Documents\\7. Projects\\Log\\Memory\\DIMM POP POR\\GNRSP_9 DIMM fallback to 4 DIMM - 1.txt"],
+      "expectations": [
+        "The skill asks the user to confirm the platform before decoding",
+        "The skill suggests BHS (not EGS) based on 'GNRSP' in the filename",
+        "The skill does not silently run the decoder without platform confirmation",
+        "If the user confirms BHS, the decoder is invoked with --platform bhs"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I have a BIOS serial log from an EMR server that shows FATAL ERROR during memory training. Can you decode it?",
+      "expected_output": "The skill should detect 'EMR' as an EGS platform clue, suggest EGS, and ask the user to confirm before proceeding.",
+      "files": [],
+      "expectations": [
+        "The skill asks the user to confirm the platform before decoding",
+        "The skill suggests EGS based on 'EMR' in the prompt",
+        "The skill does not silently assume EGS and proceed"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Analyze this BIOS log for EWL errors. The log file is at /tmp/debug_serial.log",
+      "expected_output": "No platform clue is available in the prompt or filename. The skill must ask the user which platform (EGS, BHS, or OKS) the log comes from before running the decoder.",
+      "files": [],
+      "expectations": [
+        "The skill asks the user which platform the log is from",
+        "The skill presents EGS, BHS, and OKS as options",
+        "The skill does not guess or default to any platform without asking"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Analyze the attached BIOS log file: GNRSP_9 DIMM fallback to 4 DIMM - 1.txt\n\n(User selects BHS from the platform picker)",
+      "expected_output": "After the user confirms BHS, the entire analysis output should focus exclusively on BHS. No mention of EGS, OKS, SPR, EMR, DMR, CWF, or NVL should appear in the response. The decoder must be invoked with --platform bhs.",
+      "files": ["c:\\Users\\wenweita\\OneDrive - Intel Corporation\\Documents\\My Documents\\7. Projects\\Log\\Memory\\DIMM POP POR\\GNRSP_9 DIMM fallback to 4 DIMM - 1.txt"],
+      "expectations": [
+        "The decoder is invoked with --platform bhs",
+        "The output does not mention EGS or OKS platforms",
+        "The output does not mention SPR, EMR, DMR, CWF, or NVL products",
+        "The output does not compare BHS to any other platform",
+        "All analysis and recommendations are specific to BHS only"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Analyze this BIOS log and decode all findings.\n\n(User selects BHS from the platform picker)\n\nLog snippet:\nERROR: C80000002:V00021002 I0 DE1F3623-038D-42FE-A096-8EAA80C8171D\nEnhanced warning of type 1 logged:\nMajor Warning Code = 0x0A, Minor Warning Code = 0x03,\nMajor Checkpoint: 0xE2\nMinor Checkpoint: 0x00\nSocket 0\nChannel 1\nDimm 0\nRank 0",
+      "expected_output": "When platform is BHS, IPSD should not be considered or mentioned even if ERROR: C8... appears in the text. Output should include only decoded BHS-relevant findings (EWL/RC Fatal as applicable) and no IPSD section or IPSD count line.",
+      "files": [],
+      "expectations": [
+        "The output contains the decoded EWL finding",
+        "The output does not include an IPSD findings section",
+        "The output does not include an IPSD errors count line",
+        "The output does not decode or describe C80000002 when platform is BHS"
+      ]
+    }
+  ]
+}

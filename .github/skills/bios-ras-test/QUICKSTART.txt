@@ -1,0 +1,138 @@
+RAS-TEST QUICKSTART
+===================
+
+User-facing document only.
+This file is for humans who want a short setup and usage guide.
+The ras-test skill does not need to review this file during execution.
+
+1. Prepare the workspace
+
+Before using ras-test, create a VS Code workspace that contains:
+- IVG/
+- Cscripts_User_Guide/
+
+These two inputs are the required starting point.
+Other files such as generated .py testscripts and rak_results/ logs will be created during usage.
+
+Recommended initial layout:
+
+<workspace>/
+|- IVG/
+`- Cscripts_User_Guide/
+
+
+2. Prepare the remote config
+
+Edit this file:
+- ./rak_remote_config.ini
+
+Set at least these fields:
+- host
+- port
+- user
+- rak_path
+- case_dir
+- rak_result_dir
+- generated_testscripts_dir
+- timeout
+- interactive
+- show_cmd
+
+Before each run, provide --case-file with the local .py script you want to execute.
+SSH password is prompted at runtime and should not be stored in the config file.
+
+
+3. Prepare the remote debug machine
+
+The remote machine must already have:
+- RAK installed
+- rak_cui.exe under rak_path
+- OpenSSH Server enabled
+- a valid SSH account
+- required debug/probe environment ready if the case depends on CScripts/ITP
+
+
+4. How to enable SSH on a Windows remote debug machine
+
+Run these commands in an elevated PowerShell window on the remote machine:
+
+Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+Start-Service sshd
+Set-Service -Name sshd -StartupType Automatic
+New-NetFirewallRule -Name sshd -DisplayName "OpenSSH Server (sshd)" -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+
+If OpenSSH Server is already installed, the first command may report that it is already present.
+
+
+5. How to confirm SSH is enabled
+
+On the remote machine, run:
+
+Get-Service sshd
+
+Expected result:
+- Status should be Running
+- StartupType should be Automatic or Manual
+
+Also check that port 22 is listening:
+
+netstat -ano | findstr :22
+
+Or in PowerShell:
+
+Get-NetTCPConnection -LocalPort 22 -State Listen
+
+From the local machine, verify SSH connectivity:
+
+ssh <user>@<host>
+
+If SSH is working, you should either:
+- log in successfully, or
+- get a password prompt
+
+If SSH connection is refused, check:
+- sshd service is running
+- firewall rule allows TCP 22
+- host and port in rak_remote_config.ini are correct
+
+
+6. Typical usage
+
+Case A: user only has a RAS scenario
+- Ask ras-test to generate a testcase from IVG / User Guide material
+- Then run it remotely
+- Then analyze the downloaded logs
+
+Case B: user already has a .py testcase
+- Ask ras-test to run the script remotely
+- Then analyze the downloaded logs
+
+Example prompts:
+- Generate a RAS testcase from IVG and run it remotely
+- Run testscripts on the remote machine and analyze the logs
+- Analyze the RAK logs under ./rak_results/XXX
+
+
+7. What ras-test does
+
+ras-test supports three phases:
+- Phase 1: generate or review a RAK testcase
+- Phase 2: upload and run it on the remote debug machine
+- Phase 3: analyze the downloaded RAK logs
+
+This skill is not limited to one specific feature.
+It can be used for supported Intel RAS features in general, depending on the available references and platform constraints.
+
+
+8. If something fails
+
+Common issues:
+- missing IVG or User Guide reference material
+- wrong SSH credentials
+- wrong rak_path or missing rak_cui.exe
+- remote machine not ready for probe/debug access
+- CScripts/OpenIPC/halt() instability during execution
+
+When troubleshooting, separate these two outcomes:
+- runner success: upload, remote launch, and log download worked
+- testcase success: the RAK testcase itself passed inside the downloaded logs

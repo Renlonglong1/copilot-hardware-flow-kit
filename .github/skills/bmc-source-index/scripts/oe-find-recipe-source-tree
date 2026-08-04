@@ -1,0 +1,242 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Usage:
+  oe-find-recipe-source-tree [--env-script PATH] <recipe>
+  oe-find-recipe-source-tree [--env-script PATH] --details <recipe>
+  oe-find-recipe-source-tree [--env-script PATH] --json <recipe>
+  oe-find-recipe-source-tree [--env-script PATH] --workdir <recipe>
+
+Options:
+  --details           Print recipe file, WORKDIR, S, SRC_URI, and SRCREV.
+  --json              Print machine-readable JSON metadata for the recipe source tree.
+  --workdir           Print WORKDIR instead of S.
+  --env-script PATH   Path to en_env.sh or an equivalent OpenEmbedded env bootstrap.
+  -h, --help          Show this help text.
+
+Examples:
+  oe-find-recipe-source-tree --env-script ./en_env.sh phosphor-logging
+  oe-find-recipe-source-tree --json bmcweb
+EOF
+}
+
+detect_repo_root() {
+    local start_dir="$1"
+    local current_dir="$start_dir"
+
+    while [[ -n "$current_dir" && "$current_dir" != "/" ]]; do
+        if [[ -f "$current_dir/oe-init-build-env" || -f "$current_dir/en_env.sh" || -f "$current_dir/scripts/lib/scriptpath.py" ]]; then
+            printf '%s\n' "$current_dir"
+            return 0
+        fi
+        current_dir="$(dirname -- "$current_dir")"
+    done
+
+    return 1
+}
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+repo_root="$(detect_repo_root "$script_dir" || true)"
+
+details=0
+json_mode=0
+print_var="S"
+env_script=""
+recipe=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --details)
+            details=1
+            shift
+            ;;
+        --json)
+            json_mode=1
+            shift
+            ;;
+        --workdir)
+            print_var="WORKDIR"
+            shift
+            ;;
+        --env-script)
+            if [[ $# -lt 2 ]]; then
+                echo "error: --env-script requires a path" >&2
+                usage >&2
+                exit 1
+            fi
+            env_script="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --*)
+            echo "error: unknown option: $1" >&2
+            usage >&2
+            exit 1
+            ;;
+        *)
+            if [[ -n "$recipe" ]]; then
+                echo "error: only one recipe may be specified" >&2
+                usage >&2
+                exit 1
+            fi
+            recipe="$1"
+            shift
+            ;;
+    esac
+done
+
+if [[ -z "$recipe" ]]; then
+    echo "error: missing recipe name" >&2
+    usage >&2
+    exit 1
+fi
+
+if [[ "$details" -eq 1 && "$json_mode" -eq 1 ]]; then
+    echo "error: --details and --json cannot be used together" >&2
+    usage >&2
+    exit 1
+fi
+
+if [[ "$json_mode" -eq 1 && "$print_var" != "S" ]]; then
+    echo "error: --json and --workdir cannot be used together" >&2
+    usage >&2
+    exit 1
+fi
+
+if [[ -n "$env_script" ]]; then
+    env_script="$(realpath "$env_script")"
+elif [[ -n "$repo_root" && -f "$repo_root/en_env.sh" ]]; then
+    env_script="$repo_root/en_env.sh"
+fi
+
+if [[ -z "$env_script" || ! -f "$env_script" ]]; then
+    echo "error: en_env.sh was not found. Provide --env-script /path/to/en_env.sh or add en_env.sh to the repo root." >&2
+    echo "hint: en_env.sh should enter the OpenEmbedded build environment and make bitbake available." >&2
+    exit 1
+fi
+
+shell_flags="$-"
+set +u
+# shellcheck source=/dev/null
+source "$env_script" >/dev/null
+case "$shell_flags" in
+    *u*) set -u ;;
+esac
+
+if ! command -v bitbake >/dev/null 2>&1; then
+    echo "error: bitbake is not available after sourcing $env_script" >&2
+    exit 1
+fi
+
+metadata=""
+
+load_metadata_fallback() {
+    if [[ -n "$metadata" ]]; then
+        return
+    fi
+
+    metadata="$({
+        bitbake -e "$recipe" | awk '/^(FILE|WORKDIR|S|SRC_URI|SRCREV)=/ { print }'
+    })"
+}
+
+extract_var() {
+    local name="$1"
+    local value
+
+    if command -v bitbake-getvar >/dev/null 2>&1; then
+        if value="$(bitbake-getvar -q -r "$recipe" --value "$name" 2>/dev/null)"; then
+            printf '%s\n' "$value"
+            return
+        fi
+    fi
+
+    load_metadata_fallback
+    value="$(printf '%s\n' "$metadata" | awk -F= -v name="$name" '$1 == name { print substr($0, length(name) + 2); exit }')"
+    value="${value#\"}"
+    value="${value%\"}"
+    printf '%s\n' "$value"
+}
+
+recipe_file="$(extract_var FILE)"
+workdir="$(extract_var WORKDIR)"
+source_tree="$(extract_var S)"
+src_uri="$(extract_var SRC_URI)"
+srcrev="$(extract_var SRCREV)"
+
+if [[ -z "$source_tree" || -z "$workdir" ]]; then
+    echo "error: failed to resolve recipe metadata for ${recipe}" >&2
+    exit 1
+fi
+
+source_exists=false
+status="ready"
+if [[ ! -d "$source_tree" ]]; then
+    status="source-not-unpacked"
+else
+    source_exists=true
+fi
+
+if [[ "$json_mode" -eq 1 ]]; then
+    JSON_RECIPE="$recipe" \
+    JSON_FILE="$recipe_file" \
+    JSON_WORKDIR="$workdir" \
+    JSON_SOURCE="$source_tree" \
+    JSON_SRC_URI="$src_uri" \
+    JSON_SRCREV="$srcrev" \
+    JSON_EXISTS="$source_exists" \
+    JSON_STATUS="$status" \
+    python3 - <<'PY'
+import json
+import os
+import sys
+
+payload = {
+    "recipe": os.environ["JSON_RECIPE"],
+    "file": os.environ["JSON_FILE"] or None,
+    "workdir": os.environ["JSON_WORKDIR"] or None,
+    "source": os.environ["JSON_SOURCE"] or None,
+    "src_uri": os.environ["JSON_SRC_URI"] or None,
+    "srcrev": os.environ["JSON_SRCREV"] or None,
+    "exists": os.environ["JSON_EXISTS"] == "true",
+    "status": os.environ["JSON_STATUS"],
+}
+json.dump(payload, sys.stdout)
+sys.stdout.write("\n")
+PY
+    exit 0
+fi
+
+if [[ "$details" -eq 1 ]]; then
+    printf 'recipe: %s\n' "$recipe"
+    printf 'file: %s\n' "$recipe_file"
+    printf 'workdir: %s\n' "$workdir"
+    printf 'source: %s\n' "$source_tree"
+    printf 'src_uri: %s\n' "$src_uri"
+    printf 'srcrev: %s\n' "$srcrev"
+
+    if [[ "$source_exists" != true ]]; then
+        printf 'status: source tree is not unpacked yet\n'
+    fi
+
+    exit 0
+fi
+
+resolved_path="$source_tree"
+if [[ "$print_var" == "WORKDIR" ]]; then
+    resolved_path="$workdir"
+fi
+
+if [[ ! -d "$resolved_path" ]]; then
+    echo "error: resolved ${print_var} path does not exist yet: ${resolved_path}" >&2
+    echo "hint: run 'bitbake ${recipe} -c unpack' or build the recipe first" >&2
+    exit 2
+fi
+
+printf '%s\n' "$resolved_path"

@@ -1,0 +1,53 @@
+{
+  "skill_name": "os-connect-remote-server",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "ssh into my test box at 192.168.50.20 as root and check the PCIe AER counters plus the last 100 lines of dmesg. If you see any AER correctable errors on the NIC's root port, clear the device and rescan it, then re-check. Keep me posted as you go.",
+      "expected_output": "Agent opens a single persistent (async) interactive SSH session and reuses it, runs lspci/aer/dmesg diagnostics, applies the smallest fix (remove+rescan) and re-runs to verify, rather than firing repeated one-off ssh user@ip \"cmd\" calls.",
+      "files": [],
+      "expectations": [
+        "Opens a persistent SSH session and reuses it for all steps instead of repeated independent re-auth",
+        "Reads AER counters from sysfs (aer_dev_* on the NIC's Root Port)",
+        "Includes a last-100-lines dmesg check",
+        "Applies remove+rescan only conditionally on correctable AER, then re-verifies"
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "Connect to my lab server 172.16.8.5 with username lab and remember the password so I don't have to type it again next time, then run uname -a there.",
+      "expected_output": "Agent uses ssh_manager.py save-creds to store the password in the AES-encrypted vault, then connects to run uname -a; it never prints the plaintext password back and notes the credentials dir should not be committed.",
+      "files": [],
+      "expectations": [
+        "Uses the skill's credential vault via ssh_manager.py save-creds",
+        "Stores the password using AES-256-GCM in the skill's vault (credential_store)",
+        "Connects with the password omitted so it auto-loads from the vault",
+        "Never prints the plaintext password and masks it in output"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need to capture the full BIOS POST serial log across a cold reboot from the BMC at 10.45.22.7 (ssh user debuguser, same creds for IPMI). Give me the exact command sequence to save the POST output to a file and copy it back to my Windows box.",
+      "expected_output": "Agent produces the two-SSH-session BMC SOL pattern: session A runs `ipmitool ... sol activate | tee $LOG`, session B runs a `chassis power` reboot then `sol deactivate` to unblock A, then copies the log back with pscp/scp. Explains why backgrounding sol activate fails.",
+      "files": [],
+      "expectations": [
+        "Uses two separate BMC SSH sessions and explains why",
+        "Captures with ipmitool sol activate piped to tee into a log file",
+        "Stops the capture from the second session via sol deactivate rather than relying solely on the ~. escape",
+        "Copies the log back to Windows with pscp or scp"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Launch pythonsv for graniterapids on my OOB host oob-gnr-3 — I'm a local admin on that box. PsExec is at C:\\tools\\PsExec.exe.",
+      "expected_output": "Agent uses pass-through PsExec (no -u/-p) to open an async cmd on oob-gnr-3, waits for the prompt, then cd to the graniterapids pythonsv root and runs `python startgnr.py`, waiting for the interactive-mode banner. Does not put plaintext credentials on the command line.",
+      "files": [],
+      "expectations": [
+        "Uses PsExec with pass-through auth as the first attempt to keep plaintext credentials off the command line",
+        "Opens the connection async and waits for the remote C:\\Windows\\System32> prompt",
+        "Launches the correct graniterapids launcher startgnr.py",
+        "Waits for the PythonSv interactive-mode / Running graniterapids readiness banner"
+      ]
+    }
+  ]
+}

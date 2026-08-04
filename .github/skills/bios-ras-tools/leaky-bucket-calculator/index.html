@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leaky Bucket Calculator</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="brand">Leaky Bucket Calculator</div>
+      </div>
+      <span class="platform-badge">Memory / PCIe</span>
+      <div id="status" class="status" aria-live="polite">Ready</div>
+      <div class="header-actions">
+        <button id="theme-toggle" type="button" title="Toggle dark/light theme">dark_mode</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="sidebar" aria-label="Calculation modes">
+        <button class="nav-button active" data-mode="ddr">DDR<span>Memory leaky bucket timing</span></button>
+        <button class="nav-button" data-mode="pcie-registers">PCIe<span>From Registers EXP_BER to leak time and BER</span></button>
+        <button class="nav-button" data-mode="pcie-target">PCIe Target BER<span>BER target to register values</span></button>
+        <button class="nav-button" data-mode="reference">Reference<span>Inputs, fields, and formulas</span></button>
+      </nav>
+
+      <main class="workspace">
+        <section class="hero-row">
+          <div>
+            <h1 id="mode-title">DDR</h1>
+            <p id="mode-description">Select a platform, enter register values, and calculate the drip interval.</p>
+          </div>
+          <div id="mode-badge" class="mode-badge">Guided wizard</div>
+        </section>
+
+        <section class="steps" aria-label="Workflow steps">
+          <div class="step active"><strong>1 Select</strong><span>Choose mode and platform.</span></div>
+          <div class="step active"><strong>2 Read</strong><span>Review required fields.</span></div>
+          <div class="step active"><strong>3 Enter</strong><span>Input register values.</span></div>
+          <div class="step"><strong>4 Review</strong><span>Check result and formula.</span></div>
+        </section>
+
+        <section id="mode-root" class="mode-root"></section>
+      </main>
+    </div>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

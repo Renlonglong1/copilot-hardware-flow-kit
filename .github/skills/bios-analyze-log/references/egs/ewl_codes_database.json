@@ -1,0 +1,1775 @@
+{
+  "0x01": {
+    "name": "WARN_RDIMM_ON_UDIMM",
+    "description": "RDIMM ON UDIMM",
+    "type": "major",
+    "source_line": 43,
+    "minors": {
+      "0x01": {
+        "name": "WARN_MINOR_CONFIG_NOT_SUPPORTED",
+        "description": "MINOR CONFIG NOT SUPPORTED"
+      }
+    }
+  },
+  "0x02": {
+    "name": "WARN_CMPL_DELAY_BELOW_MIN",
+    "description": "CMPL DELAY BELOW MIN",
+    "type": "major",
+    "source_line": 317,
+    "minors": {}
+  },
+  "0x03": {
+    "name": "WARN_CMPL_DELAY_MAX_EXCEEDED",
+    "description": "CMPL DELAY MAX EXCEEDED",
+    "type": "major",
+    "source_line": 318,
+    "minors": {}
+  },
+  "0x04": {
+    "name": "WARN_4Gb_FUSE",
+    "description": "4Gb FUSE",
+    "type": "major",
+    "source_line": 47,
+    "minors": {}
+  },
+  "0x05": {
+    "name": "WARN_8Gb_FUSE",
+    "description": "8Gb FUSE",
+    "type": "major",
+    "source_line": 48,
+    "minors": {}
+  },
+  "0x06": {
+    "name": "WARN_IMC_DISABLED",
+    "description": "IMC DISABLED",
+    "type": "major",
+    "source_line": 49,
+    "minors": {}
+  },
+  "0x07": {
+    "name": "WARN_DIMM_COMPAT",
+    "description": "DIMM COMPAT",
+    "type": "major",
+    "source_line": 50,
+    "minors": {
+      "0x01": {
+        "name": "WARN_DIMM_COMPAT_MINOR_X16_C0MBO",
+        "description": "DIMM COMPAT MINOR X16 C0MBO"
+      },
+      "0x02": {
+        "name": "WARN_DIMM_COMPAT_MINOR_MAX_RANKS",
+        "description": "DIMM COMPAT MINOR MAX RANKS"
+      },
+      "0x03": {
+        "name": "WARN_DIMM_COMPAT_MINOR_QR",
+        "description": "DIMM COMPAT MINOR QR"
+      },
+      "0x04": {
+        "name": "WARN_DIMM_COMPAT_MINOR_NOT_SUPPORTED",
+        "description": "DIMM COMPAT MINOR NOT SUPPORTED"
+      },
+      "0x05": {
+        "name": "WARN_RANK_NUM",
+        "description": "RANK NUM"
+      },
+      "0x06": {
+        "name": "WARN_TOO_SLOW",
+        "description": "TOO SLOW"
+      },
+      "0x07": {
+        "name": "WARN_DIMM_COMPAT_MINOR_ROW_ADDR_ORDER",
+        "description": "DIMM COMPAT MINOR ROW ADDR ORDER"
+      },
+      "0x08": {
+        "name": "WARN_CHANNEL_CONFIG_NOT_SUPPORTED",
+        "description": "CHANNEL CONFIG NOT SUPPORTED"
+      },
+      "0x09": {
+        "name": "WARN_CHANNEL_MIX_ECC_NONECC",
+        "description": "CHANNEL MIX ECC NONECC"
+      },
+      "0x0a": {
+        "name": "WARN_DIMM_VOLTAGE_NOT_SUPPORTED",
+        "description": "DIMM VOLTAGE NOT SUPPORTED"
+      },
+      "0x0b": {
+        "name": "WARN_DIMM_COMPAT_TRP_NOT_SUPPORTED",
+        "description": "DIMM COMPAT TRP NOT SUPPORTED"
+      },
+      "0x0c": {
+        "name": "WARN_DIMM_NONECC",
+        "description": "DIMM NONECC"
+      },
+      "0x0d": {
+        "name": "WARN_DIMM_COMPAT_3DS_RDIMM_NOT_SUPPORTED",
+        "description": "DIMM COMPAT 3DS RDIMM NOT SUPPORTED"
+      },
+      "0x0e": {
+        "name": "WARN_RANK_COUNT_MISMATCH",
+        "description": "RANK COUNT MISMATCH"
+      },
+      "0x0f": {
+        "name": "WARN_DIMM_SKU_MISMATCH",
+        "description": "DIMM SKU MISMATCH"
+      },
+      "0x10": {
+        "name": "WARN_DIMM_3DS_NOT_SUPPORTED",
+        "description": "DIMM 3DS NOT SUPPORTED"
+      },
+      "0x11": {
+        "name": "WARN_DIMM_NVMDIMM_NOT_SUPPORTED",
+        "description": "DIMM NVMDIMM NOT SUPPORTED"
+      },
+      "0x12": {
+        "name": "WARN_DIMM_16GB_SUPPORTED",
+        "description": "DIMM 16GB SUPPORTED"
+      },
+      "0x13": {
+        "name": "WARN_CHANNEL_SKU_NOT_SUPPORTED",
+        "description": "CHANNEL SKU NOT SUPPORTED"
+      },
+      "0x14": {
+        "name": "WARN_DIMM_SKU_NOT_SUPPORTED",
+        "description": "DIMM SKU NOT SUPPORTED"
+      },
+      "0x15": {
+        "name": "WARN_CHANNEL_CONFIG_FREQ_NOT_SUPPORTED",
+        "description": "CHANNEL CONFIG FREQ NOT SUPPORTED"
+      },
+      "0x16": {
+        "name": "WARN_DIMM_SPEED_NOT_SUP",
+        "description": "DIMM SPEED NOT SUP"
+      },
+      "0x17": {
+        "name": "WARN_NO_DDR4_ON_SOCKET",
+        "description": "NO DDR4 ON SOCKET"
+      },
+      "0x18": {
+        "name": "WARN_NO_DDR4_ON_S0C0D0",
+        "description": "NO DDR4 ON S0C0D0"
+      },
+      "0x19": {
+        "name": "WARN_DIMM_NOT_IN_DDRT_POR_DDR_TABLE",
+        "description": "DIMM NOT IN DDRT POR DDR TABLE"
+      },
+      "0x1a": {
+        "name": "WARN_SOCKET_CPU_DOES_NOT_SUPPORT_NVMDIMM",
+        "description": "SOCKET CPU DOES NOT SUPPORT NVMDIMM"
+      },
+      "0x1b": {
+        "name": "WARN_SOCKET_SKU_DOES_NOT_SUPPORT_NVMDIMM",
+        "description": "SOCKET SKU DOES NOT SUPPORT NVMDIMM"
+      },
+      "0x1c": {
+        "name": "WARN_DIMM_IN_DDRT_POR_DDR_TABLE_NOT_VALIDATED",
+        "description": "DIMM IN DDRT POR DDR TABLE NOT VALIDATED"
+      },
+      "0x1d": {
+        "name": "WARN_DDRT_DIMM_NOT_SUPPORTED",
+        "description": "DDRT DIMM NOT SUPPORTED"
+      },
+      "0x1e": {
+        "name": "WARN_CHANNEL_WIDTH_MIX_NOT_SUPPORTED",
+        "description": "CHANNEL WIDTH MIX NOT SUPPORTED"
+      },
+      "0x1f": {
+        "name": "WARN_DIMM_24GB_SUPPORTED",
+        "description": "DIMM 24GB SUPPORTED"
+      },
+      "0x20": {
+        "name": "WARN_DIMM_32GB_SUPPORTED",
+        "description": "DIMM 32GB SUPPORTED"
+      },
+      "0x21": {
+        "name": "WARN_LRDIMM_NOT_SUPPORTED",
+        "description": "LRDIMM NOT SUPPORTED"
+      },
+      "0x22": {
+        "name": "WARN_DIMM_NVMDIMM_HBM_NOT_SUPPORTED",
+        "description": "DIMM NVMDIMM HBM NOT SUPPORTED"
+      },
+      "0x23": {
+        "name": "WARN_CPU_NOT_SUPPORTED_NVDIMM",
+        "description": "CPU NOT SUPPORTED NVDIMM"
+      },
+      "0x24": {
+        "name": "WARN_OLD_DRAM_VENDOR_NOT_SUPPORTED",
+        "description": "OLD DRAM VENDOR NOT SUPPORTED"
+      },
+      "0x25": {
+        "name": "WARN_INVALID_DDR5_SPD_CONTENT",
+        "description": "INVALID DDR5 SPD CONTENT"
+      },
+      "0x2a": {
+        "name": "WARN_DRAM_DENSITY_MIX_NOT_SUPPORTED_WITHIN_SOCKET",
+        "description": "DRAM DENSITY MIX NOT SUPPORTED WITHIN SOCKET"
+      }
+    }
+  },
+  "0x09": {
+    "name": "WARN_LOCKSTEP_DISABLE",
+    "description": "LOCKSTEP DISABLE",
+    "type": "major",
+    "source_line": 90,
+    "minors": {
+      "0x01": {
+        "name": "WARN_LOCKSTEP_DISABLE_MINOR_RAS_MODE",
+        "description": "LOCKSTEP DISABLE MINOR RAS MODE"
+      },
+      "0x02": {
+        "name": "WARN_LOCKSTEP_DISABLE_MINOR_MISMATCHED",
+        "description": "LOCKSTEP DISABLE MINOR MISMATCHED"
+      },
+      "0x03": {
+        "name": "WARN_LOCKSTEP_DISABLE_MINOR_MEMTEST_FAILED",
+        "description": "LOCKSTEP DISABLE MINOR MEMTEST FAILED"
+      }
+    }
+  },
+  "0x0a": {
+    "name": "WARN_USER_DIMM_DISABLE",
+    "description": "USER DIMM DISABLE",
+    "type": "major",
+    "source_line": 94,
+    "minors": {
+      "0x01": {
+        "name": "WARN_USER_DIMM_DISABLE_QUAD_AND_3DPC",
+        "description": "USER DIMM DISABLE QUAD AND 3DPC"
+      },
+      "0x02": {
+        "name": "WARN_USER_DIMM_DISABLE_MEMTEST",
+        "description": "USER DIMM DISABLE MEMTEST"
+      },
+      "0x03": {
+        "name": "WARN_USER_DIMM_DISABLE_RANK_DISABLED",
+        "description": "USER DIMM DISABLE RANK DISABLED"
+      },
+      "0x04": {
+        "name": "WARN_USER_DIMM_DISABLE_MAPPED_OUT",
+        "description": "USER DIMM DISABLE MAPPED OUT"
+      }
+    }
+  },
+  "0x0b": {
+    "name": "WARN_MEMTEST_DIMM_DISABLE",
+    "description": "MEMTEST DIMM DISABLE",
+    "type": "major",
+    "source_line": 99,
+    "minors": {}
+  },
+  "0x0c": {
+    "name": "WARN_MIRROR_DISABLE",
+    "description": "MIRROR DISABLE",
+    "type": "major",
+    "source_line": 100,
+    "minors": {
+      "0x01": {
+        "name": "WARN_MIRROR_DISABLE_MINOR_RAS_DISABLED",
+        "description": "MIRROR DISABLE MINOR RAS DISABLED"
+      },
+      "0x02": {
+        "name": "WARN_MIRROR_DISABLE_MINOR_MISMATCH",
+        "description": "MIRROR DISABLE MINOR MISMATCH"
+      },
+      "0x03": {
+        "name": "WARN_MIRROR_DISABLE_MINOR_MEMTEST",
+        "description": "MIRROR DISABLE MINOR MEMTEST"
+      }
+    }
+  },
+  "0x0d": {
+    "name": "WARN_PMIRROR_DISABLE",
+    "description": "PMIRROR DISABLE",
+    "type": "major",
+    "source_line": 104,
+    "minors": {
+      "0x01": {
+        "name": "WARN_PMIRROR_DISABLE_MINOR_RAS_DISABLED",
+        "description": "PMIRROR DISABLE MINOR RAS DISABLED"
+      }
+    }
+  },
+  "0x0e": {
+    "name": "WARN_INTERLEAVE_FAILURE",
+    "description": "INTERLEAVE FAILURE",
+    "type": "major",
+    "source_line": 106,
+    "minors": {
+      "0x01": {
+        "name": "WARN_SAD_RULES_EXCEEDED",
+        "description": "SAD RULES EXCEEDED"
+      },
+      "0x02": {
+        "name": "WARN_TAD_RULES_EXCEEDED",
+        "description": "TAD RULES EXCEEDED"
+      },
+      "0x03": {
+        "name": "WARN_RIR_RULES_EXCEEDED",
+        "description": "RIR RULES EXCEEDED"
+      },
+      "0x04": {
+        "name": "WARN_TAD_OFFSET_NEGATIVE",
+        "description": "TAD OFFSET NEGATIVE"
+      },
+      "0x05": {
+        "name": "WARN_TAD_LIMIT_ERROR",
+        "description": "TAD LIMIT ERROR"
+      },
+      "0x06": {
+        "name": "WARN_INTERLEAVE_3WAY",
+        "description": "INTERLEAVE 3WAY"
+      },
+      "0x07": {
+        "name": "WARN_A7_MODE_AND_3WAY_CH_INTRLV",
+        "description": "A7 MODE AND 3WAY CH INTRLV"
+      },
+      "0x08": {
+        "name": "WARN_INTERLEAVE_EXCEEDED",
+        "description": "INTERLEAVE EXCEEDED"
+      },
+      "0x09": {
+        "name": "WARN_DIMM_CAPACITY_MISMATCH",
+        "description": "DIMM CAPACITY MISMATCH"
+      },
+      "0x0a": {
+        "name": "WARN_DIMM_POPULATION_MISMATCH",
+        "description": "DIMM POPULATION MISMATCH"
+      },
+      "0x0b": {
+        "name": "WARN_NM_MAX_SIZE_EXCEEDED",
+        "description": "NM MAX SIZE EXCEEDED"
+      },
+      "0x0c": {
+        "name": "WARN_NM_SIZE_BELOW_MIN_LIMIT",
+        "description": "NM SIZE BELOW MIN LIMIT"
+      },
+      "0x0d": {
+        "name": "WARN_NM_SIZE_NOT_POWER_OF_TWO",
+        "description": "NM SIZE NOT POWER OF TWO"
+      },
+      "0x0e": {
+        "name": "WARN_MAX_INTERLEAVE_SETS_EXCEEDED",
+        "description": "MAX INTERLEAVE SETS EXCEEDED"
+      },
+      "0x0f": {
+        "name": "WARN_NGN_DIMM_COMM_FAILED",
+        "description": "NGN DIMM COMM FAILED"
+      }
+    }
+  },
+  "0x0f": {
+    "name": "WARN_DIMM_COMM_FAILED",
+    "description": "DIMM COMM FAILED",
+    "type": "major",
+    "source_line": 122,
+    "minors": {
+      "0x01": {
+        "name": "WARN_MINOR_DIMM_COMM_START_DOORBELL_TIMEOUT",
+        "description": "MINOR DIMM COMM START DOORBELL TIMEOUT"
+      },
+      "0x02": {
+        "name": "WARN_MINOR_DIMM_COMM_FAILED_STATUS",
+        "description": "MINOR DIMM COMM FAILED STATUS"
+      },
+      "0x03": {
+        "name": "WARN_MINOR_DIMM_MAILBOX_FAILED",
+        "description": "MINOR DIMM MAILBOX FAILED"
+      },
+      "0x04": {
+        "name": "WARN_MINOR_DIMM_COMM_FINISH_DOORBELL_TIMEOUT",
+        "description": "MINOR DIMM COMM FINISH DOORBELL TIMEOUT"
+      },
+      "0x05": {
+        "name": "WARN_MINOR_DIMM_COMM_FINISH_COMPLETE_TIMEOUT",
+        "description": "MINOR DIMM COMM FINISH COMPLETE TIMEOUT"
+      }
+    }
+  },
+  "0x10": {
+    "name": "WARN_SPARE_DISABLE",
+    "description": "SPARE DISABLE",
+    "type": "major",
+    "source_line": 128,
+    "minors": {
+      "0x01": {
+        "name": "WARN_SPARE_DISABLE_MINOR_RK_SPARE",
+        "description": "SPARE DISABLE MINOR RK SPARE"
+      }
+    }
+  },
+  "0x11": {
+    "name": "WARN_PTRLSCRB_DISABLE",
+    "description": "PTRLSCRB DISABLE",
+    "type": "major",
+    "source_line": 130,
+    "minors": {
+      "0x00": {
+        "name": "WARN_PTRLSCRB_MINOR_DISABLE",
+        "description": "PTRLSCRB MINOR DISABLE"
+      }
+    }
+  },
+  "0x12": {
+    "name": "WARN_UNUSED_MEMORY",
+    "description": "UNUSED MEMORY",
+    "type": "major",
+    "source_line": 132,
+    "minors": {
+      "0x01": {
+        "name": "WARN_UNUSED_MEMORY_MINOR_MIRROR",
+        "description": "UNUSED MEMORY MINOR MIRROR"
+      },
+      "0x02": {
+        "name": "WARN_UNUSED_MEMORY_MINOR_LOCKSTEP",
+        "description": "UNUSED MEMORY MINOR LOCKSTEP"
+      }
+    }
+  },
+  "0x13": {
+    "name": "WARN_RD_DQ_DQS",
+    "description": "RD DQ DQS",
+    "type": "major",
+    "source_line": 135,
+    "minors": {}
+  },
+  "0x14": {
+    "name": "WARN_RD_RCVEN",
+    "description": "RD RCVEN",
+    "type": "major",
+    "source_line": 136,
+    "minors": {
+      "0x01": {
+        "name": "WARN_ROUNDTRIP_EXCEEDED",
+        "description": "ROUNDTRIP EXCEEDED"
+      },
+      "0x02": {
+        "name": "WARN_RCVEN_PI_DELAY_EXCEEDED",
+        "description": "RCVEN PI DELAY EXCEEDED"
+      }
+    }
+  },
+  "0x15": {
+    "name": "WARN_WR_LEVEL",
+    "description": "WR LEVEL",
+    "type": "major",
+    "source_line": 139,
+    "minors": {
+      "0x00": {
+        "name": "WARN_WR_FLYBY_CORR",
+        "description": "WR FLYBY CORR"
+      },
+      "0x01": {
+        "name": "WARN_WR_FLYBY_UNCORR",
+        "description": "WR FLYBY UNCORR"
+      },
+      "0x02": {
+        "name": "WARN_WR_FLYBY_DELAY",
+        "description": "WR FLYBY DELAY"
+      }
+    }
+  },
+  "0x16": {
+    "name": "WARN_WR_DQ_DQS",
+    "description": "WR DQ DQS",
+    "type": "major",
+    "source_line": 143,
+    "minors": {}
+  },
+  "0x17": {
+    "name": "WARN_DIMM_POP_RUL",
+    "description": "DIMM POP RUL",
+    "type": "major",
+    "source_line": 144,
+    "minors": {
+      "0x01": {
+        "name": "WARN_DIMM_POP_RUL_MINOR_OUT_OF_ORDER",
+        "description": "DIMM POP RUL MINOR OUT OF ORDER"
+      },
+      "0x02": {
+        "name": "WARN_DIMM_POP_RUL_MINOR_INDEPENDENT_MODE",
+        "description": "DIMM POP RUL MINOR INDEPENDENT MODE"
+      },
+      "0x03": {
+        "name": "WARN_DIMM_POP_RUL_2_AEP_FOUND_ON_SAME_CH",
+        "description": "DIMM POP RUL 2 AEP FOUND ON SAME CH"
+      },
+      "0x04": {
+        "name": "WARN_DIMM_POP_RUL_MINOR_MIXED_RANKS_FOUND",
+        "description": "DIMM POP RUL MINOR MIXED RANKS FOUND"
+      },
+      "0x05": {
+        "name": "WARN_DIMM_POP_RUL_NVMDIMM_OUT_OF_ORDER",
+        "description": "DIMM POP RUL NVMDIMM OUT OF ORDER"
+      },
+      "0x06": {
+        "name": "WARN_DIMM_POP_RUL_MINOR_NO_DDRT_ON_MC0",
+        "description": "DIMM POP RUL MINOR NO DDRT ON MC0"
+      },
+      "0x07": {
+        "name": "WARN_DIMM_POP_RUL_MINOR_NO_DDRT_ON_SOCKET0",
+        "description": "DIMM POP RUL MINOR NO DDRT ON SOCKET0"
+      },
+      "0x08": {
+        "name": "WARN_DIMM_POP_RUL_DDR4_CAP_NOT_POR_FOR_MEM_POP",
+        "description": "DIMM POP RUL DDR4 CAP NOT POR FOR MEM POP"
+      },
+      "0x09": {
+        "name": "WARN_DIMM_POP_RUL_DDR4_TYPE_NOT_POR_FOR_MM",
+        "description": "DIMM POP RUL DDR4 TYPE NOT POR FOR MM"
+      },
+      "0x0a": {
+        "name": "WARN_DIMM_POP_RUL_MEM_TOPOLOGY_NOT_SYMMETRICAL",
+        "description": "DIMM POP RUL MEM TOPOLOGY NOT SYMMETRICAL"
+      },
+      "0x0b": {
+        "name": "WARN_DIMM_POP_RUL_NM_FM_RATIO_VIOLATION",
+        "description": "DIMM POP RUL NM FM RATIO VIOLATION"
+      },
+      "0x0c": {
+        "name": "WARN_DIMM_POP_RUL_2LM_IMC_MEM_MISMATCH",
+        "description": "DIMM POP RUL 2LM IMC MEM MISMATCH"
+      },
+      "0x0d": {
+        "name": "WARN_DIMM_POP_RUL_DDRT_CAPACITY_MISMATCH",
+        "description": "DIMM POP RUL DDRT CAPACITY MISMATCH"
+      },
+      "0x0e": {
+        "name": "WARN_DIMM_POP_RUL_DDRT_PARTITION_MISMATCH",
+        "description": "DIMM POP RUL DDRT PARTITION MISMATCH"
+      },
+      "0x0f": {
+        "name": "WARN_DIMM_POP_RUL_AEP_VDD_CHANGED",
+        "description": "DIMM POP RUL AEP VDD CHANGED"
+      },
+      "0x10": {
+        "name": "WARN_DIMM_POP_RUL_SOCKET_MODE_MISMATCH",
+        "description": "DIMM POP RUL SOCKET MODE MISMATCH"
+      },
+      "0x11": {
+        "name": "WARN_DIMM_POP_RUL_DCPDIMM_MIXING",
+        "description": "DIMM POP RUL DCPDIMM MIXING"
+      },
+      "0x12": {
+        "name": "WARN_DIMM_POP_RUL_DDR_CAPACITY_MISMATCH",
+        "description": "DIMM POP RUL DDR CAPACITY MISMATCH"
+      },
+      "0x13": {
+        "name": "WARN_DIMM_POP_RUL_POPULATION_POR_MISMATCH",
+        "description": "DIMM POP RUL POPULATION POR MISMATCH"
+      },
+      "0x14": {
+        "name": "WARN_DIMM_POP_RUL_MEM_POP_POR_TBL_INVALID",
+        "description": "DIMM POP RUL MEM POP POR TBL INVALID"
+      },
+      "0x15": {
+        "name": "WARN_DIMM_POP_RUL_2LM_FM_CH_NOT_PWR_OF_TWO",
+        "description": "DIMM POP RUL 2LM FM CH NOT PWR OF TWO"
+      },
+      "0x16": {
+        "name": "WARN_DIMM_POP_RUL_POPULATION_POR_NOT_FOUND",
+        "description": "DIMM POP RUL POPULATION POR NOT FOUND"
+      },
+      "0x17": {
+        "name": "WARN_DIMM_POP_RUL_PMEM_X1_POPULATION_INVALID",
+        "description": "DIMM POP RUL PMEM X1 POPULATION INVALID"
+      },
+      "0x18": {
+        "name": "WARN_DIMM_POP_RUL_NO_DIMM_ON_SOCKET",
+        "description": "DIMM POP RUL NO DIMM ON SOCKET"
+      },
+      "0x19": {
+        "name": "WARN_DIMM_POP_RUL_UMA_POR_COMPATABILITY",
+        "description": "DIMM POP RUL UMA POR COMPATABILITY"
+      },
+      "0x1a": {
+        "name": "WARN_DIMM_POP_RUL_MCR_POP_INVALID",
+        "description": "DIMM POP RUL MCR POP INVALID"
+      },
+      "0x1b": {
+        "name": "WARN_DIMM_POP_RUL_9X4_CONFIG_INVALID",
+        "description": "DIMM POP RUL 9X4 CONFIG INVALID"
+      },
+      "0x1c": {
+        "name": "WARN_DIMM_POP_RUL_DDR_CONFIG_NOT_UNIFORM",
+        "description": "DIMM POP RUL DDR CONFIG NOT UNIFORM"
+      },
+      "0x1d": {
+        "name": "WARN_DIMM_POP_RUL_SOCKETS_CONFIG_NOT_SUPPORTED",
+        "description": "DIMM POP RUL SOCKETS CONFIG NOT SUPPORTED"
+      },
+      "0x1e": {
+        "name": "WARN_DIMM_POP_RUL_CPU_NOT_SUPPORTED",
+        "description": "DIMM POP RUL CPU NOT SUPPORTED"
+      }
+    }
+  },
+  "0x3e": {
+    "name": "WARN_DIMM_POP_RUL_EXTENDED",
+    "description": "DIMM POP RUL EXTENDED",
+    "type": "major",
+    "source_line": 179,
+    "minors": {}
+  },
+  "0x18": {
+    "name": "WARN_CLTT_DISABLE",
+    "description": "CLTT DISABLE",
+    "type": "major",
+    "source_line": 183,
+    "minors": {
+      "0x01": {
+        "name": "WARN_CLTT_MINOR_NO_TEMP_SENSOR",
+        "description": "CLTT MINOR NO TEMP SENSOR"
+      },
+      "0x02": {
+        "name": "WARN_CLTT_MINOR_CIRCUIT_TST_FAILED",
+        "description": "CLTT MINOR CIRCUIT TST FAILED"
+      }
+    }
+  },
+  "0x19": {
+    "name": "WARN_THROT_INSUFFICIENT",
+    "description": "THROT INSUFFICIENT",
+    "type": "major",
+    "source_line": 186,
+    "minors": {
+      "0x01": {
+        "name": "WARN_2X_REFRESH_TEMPLO_DISABLED",
+        "description": "2X REFRESH TEMPLO DISABLED"
+      },
+      "0x02": {
+        "name": "WARN_CUSTOM_REFRESH_RATE_REVERTED",
+        "description": "CUSTOM REFRESH RATE REVERTED"
+      }
+    }
+  },
+  "0x1a": {
+    "name": "WARN_CLTT_DIMM_UNKNOWN",
+    "description": "CLTT DIMM UNKNOWN",
+    "type": "major",
+    "source_line": 189,
+    "minors": {}
+  },
+  "0x1b": {
+    "name": "WARN_DQS_TEST",
+    "description": "DQS TEST",
+    "type": "major",
+    "source_line": 190,
+    "minors": {}
+  },
+  "0x1c": {
+    "name": "WARN_MEM_TEST",
+    "description": "MEM TEST",
+    "type": "major",
+    "source_line": 191,
+    "minors": {}
+  },
+  "0x1d": {
+    "name": "WARN_CLOSED_PAGE_OVERRIDE",
+    "description": "CLOSED PAGE OVERRIDE",
+    "type": "major",
+    "source_line": 192,
+    "minors": {}
+  },
+  "0x1e": {
+    "name": "WARN_DIMM_VREF_NOT_PRESENT",
+    "description": "DIMM VREF NOT PRESENT",
+    "type": "major",
+    "source_line": 193,
+    "minors": {}
+  },
+  "0x1f": {
+    "name": "WARN_EARLY_RID",
+    "description": "EARLY RID",
+    "type": "major",
+    "source_line": 194,
+    "minors": {
+      "0x01": {
+        "name": "WARN_EARLY_RID_UNCORR",
+        "description": "EARLY RID UNCORR"
+      },
+      "0x02": {
+        "name": "WARN_EARLY_RID_CYCLE_FAIL",
+        "description": "EARLY RID CYCLE FAIL"
+      }
+    }
+  },
+  "0x20": {
+    "name": "WARN_LV_STD_DIMM_MIX",
+    "description": "LV STD DIMM MIX",
+    "type": "major",
+    "source_line": 197,
+    "minors": {}
+  },
+  "0x21": {
+    "name": "WARN_LV_2QR_DIMM",
+    "description": "LV 2QR DIMM",
+    "type": "major",
+    "source_line": 198,
+    "minors": {}
+  },
+  "0x22": {
+    "name": "WARN_LV_3DPC",
+    "description": "LV 3DPC",
+    "type": "major",
+    "source_line": 199,
+    "minors": {}
+  },
+  "0x23": {
+    "name": "WARN_CMD_ADDR_PARITY_ERR",
+    "description": "CMD ADDR PARITY ERR",
+    "type": "major",
+    "source_line": 200,
+    "minors": {}
+  },
+  "0x24": {
+    "name": "WARN_DQ_SWIZZLE_DISC",
+    "description": "DQ SWIZZLE DISC",
+    "type": "major",
+    "source_line": 201,
+    "minors": {
+      "0x01": {
+        "name": "WARN_DQ_SWIZZLE_DISC_UNCORR",
+        "description": "DQ SWIZZLE DISC UNCORR"
+      }
+    }
+  },
+  "0x25": {
+    "name": "WARN_COD_HA_NOT_ACTIVE",
+    "description": "COD HA NOT ACTIVE",
+    "type": "major",
+    "source_line": 203,
+    "minors": {}
+  },
+  "0x26": {
+    "name": "WARN_CMD_CLK_TRAINING",
+    "description": "CMD CLK TRAINING",
+    "type": "major",
+    "source_line": 204,
+    "minors": {
+      "0x01": {
+        "name": "WARN_CMD_PI_GROUP_SMALL_EYE",
+        "description": "CMD PI GROUP SMALL EYE"
+      },
+      "0x02": {
+        "name": "WARN_CMD_PI_GROUP_NO_EYE",
+        "description": "CMD PI GROUP NO EYE"
+      }
+    }
+  },
+  "0x27": {
+    "name": "WARN_INVALID_BUS",
+    "description": "INVALID BUS",
+    "type": "major",
+    "source_line": 207,
+    "minors": {}
+  },
+  "0x28": {
+    "name": "WARN_INVALID_FNV_OPCODE",
+    "description": "INVALID FNV OPCODE",
+    "type": "major",
+    "source_line": 208,
+    "minors": {
+      "0x00": {
+        "name": "WARN_INVALID_FNV_SUBOPCODE",
+        "description": "INVALID FNV SUBOPCODE"
+      }
+    }
+  },
+  "0x29": {
+    "name": "WARN_MEMORY_TRAINING",
+    "description": "MEMORY TRAINING",
+    "type": "major",
+    "source_line": 210,
+    "minors": {
+      "0x02": {
+        "name": "WARN_CTL_CLK_LOOPBACK_TRAINING",
+        "description": "CTL CLK LOOPBACK TRAINING"
+      },
+      "0x03": {
+        "name": "WARN_ODT_TIMING_OVERFLOW",
+        "description": "ODT TIMING OVERFLOW"
+      },
+      "0x04": {
+        "name": "WARN_CS_CLK_LOOPBACK_TRAINING",
+        "description": "CS CLK LOOPBACK TRAINING"
+      },
+      "0x05": {
+        "name": "WARN_CA_CLK_LOOPBACK_TRAINING",
+        "description": "CA CLK LOOPBACK TRAINING"
+      },
+      "0x06": {
+        "name": "WARN_REQ_CLK_TRAINING",
+        "description": "REQ CLK TRAINING"
+      }
+    }
+  },
+  "0x2a": {
+    "name": "WARN_NO_MEMORY",
+    "description": "NO MEMORY",
+    "type": "major",
+    "source_line": 216,
+    "minors": {
+      "0x01": {
+        "name": "WARN_NO_MEMORY_MINOR_NO_MEMORY",
+        "description": "NO MEMORY MINOR NO MEMORY"
+      },
+      "0x02": {
+        "name": "WARN_NO_MEMORY_MINOR_ALL_CH_DISABLED",
+        "description": "NO MEMORY MINOR ALL CH DISABLED"
+      },
+      "0x03": {
+        "name": "WARN_NO_MEMORY_MINOR_ALL_CH_DISABLED_MIXED",
+        "description": "NO MEMORY MINOR ALL CH DISABLED MIXED"
+      },
+      "0x04": {
+        "name": "WARN_NO_MEMORY_MINOR_NO_DDR",
+        "description": "NO MEMORY MINOR NO DDR"
+      }
+    }
+  },
+  "0x2b": {
+    "name": "WARN_ROUNDTRIP_ERROR",
+    "description": "ROUNDTRIP ERROR",
+    "type": "major",
+    "source_line": 221,
+    "minors": {
+      "0x01": {
+        "name": "WARN_RCVNTAP_CMDDELAY_EXCEEDED",
+        "description": "RCVNTAP CMDDELAY EXCEEDED"
+      }
+    }
+  },
+  "0x2c": {
+    "name": "WARN_MEMORY_MODEL_ERROR",
+    "description": "MEMORY MODEL ERROR",
+    "type": "major",
+    "source_line": 223,
+    "minors": {
+      "0x01": {
+        "name": "WARN_SNC24_MODEL_ERROR",
+        "description": "SNC24 MODEL ERROR"
+      },
+      "0x02": {
+        "name": "WARN_QUAD_HEMI_MODEL_ERROR",
+        "description": "QUAD HEMI MODEL ERROR"
+      },
+      "0x03": {
+        "name": "WARN_SNC24_DIMM_POPULATION_MISMATCH",
+        "description": "SNC24 DIMM POPULATION MISMATCH"
+      },
+      "0x04": {
+        "name": "WARN_SNC24_INCOMPATIBLE_DDR_CAPACITY",
+        "description": "SNC24 INCOMPATIBLE DDR CAPACITY"
+      },
+      "0x05": {
+        "name": "WARN_SNC24_INCOMPATIBLE_MCDRAM_CAPACITY",
+        "description": "SNC24 INCOMPATIBLE MCDRAM CAPACITY"
+      },
+      "0x06": {
+        "name": "WARN_MCDRAM_CONFIG_NOT_SUPPORTED",
+        "description": "MCDRAM CONFIG NOT SUPPORTED"
+      },
+      "0x07": {
+        "name": "WARN_SNC24_TILE_POPULATION_MISMATCH",
+        "description": "SNC24 TILE POPULATION MISMATCH"
+      }
+    }
+  },
+  "0x2d": {
+    "name": "WARN_OVERRIDE_MEMORY_MODE",
+    "description": "OVERRIDE MEMORY MODE",
+    "type": "major",
+    "source_line": 231,
+    "minors": {
+      "0x01": {
+        "name": "WARN_OVERRIDE_TO_FLAT_NOT_ENOUGH_NEAR_MEMORY",
+        "description": "OVERRIDE TO FLAT NOT ENOUGH NEAR MEMORY"
+      },
+      "0x02": {
+        "name": "WARN_OVERRIDE_TO_FLAT_NOT_ENOUGH_FAR_MEMORY",
+        "description": "OVERRIDE TO FLAT NOT ENOUGH FAR MEMORY"
+      },
+      "0x03": {
+        "name": "WARN_OVERRIDE_TO_HYBRID_50_PERCENT",
+        "description": "OVERRIDE TO HYBRID 50 PERCENT"
+      }
+    }
+  },
+  "0x2e": {
+    "name": "WARN_MEM_INIT",
+    "description": "MEM INIT",
+    "type": "major",
+    "source_line": 241,
+    "minors": {}
+  },
+  "0x2f": {
+    "name": "WARN_SENS_AMP_TRAINING",
+    "description": "SENS AMP TRAINING",
+    "type": "major",
+    "source_line": 242,
+    "minors": {
+      "0x01": {
+        "name": "WARN_SENS_AMP_CH_FAILIURE",
+        "description": "SENS AMP CH FAILIURE"
+      }
+    }
+  },
+  "0x30": {
+    "name": "WARN_FPT_CORRECTABLE_ERROR",
+    "description": "FPT CORRECTABLE ERROR",
+    "type": "major",
+    "source_line": 245,
+    "minors": {}
+  },
+  "0x31": {
+    "name": "WARN_FPT_UNCORRECTABLE_ERROR",
+    "description": "FPT UNCORRECTABLE ERROR",
+    "type": "major",
+    "source_line": 246,
+    "minors": {
+      "0x13": {
+        "name": "WARN_FPT_MINOR_RD_DQ_DQS",
+        "description": "FPT MINOR RD DQ DQS"
+      },
+      "0x14": {
+        "name": "WARN_FPT_MINOR_RD_RCVEN",
+        "description": "FPT MINOR RD RCVEN"
+      },
+      "0x15": {
+        "name": "WARN_FPT_MINOR_WR_LEVEL",
+        "description": "FPT MINOR WR LEVEL"
+      },
+      "0x00": {
+        "name": "WARN_FPT_MINOR_WR_FLYBY",
+        "description": "FPT MINOR WR FLYBY"
+      },
+      "0x16": {
+        "name": "WARN_FPT_MINOR_WR_DQ_DQS",
+        "description": "FPT MINOR WR DQ DQS"
+      },
+      "0x1b": {
+        "name": "WARN_FPT_MINOR_DQS_TEST",
+        "description": "FPT MINOR DQS TEST"
+      },
+      "0x1c": {
+        "name": "WARN_FPT_MINOR_MEM_TEST",
+        "description": "FPT MINOR MEM TEST"
+      },
+      "0x20": {
+        "name": "WARN_FPT_MINOR_LRDIMM_DWL_EXT_COARSE_TRAINING",
+        "description": "FPT MINOR LRDIMM DWL EXT COARSE TRAINING"
+      },
+      "0x21": {
+        "name": "WARN_FPT_MINOR_LRDIMM_DWL_EXT_FINE_TRAINING",
+        "description": "FPT MINOR LRDIMM DWL EXT FINE TRAINING"
+      },
+      "0x22": {
+        "name": "WARN_FPT_MINOR_LRDIMM_DWL_INT_COARSE_TRAINING",
+        "description": "FPT MINOR LRDIMM DWL INT COARSE TRAINING"
+      },
+      "0x23": {
+        "name": "WARN_FPT_MINOR_LRDIMM_DWL_INT_FINE_TRAINING",
+        "description": "FPT MINOR LRDIMM DWL INT FINE TRAINING"
+      },
+      "0x24": {
+        "name": "WARN_FPT_MINOR_LRDIMM_TRAINING",
+        "description": "FPT MINOR LRDIMM TRAINING"
+      },
+      "0x25": {
+        "name": "WARN_FPT_MINOR_VREF_TRAINING",
+        "description": "FPT MINOR VREF TRAINING"
+      },
+      "0x26": {
+        "name": "WARN_FPT_MINOR_LRDIMM_RCVEN_PHASE_TRAINING",
+        "description": "FPT MINOR LRDIMM RCVEN PHASE TRAINING"
+      },
+      "0x27": {
+        "name": "WARN_FPT_MINOR_LRDIMM_RCVEN_CYCLE_TRAINING",
+        "description": "FPT MINOR LRDIMM RCVEN CYCLE TRAINING"
+      },
+      "0x28": {
+        "name": "WARN_FPT_MINOR_LRDIMM_READ_DELAY_TRAINING",
+        "description": "FPT MINOR LRDIMM READ DELAY TRAINING"
+      },
+      "0x29": {
+        "name": "WARN_FPT_MINOR_LRDIMM_WL_TRAINING",
+        "description": "FPT MINOR LRDIMM WL TRAINING"
+      },
+      "0x2a": {
+        "name": "WARN_FPT_MINOR_LRDIMM_COARSE_WL_TRAINING",
+        "description": "FPT MINOR LRDIMM COARSE WL TRAINING"
+      },
+      "0x2b": {
+        "name": "WARN_FPT_MINOR_LRDIMM_WRITE_DELAY_TRAINING",
+        "description": "FPT MINOR LRDIMM WRITE DELAY TRAINING"
+      },
+      "0x2c": {
+        "name": "WARN_QxCA_CLK_NO_EYE_FOUND",
+        "description": "QxCA CLK NO EYE FOUND"
+      },
+      "0x2d": {
+        "name": "WARN_FPT_ROW_FAILURE",
+        "description": "FPT ROW FAILURE"
+      },
+      "0x2e": {
+        "name": "WARN_FPT_PPR_ROW_REPAIR",
+        "description": "FPT PPR ROW REPAIR"
+      },
+      "0x2f": {
+        "name": "WARN_FPT_MINOR_PPR_ROW_REPAIR_FAIL",
+        "description": "FPT MINOR PPR ROW REPAIR FAIL"
+      },
+      "0x30": {
+        "name": "WARN_FPT_MINOR_WL_EXTERNAL_COARSE",
+        "description": "FPT MINOR WL EXTERNAL COARSE"
+      },
+      "0x31": {
+        "name": "WARN_FPT_MINOR_WL_EXTERNAL_FINE",
+        "description": "FPT MINOR WL EXTERNAL FINE"
+      },
+      "0x32": {
+        "name": "WARN_FPT_MINOR_WL_INTERNAL_COARSE",
+        "description": "FPT MINOR WL INTERNAL COARSE"
+      },
+      "0x33": {
+        "name": "WARN_FPT_MINOR_WL_INTERNAL_FINE",
+        "description": "FPT MINOR WL INTERNAL FINE"
+      },
+      "0x34": {
+        "name": "WARN_FPT_MINOR_WL_INTERNAL_OUT_OF_CYCLE",
+        "description": "FPT MINOR WL INTERNAL OUT OF CYCLE"
+      },
+      "0x35": {
+        "name": "WARN_FPT_MINOR_RD_DQ_DQS_JITTER",
+        "description": "FPT MINOR RD DQ DQS JITTER"
+      },
+      "0x36": {
+        "name": "WARN_FPT_PPR_ROW_REPAIR_INVALID_ENTRY",
+        "description": "FPT PPR ROW REPAIR INVALID ENTRY"
+      },
+      "0x37": {
+        "name": "WARN_FPT_MINOR_PER_BIT_SKEW",
+        "description": "FPT MINOR PER BIT SKEW"
+      }
+    }
+  },
+  "0x32": {
+    "name": "WARN_CH_DISABLED",
+    "description": "CH DISABLED",
+    "type": "major",
+    "source_line": 279,
+    "minors": {
+      "0x01": {
+        "name": "WARN_TWR_LIMIT_REACHED",
+        "description": "TWR LIMIT REACHED"
+      },
+      "0x02": {
+        "name": "WARN_TWR_LIMIT_ON_LOCKSTEP_CH",
+        "description": "TWR LIMIT ON LOCKSTEP CH"
+      },
+      "0x03": {
+        "name": "WARN_SPD_BLOCK_UNLOCKED",
+        "description": "SPD BLOCK UNLOCKED"
+      }
+    }
+  },
+  "0x33": {
+    "name": "WARN_MEM_LIMIT",
+    "description": "MEM LIMIT",
+    "type": "major",
+    "source_line": 284,
+    "minors": {}
+  },
+  "0x34": {
+    "name": "WARN_RT_DIFF_EXCEED",
+    "description": "RT DIFF EXCEED",
+    "type": "major",
+    "source_line": 285,
+    "minors": {
+      "0x01": {
+        "name": "WARN_RT_DIFF_MINOR_EXCEED",
+        "description": "RT DIFF MINOR EXCEED"
+      }
+    }
+  },
+  "0x35": {
+    "name": "WARN_PPR_FAILED",
+    "description": "PPR FAILED",
+    "type": "major",
+    "source_line": 288,
+    "minors": {}
+  },
+  "0x36": {
+    "name": "WARN_REGISTER_OVERFLOW",
+    "description": "REGISTER OVERFLOW",
+    "type": "major",
+    "source_line": 289,
+    "minors": {
+      "0x01": {
+        "name": "WARN_MINOR_REGISTER_OVERFLOW",
+        "description": "MINOR REGISTER OVERFLOW"
+      },
+      "0x02": {
+        "name": "WARN_MINOR_REGISTER_UNDERFLOW",
+        "description": "MINOR REGISTER UNDERFLOW"
+      }
+    }
+  },
+  "0x37": {
+    "name": "WARN_SWIZZLE_DISCOVERY_TRAINING",
+    "description": "SWIZZLE DISCOVERY TRAINING",
+    "type": "major",
+    "source_line": 292,
+    "minors": {
+      "0x01": {
+        "name": "WARN_SWIZZLE_PATTERN_MISMATCH",
+        "description": "SWIZZLE PATTERN MISMATCH"
+      }
+    }
+  },
+  "0x38": {
+    "name": "WARN_WRCRC_DISABLE",
+    "description": "WRCRC DISABLE",
+    "type": "major",
+    "source_line": 294,
+    "minors": {
+      "0x01": {
+        "name": "WARN_TRAIL_ODT_LIMIT_REACHED",
+        "description": "TRAIL ODT LIMIT REACHED"
+      }
+    }
+  },
+  "0x39": {
+    "name": "WARN_FNV_BSR",
+    "description": "FNV BSR",
+    "type": "major",
+    "source_line": 296,
+    "minors": {
+      "0x01": {
+        "name": "WARN_DT_ERROR",
+        "description": "DT ERROR"
+      },
+      "0x02": {
+        "name": "WARN_MEDIA_READY_ERROR",
+        "description": "MEDIA READY ERROR"
+      },
+      "0x03": {
+        "name": "WARN_POLLING_LOOP_TIMEOUT",
+        "description": "POLLING LOOP TIMEOUT"
+      },
+      "0x04": {
+        "name": "WARN_OPCODE_INDEX_LOOKUP",
+        "description": "OPCODE INDEX LOOKUP"
+      },
+      "0x05": {
+        "name": "WARN_DR_READY_ERROR",
+        "description": "DR READY ERROR"
+      },
+      "0x06": {
+        "name": "WARN_FADR_ERROR",
+        "description": "FADR ERROR"
+      },
+      "0x07": {
+        "name": "WARN_WDB_ERROR",
+        "description": "WDB ERROR"
+      }
+    }
+  },
+  "0x3a": {
+    "name": "WARN_ADDDC_DISABLE",
+    "description": "ADDDC DISABLE",
+    "type": "major",
+    "source_line": 305,
+    "minors": {
+      "0x01": {
+        "name": "WARN_ADDDC_MINOR_DISABLE",
+        "description": "ADDDC MINOR DISABLE"
+      }
+    }
+  },
+  "0x3b": {
+    "name": "WARN_SDDC_DISABLE",
+    "description": "SDDC DISABLE",
+    "type": "major",
+    "source_line": 307,
+    "minors": {
+      "0x02": {
+        "name": "WARN_SDDC_MINOR_DISABLE",
+        "description": "SDDC MINOR DISABLE"
+      }
+    }
+  },
+  "0x3c": {
+    "name": "WARN_FW_OUT_OF_DATE",
+    "description": "FW OUT OF DATE",
+    "type": "major",
+    "source_line": 310,
+    "minors": {
+      "0x00": {
+        "name": "WARN_FW_CLK_MOVEMENT",
+        "description": "FW CLK MOVEMENT"
+      },
+      "0x01": {
+        "name": "WARN_FW_BCOM_MARGINING",
+        "description": "FW BCOM MARGINING"
+      }
+    }
+  },
+  "0x3d": {
+    "name": "WARN_SMBUS_FAULT",
+    "description": "SMBUS FAULT",
+    "type": "major",
+    "source_line": 313,
+    "minors": {
+      "0x01": {
+        "name": "WARN_SMBUS_WRITE",
+        "description": "SMBUS WRITE"
+      },
+      "0x02": {
+        "name": "WARN_SMBUS_READ",
+        "description": "SMBUS READ"
+      }
+    }
+  },
+  "0x3f": {
+    "name": "WARN_COMPLETION_DELAY_ERROR",
+    "description": "COMPLETION DELAY ERROR",
+    "type": "major",
+    "source_line": 316,
+    "minors": {}
+  },
+  "0x40": {
+    "name": "WARN_MEM_CONFIG_CHANGED",
+    "description": "MEM CONFIG CHANGED",
+    "type": "major",
+    "source_line": 320,
+    "minors": {
+      "0x01": {
+        "name": "WARN_MEM_OVERRIDE_DISABLED",
+        "description": "MEM OVERRIDE DISABLED"
+      }
+    }
+  },
+  "0x41": {
+    "name": "WARN_DIMM_MEM_MODE",
+    "description": "DIMM MEM MODE",
+    "type": "major",
+    "source_line": 323,
+    "minors": {
+      "0x01": {
+        "name": "WARN_DIMM_MEM_MODE_NEW_DIMM_2LM_NOT_SUPPORTED",
+        "description": "DIMM MEM MODE NEW DIMM 2LM NOT SUPPORTED"
+      },
+      "0x02": {
+        "name": "WARN_DIMM_MEM_MODE_2LM_NOT_SUPPORTED",
+        "description": "DIMM MEM MODE 2LM NOT SUPPORTED"
+      }
+    }
+  },
+  "0x42": {
+    "name": "WARN_DFE_TAP_MARGIN_STATUS",
+    "description": "DFE TAP MARGIN STATUS",
+    "type": "major",
+    "source_line": 327,
+    "minors": {
+      "0x01": {
+        "name": "WARN_DFE_TAP_ZERO_MARGIN_ERROR",
+        "description": "DFE TAP ZERO MARGIN ERROR"
+      }
+    }
+  },
+  "0x43": {
+    "name": "WARN_DFE_MARGIN_STATUS",
+    "description": "DFE MARGIN STATUS",
+    "type": "major",
+    "source_line": 330,
+    "minors": {
+      "0x01": {
+        "name": "WARN_DFE_ZERO_MARGIN_ERROR",
+        "description": "DFE ZERO MARGIN ERROR"
+      }
+    }
+  },
+  "0x44": {
+    "name": "WARN_FREQUENCY_POR_CHECK",
+    "description": "FREQUENCY POR CHECK",
+    "type": "major",
+    "source_line": 333,
+    "minors": {
+      "0x00": {
+        "name": "WARN_PLATFORM_SEGMENT_NOT_FOUND",
+        "description": "PLATFORM SEGMENT NOT FOUND"
+      },
+      "0x01": {
+        "name": "WARN_INVALID_NUMBER_OF_SOCKETS",
+        "description": "INVALID NUMBER OF SOCKETS"
+      },
+      "0x02": {
+        "name": "WARN_UNKNOWN_PLATFORM_SEGMENT",
+        "description": "UNKNOWN PLATFORM SEGMENT"
+      },
+      "0x03": {
+        "name": "WARN_INVALID_POR_SOCKET_CONFIG",
+        "description": "INVALID POR SOCKET CONFIG"
+      }
+    }
+  },
+  "0x45": {
+    "name": "WARN_BOUNDS_ERROR",
+    "description": "BOUNDS ERROR",
+    "type": "major",
+    "source_line": 339,
+    "minors": {
+      "0x01": {
+        "name": "WARN_INVALID_DIMM_INDEX",
+        "description": "INVALID DIMM INDEX"
+      }
+    }
+  },
+  "0x46": {
+    "name": "WARN_POWER_FAILURE",
+    "description": "POWER FAILURE",
+    "type": "major",
+    "source_line": 342,
+    "minors": {
+      "0x00": {
+        "name": "WARN_DDR5_POWER_FAILURE_PHASE_1",
+        "description": "DDR5 POWER FAILURE PHASE 1"
+      },
+      "0x01": {
+        "name": "WARN_DDR5_POWER_FAILURE_PHASE_2",
+        "description": "DDR5 POWER FAILURE PHASE 2"
+      },
+      "0x02": {
+        "name": "WARN_DDRT_POWER_FAILURE",
+        "description": "DDRT POWER FAILURE"
+      },
+      "0x03": {
+        "name": "WARN_DDRIO_POWER_FAILURE",
+        "description": "DDRIO POWER FAILURE"
+      },
+      "0x04": {
+        "name": "WARN_DDR5_POWER_FAILURE_VOLTAGE_FAIL",
+        "description": "DDR5 POWER FAILURE VOLTAGE FAIL"
+      },
+      "0x05": {
+        "name": "WARN_DDR5_POWER_FAILURE_CRIT_TEMP",
+        "description": "DDR5 POWER FAILURE CRIT TEMP"
+      },
+      "0x06": {
+        "name": "WARN_DDR5_POWER_FAILURE_IBI_ERROR",
+        "description": "DDR5 POWER FAILURE IBI ERROR"
+      },
+      "0x07": {
+        "name": "WARN_DDR5_POWER_FAILURE_ISOLATED_ERROR",
+        "description": "DDR5 POWER FAILURE ISOLATED ERROR"
+      },
+      "0x08": {
+        "name": "WARN_DDR5_POWER_FAILURE_VIN_BULK_INVALID",
+        "description": "DDR5 POWER FAILURE VIN BULK INVALID"
+      },
+      "0x09": {
+        "name": "WARN_DDR5_POWER_FAILURE_VIN_BULK_OVER_VOLTAGE",
+        "description": "DDR5 POWER FAILURE VIN BULK OVER VOLTAGE"
+      }
+    }
+  },
+  "0x47": {
+    "name": "WARN_TRAINING_RESULT_CHECK",
+    "description": "TRAINING RESULT CHECK",
+    "type": "major",
+    "source_line": 354,
+    "minors": {
+      "0x01": {
+        "name": "WARN_TRAINING_RESULT_BEYOND_LIMIT",
+        "description": "TRAINING RESULT BEYOND LIMIT"
+      }
+    }
+  },
+  "0x48": {
+    "name": "WARN_MEMTEST_ROW_FAIL_RANGE_ERROR",
+    "description": "MEMTEST ROW FAIL RANGE ERROR",
+    "type": "major",
+    "source_line": 357,
+    "minors": {
+      "0x01": {
+        "name": "WARN_MEMTEST_DDR_ROW_FAIL_RANGE_LIST_FULL",
+        "description": "MEMTEST DDR ROW FAIL RANGE LIST FULL"
+      },
+      "0x02": {
+        "name": "WARN_MEMTEST_HBM_ROW_FAIL_RANGE_LIST_FULL",
+        "description": "MEMTEST HBM ROW FAIL RANGE LIST FULL"
+      }
+    }
+  },
+  "0x49": {
+    "name": "WARN_MRC_MISC_ERROR",
+    "description": "MRC MISC ERROR",
+    "type": "major",
+    "source_line": 361,
+    "minors": {
+      "0x01": {
+        "name": "WARN_MC_COMP_TIMEOUT",
+        "description": "MC COMP TIMEOUT"
+      },
+      "0x05": {
+        "name": "WARN_SENSEAMP_HWFSM_FAILURE",
+        "description": "SENSEAMP HWFSM FAILURE"
+      }
+    }
+  },
+  "0x50": {
+    "name": "WARN_MCA_UNCORRECTABLE_ERROR",
+    "description": "MCA UNCORRECTABLE ERROR",
+    "type": "major",
+    "source_line": 365,
+    "minors": {
+      "0x01": {
+        "name": "WARN_PREVIOUS_BOOT_MCA_MINOR_CODE",
+        "description": "PREVIOUS BOOT MCA MINOR CODE"
+      }
+    }
+  },
+  "0x60": {
+    "name": "WARN_DM_TEST_ERROR_CODE",
+    "description": "DM TEST ERROR CODE",
+    "type": "major",
+    "source_line": 368,
+    "minors": {
+      "0x01": {
+        "name": "WARN_DM_TEST_PARSE_ERROR_MINOR_CODE",
+        "description": "DM TEST PARSE ERROR MINOR CODE"
+      },
+      "0x02": {
+        "name": "WARN_DM_TEST_CONFIGURATION_ERROR_MINOR_CODE",
+        "description": "DM TEST CONFIGURATION ERROR MINOR CODE"
+      },
+      "0x03": {
+        "name": "WARN_DM_TEST_EXECUTION_ERROR_MINOR_CODE",
+        "description": "DM TEST EXECUTION ERROR MINOR CODE"
+      }
+    }
+  },
+  "0x75": {
+    "name": "WARN_FPGA_NOT_DETECTED",
+    "description": "FPGA NOT DETECTED",
+    "type": "major",
+    "source_line": 372,
+    "minors": {}
+  },
+  "0x79": {
+    "name": "WARN_HBM_POR_LIMITATION",
+    "description": "HBM POR LIMITATION",
+    "type": "major",
+    "source_line": 378,
+    "minors": {
+      "0x01": {
+        "name": "WARN_HBM_UNSUPPORTED_SOCKET_POPULATION",
+        "description": "HBM UNSUPPORTED SOCKET POPULATION"
+      },
+      "0x02": {
+        "name": "WARN_HBM_UNSUPPORTED_IO_STACK_POPULATION",
+        "description": "HBM UNSUPPORTED IO STACK POPULATION"
+      }
+    }
+  },
+  "0x80": {
+    "name": "WARN_FSM_ERROR_CODE",
+    "description": "FSM ERROR CODE",
+    "type": "major",
+    "source_line": 382,
+    "minors": {
+      "0x01": {
+        "name": "WARN_FSM_TIMEOUT_ERROR",
+        "description": "FSM TIMEOUT ERROR"
+      }
+    }
+  },
+  "0x81": {
+    "name": "WARN_IEEE_1500_ERROR_CODE",
+    "description": "IEEE 1500 ERROR CODE",
+    "type": "major",
+    "source_line": 385,
+    "minors": {
+      "0x01": {
+        "name": "WARN_IEEE_1500_TIMEOUT_ERROR",
+        "description": "IEEE 1500 TIMEOUT ERROR"
+      }
+    }
+  },
+  "0x82": {
+    "name": "WARN_HBM_ERROR",
+    "description": "HBM ERROR",
+    "type": "major",
+    "source_line": 388,
+    "minors": {
+      "0x01": {
+        "name": "WARN_HBM_TRAINING_FAILURE",
+        "description": "HBM TRAINING FAILURE"
+      },
+      "0x02": {
+        "name": "WARN_HBM_MBIST_FAILURE",
+        "description": "HBM MBIST FAILURE"
+      },
+      "0x03": {
+        "name": "WARN_HBM_INVALID_PPR_ADDRESS",
+        "description": "HBM INVALID PPR ADDRESS"
+      },
+      "0x05": {
+        "name": "WARN_HBM_BASIC_MEMTEST_FAILURE",
+        "description": "HBM BASIC MEMTEST FAILURE"
+      },
+      "0x06": {
+        "name": "WARN_HBM_ADVANCED_MEMTEST_FAILURE",
+        "description": "HBM ADVANCED MEMTEST FAILURE"
+      },
+      "0x07": {
+        "name": "WARN_HBM_BANK_SPARING_FAILURE",
+        "description": "HBM BANK SPARING FAILURE"
+      },
+      "0x0b": {
+        "name": "WARN_HBM_PPR_OVERFLOW",
+        "description": "HBM PPR OVERFLOW"
+      }
+    }
+  },
+  "0x90": {
+    "name": "WARN_HBM_CORRECTABLE_ERROR",
+    "description": "HBM CORRECTABLE ERROR",
+    "type": "major",
+    "source_line": 397,
+    "minors": {}
+  },
+  "0x91": {
+    "name": "WARN_HBM_UNCORRECTABLE_ERROR",
+    "description": "HBM UNCORRECTABLE ERROR",
+    "type": "major",
+    "source_line": 398,
+    "minors": {
+      "0x04": {
+        "name": "WARN_HBM_PPR_FAILURE",
+        "description": "HBM PPR FAILURE"
+      },
+      "0x08": {
+        "name": "WARN_HBM_ROW_FAILURE",
+        "description": "HBM ROW FAILURE"
+      },
+      "0x09": {
+        "name": "WARN_HBM_MINOR_MEM_TEST",
+        "description": "HBM MINOR MEM TEST"
+      },
+      "0x0a": {
+        "name": "WARN_HBM_PPR_ROW_REPAIR",
+        "description": "HBM PPR ROW REPAIR"
+      }
+    }
+  },
+  "0x84": {
+    "name": "WARN_NVMCTRL_MEDIA_STATUS",
+    "description": "NVMCTRL MEDIA STATUS",
+    "type": "major",
+    "source_line": 407,
+    "minors": {
+      "0x02": {
+        "name": "WARN_NVMCTRL_MEDIA_NOTREADY",
+        "description": "NVMCTRL MEDIA NOTREADY"
+      },
+      "0x03": {
+        "name": "WARN_NVMCTRL_MEDIA_INERROR",
+        "description": "NVMCTRL MEDIA INERROR"
+      },
+      "0x04": {
+        "name": "WARN_NVMCTRL_MEDIA_RESERVED",
+        "description": "NVMCTRL MEDIA RESERVED"
+      },
+      "0x05": {
+        "name": "WARN_NVMCTRL_MEDIA_DWR",
+        "description": "NVMCTRL MEDIA DWR"
+      },
+      "0x06": {
+        "name": "WARN_NVMCTRL_MEDIA_AIT_NOTREADY",
+        "description": "NVMCTRL MEDIA AIT NOTREADY"
+      }
+    }
+  },
+  "0x85": {
+    "name": "WARN_CFGCUR_STATUS",
+    "description": "CFGCUR STATUS",
+    "type": "major",
+    "source_line": 416,
+    "minors": {
+      "0x01": {
+        "name": "WARN_CFGCUR_SIGNATURE_MISMATCH",
+        "description": "CFGCUR SIGNATURE MISMATCH"
+      },
+      "0x02": {
+        "name": "WARN_CFGCUR_CHECKSUM_MISMATCH",
+        "description": "CFGCUR CHECKSUM MISMATCH"
+      },
+      "0x03": {
+        "name": "WARN_CFGCUR_REVISION_MISMATCH",
+        "description": "CFGCUR REVISION MISMATCH"
+      },
+      "0x04": {
+        "name": "WARN_CFGCUR_DATASIZE_EXCEEDED",
+        "description": "CFGCUR DATASIZE EXCEEDED"
+      },
+      "0x05": {
+        "name": "WARN_CFGCUR_DATASIZE_OFFSET_EXCEEDED",
+        "description": "CFGCUR DATASIZE OFFSET EXCEEDED"
+      }
+    }
+  },
+  "0x86": {
+    "name": "WARN_CFGIN_STATUS",
+    "description": "CFGIN STATUS",
+    "type": "major",
+    "source_line": 425,
+    "minors": {
+      "0x04": {
+        "name": "WARN_CFGIN_DATASIZE_EXCEEDED",
+        "description": "CFGIN DATASIZE EXCEEDED"
+      }
+    }
+  },
+  "0x87": {
+    "name": "WARN_CFGOUT_STATUS",
+    "description": "CFGOUT STATUS",
+    "type": "major",
+    "source_line": 433,
+    "minors": {
+      "0x04": {
+        "name": "WARN_CFGOUT_DATASIZE_EXCEEDED",
+        "description": "CFGOUT DATASIZE EXCEEDED"
+      }
+    }
+  },
+  "0x88": {
+    "name": "WARN_BIOS_CONFIG_HEADER_STATUS",
+    "description": "BIOS CONFIG HEADER STATUS",
+    "type": "major",
+    "source_line": 441,
+    "minors": {}
+  },
+  "0x89": {
+    "name": "WARN_OS_CONFIG_HEADER_STATUS",
+    "description": "OS CONFIG HEADER STATUS",
+    "type": "major",
+    "source_line": 448,
+    "minors": {}
+  },
+  "0x8a": {
+    "name": "WARN_NVDIMM_SURPRISE_CLOCK_STOP",
+    "description": "NVDIMM SURPRISE CLOCK STOP",
+    "type": "major",
+    "source_line": 456,
+    "minors": {
+      "0x01": {
+        "name": "WARN_POWER_CYCLE_POLICY_NOT_APPLY",
+        "description": "POWER CYCLE POLICY NOT APPLY"
+      },
+      "0x02": {
+        "name": "WARN_POWER_CYCLE_POLICY_APPLY",
+        "description": "POWER CYCLE POLICY APPLY"
+      }
+    }
+  },
+  "0x8b": {
+    "name": "WARN_FNV_ACCESS",
+    "description": "FNV ACCESS",
+    "type": "major",
+    "source_line": 463,
+    "minors": {
+      "0x01": {
+        "name": "WARN_INVALID_FNV_ACCESS_MODE",
+        "description": "INVALID FNV ACCESS MODE"
+      }
+    }
+  },
+  "0x8c": {
+    "name": "WARN_MEMORY_BOOT_HEALTH_CHECK",
+    "description": "MEMORY BOOT HEALTH CHECK",
+    "type": "major",
+    "source_line": 469,
+    "minors": {
+      "0x01": {
+        "name": "WARN_MEMORY_BOOT_HEALTH_CHECK_MASK_FAIL",
+        "description": "MEMORY BOOT HEALTH CHECK MASK FAIL"
+      },
+      "0x02": {
+        "name": "WARN_MEMORY_BOOT_HEALTH_CHECK_CHANNEL_MAP_OUT",
+        "description": "MEMORY BOOT HEALTH CHECK CHANNEL MAP OUT"
+      }
+    }
+  },
+  "0x8d": {
+    "name": "WARN_MEMORY_POWER_MANAGEMENT",
+    "description": "MEMORY POWER MANAGEMENT",
+    "type": "major",
+    "source_line": 476,
+    "minors": {
+      "0x01": {
+        "name": "WARN_MEMORY_PM_THERMAL_PMON_VR_NOT_FOUND",
+        "description": "MEMORY PM THERMAL PMON VR NOT FOUND"
+      },
+      "0x02": {
+        "name": "WARN_MEMORY_PM_THERMAL_TABLE_NOT_FOUND",
+        "description": "MEMORY PM THERMAL TABLE NOT FOUND"
+      },
+      "0x03": {
+        "name": "WARN_MEMORY_PM_TEMPERATURE_THRESHOLD_RANGE_ERROR",
+        "description": "MEMORY PM TEMPERATURE THRESHOLD RANGE ERROR"
+      }
+    }
+  },
+  "0xe0": {
+    "name": "WARN_TME_MKTME_FAILURE",
+    "description": "TME MKTME FAILURE",
+    "type": "major",
+    "source_line": 484,
+    "minors": {}
+  },
+  "0xe1": {
+    "name": "WARN_SILICON_CAPABILITY_LIMITATION",
+    "description": "SILICON CAPABILITY LIMITATION",
+    "type": "major",
+    "source_line": 491,
+    "minors": {
+      "0x01": {
+        "name": "WARN_TME_ENABLED_CRYSTAL_RIDGE_NOT_SUPPORTED",
+        "description": "TME ENABLED CRYSTAL RIDGE NOT SUPPORTED"
+      },
+      "0x02": {
+        "name": "WARN_SGX_ENABLED_CRYSTAL_RIDGE_NOT_SUPPORTED",
+        "description": "SGX ENABLED CRYSTAL RIDGE NOT SUPPORTED"
+      },
+      "0x03": {
+        "name": "WARN_TME_INTEGRITY_ENABLED_CRYSTAL_RIDGE_NOT_SUPPORTED",
+        "description": "TME INTEGRITY ENABLED CRYSTAL RIDGE NOT SUPPORTED"
+      }
+    }
+  },
+  "0xe2": {
+    "name": "WARN_ROUNDTRIP_CALCULATION_RANGE_ERROR",
+    "description": "ROUNDTRIP CALCULATION RANGE ERROR",
+    "type": "major",
+    "source_line": 499,
+    "minors": {
+      "0x01": {
+        "name": "WARN_DDRT_TO_DDR4_ROUNDTRIP_RANGE_ERROR",
+        "description": "DDRT TO DDR4 ROUNDTRIP RANGE ERROR"
+      },
+      "0x02": {
+        "name": "WARN_DDR4_TO_DDRT_ROUNDTRIP_RANGE_ERROR",
+        "description": "DDR4 TO DDRT ROUNDTRIP RANGE ERROR"
+      }
+    }
+  },
+  "0xff": {
+    "name": "WARN_MINOR_WILDCARD",
+    "description": "MINOR WILDCARD",
+    "type": "major",
+    "source_line": 503,
+    "minors": {}
+  }
+}

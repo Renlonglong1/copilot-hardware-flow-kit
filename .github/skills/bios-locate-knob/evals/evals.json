@@ -1,0 +1,35 @@
+{
+  "skill_name": "bios-locate-knob",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm working in D:\\oks\\ServerGen4-Original. Can you find where the EnforceDdrMemoryFreqPor knob is? I need to know which setup page it's on and roughly where it appears on the page.",
+      "expected_output": "Should find the knob in MemorySetup.hfr as a oneof type, identify it's in the Memory Configuration form (VFR_FORMID_MEMORY), resolve the form title from UNI file as 'Memory Configuration', and estimate its position within the form.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "我想找一下BIOS setup里面的AcpiS3Enable这个knob在哪里，代码在D:\\oks\\ServerGen4-Original",
+      "expected_output": "Should find AcpiS3Enable in PowerManagementSetup.hfr as a oneof type with 3 options (Disabled/Enabled/Auto), identify it's in the Power Management form, resolve form title from UNI file, and show its position on the form page. Should handle Chinese language input correctly.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Find the DirectoryModeEn setup knob in the BIOS code at D:\\oks\\ServerGen4-Original. I want to know its exact form and position so I can navigate to it in the BIOS setup menu.",
+      "expected_output": "Should find DirectoryModeEn in KtiSetup.hfr as a oneof type with INTERACTIVE flag, note the questionid = KEY_DIRECTORY_MODE_ENABLE, identify it's in a KTI-related form, resolve the form title string, find the endform boundary, and estimate position. Should also note the navigation path through KTI Configuration.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "我想找一下BIOS setup里面跟内存频率相关的选项，好像是一个可以enforce DDR频率的开关，代码目录是D:\\oks\\ServerGen4-Original",
+      "expected_output": "Should use fuzzy search strategy — extract keywords like 'memory frequency', 'enforce', 'DDR' from the user's description, search UNI files for matching prompt/help strings, find candidates including 'Enforce DDR Memory Frequency POR' (STR_ENFORCE_DDR_MEMORY_FREQ_POR_PROMPT), and locate it in MemorySetup.hfr. If multiple matches, should present a candidate list.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Is there a setup option related to S3 sleep or suspend in the BIOS code at D:\\oks\\ServerGen4-Original? Not sure what the exact variable name is, just know it has something to do with ACPI S3.",
+      "expected_output": "Should fuzzy-search UNI files for keywords like 'S3', 'ACPI', 'sleep', 'suspend'. Should find AcpiS3Enable via STR_ACPI_S3_STATE_REPORT in PowerManagementSetup.hfr, present it as a match, and provide full location report.",
+      "files": []
+    }
+  ]
+}

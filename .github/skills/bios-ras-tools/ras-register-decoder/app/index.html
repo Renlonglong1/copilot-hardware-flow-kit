@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAS Register Decoder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>RAS Register Decoder</h1>
+            <span class="platform-badge">BHS / Granite Rapids</span>
+            <div class="header-actions">
+                <button id="theme-toggle" title="Toggle dark/light theme">🌙</button>
+            </div>
+        </header>
+
+        <!-- Top Search & Filter Bar -->
+        <div class="top-toolbar">
+            <div class="toolbar-search">
+                <label>Register</label>
+                <div class="search-wrapper">
+                    <input type="text" id="reg-search" placeholder="Search register name or address..." autocomplete="off">
+                    <div class="search-dropdown" id="reg-dropdown"></div>
+                </div>
+            </div>
+            <div class="toolbar-platform">
+                <label for="platform-select">Platform</label>
+                <select id="platform-select" aria-label="Platform">
+                    <option value="BHS">BHS / Granite Rapids</option>
+                    <option value="OKS">OKS / Diamond Rapids</option>
+                </select>
+            </div>
+            <div class="toolbar-value">
+                <label>Value (hex)</label>
+                <input type="text" id="reg-value" placeholder="e.g. 0xDEADBEEF" autocomplete="off">
+            </div>
+            <button class="btn-decode" id="btn-decode">Decode</button>
+            <div class="toolbar-divider"></div>
+            <div class="toolbar-filter">
+                <input type="text" id="list-filter" placeholder="Filter registers...">
+            </div>
+            <div class="toolbar-feature">
+                <select id="feature-filter">
+                    <option value="">All Domains</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Left Sidebar: Feature Browser -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <h2>RAS Domains</h2>
+                    <span class="reg-count" id="total-count">0 registers</span>
+                </div>
+                <div class="feature-list" id="feature-list">
+                    <!-- Populated by JS -->
+                </div>
+            </aside>
+
+            <!-- Center Content -->
+            <main class="content">
+                <!-- Decoder Panel -->
+                <section class="decoder-panel" id="decoder-panel">
+                    <!-- Decode Result -->
+                    <div class="decode-result" id="decode-result" style="display:none;">
+                        <div class="result-header">
+                            <h3 id="result-reg-name"></h3>
+                            <span class="result-meta" id="result-meta"></span>
+                            <button class="btn-close-result" id="btn-close-result" title="Close">&times;</button>
+                        </div>
+                        <!-- Bitfield Visual -->
+                        <div class="bitfield-visual" id="bitfield-visual"></div>
+                        <!-- EDS Reference -->
+                        <div class="eds-reference-panel" id="eds-reference-panel" style="display:none;">
+                            <div class="eds-reference-header">
+                                <div>
+                                    <div class="eds-reference-label">EDS Reference</div>
+                                    <div class="eds-reference-content" id="eds-reference-content"></div>
+                                </div>
+                                <button class="eds-raw-toggle" id="eds-raw-toggle" type="button">Show EDS raw text</button>
+                            </div>
+                            <pre class="eds-raw-text" id="eds-raw-text" style="display:none;"></pre>
+                        </div>
+                        <!-- CScripts Command -->
+                        <div class="cscripts-command-panel" id="cscripts-command-panel" style="display:none;">
+                            <div class="cscripts-command-label">CScripts Read Command</div>
+                            <div class="cscripts-command-content" id="cscripts-command-content"></div>
+                        </div>
+                        <!-- Field Table -->
+                        <div class="field-table-wrapper">
+                            <table class="field-table" id="field-table">
+                                <thead>
+                                    <tr>
+                                        <th>Bits</th>
+                                        <th>Field Name</th>
+                                        <th>Access</th>
+                                        <th>Value</th>
+                                        <th>Hex</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="field-tbody"></tbody>
+                            </table>
+                        </div>
+                        <div class="result-actions">
+                            <button class="btn-copy" id="btn-copy-result">Copy to Clipboard</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Register List Panel -->
+                <section class="register-list-panel" id="register-list-panel">
+                    <div class="register-table-wrapper">
+                        <table class="register-table" id="register-table">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" data-sort="name">Name ▼</th>
+                                    <th class="sortable" data-sort="address">Address</th>
+                                    <th>Width</th>
+                                    <th>Fields</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="register-tbody"></tbody>
+                        </table>
+                    </div>
+                    <div class="list-footer">
+                        <span id="list-status">Showing 0 registers</span>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Batch Decode Modal -->
+    <div class="modal" id="batch-modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Batch Decode</h2>
+                <button class="modal-close" id="batch-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Paste register:value pairs (one per line).<br>
+                   Format: <code>REGISTER_NAME = 0xVALUE</code> or <code>0xADDRESS = 0xVALUE</code></p>
+                <textarea id="batch-input" rows="10" placeholder="RETRY_RD_ERR_LOG = 0x12345678&#10;0x90 = 0xDEADBEEF"></textarea>
+                <button class="btn-decode" id="btn-batch-decode">Decode All</button>
+                <div id="batch-results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="mca_decode.js?v=1"></script>
+    <script src="app.js?v=13"></script>
+</body>
+</html>

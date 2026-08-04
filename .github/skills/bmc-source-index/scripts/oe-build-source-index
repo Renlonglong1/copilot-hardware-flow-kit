@@ -1,0 +1,778 @@
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+
+import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+
+def detect_repo_root() -> Path:
+    current = Path(__file__).absolute().parent
+    candidates = [current, *current.parents]
+
+    preferred_checks = (
+        lambda candidate: (candidate / "en_env.sh").is_file(),
+        lambda candidate: (candidate / "build" / "pn-buildlist").is_file(),
+        lambda candidate: (candidate / "poky").is_dir()
+        and (candidate / "scripts" / "lib" / "scriptpath.py").is_file(),
+    )
+    fallback_checks = (
+        lambda candidate: (candidate / "oe-init-build-env").is_file(),
+        lambda candidate: (candidate / "scripts" / "lib" / "scriptpath.py").is_file(),
+    )
+
+    for check in preferred_checks:
+        for candidate in candidates:
+            if check(candidate):
+                return candidate
+
+    for candidate in candidates:
+        if any(check(candidate) for check in fallback_checks):
+            return candidate
+
+    raise SystemExit(f"error: could not locate repo root from {__file__}")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Generate a refreshed filtered source index under source-index "
+            "using symlinks to resolved recipe source trees."
+        )
+    )
+    parser.add_argument(
+        "--repo-root",
+        help="OpenBMC/OpenEmbedded repository root. Defaults to auto-detection from the script path.",
+    )
+    parser.add_argument(
+        "--build-dir",
+        help="Build directory containing pn-buildlist (default: <repo-root>/build)",
+    )
+    parser.add_argument(
+        "--output",
+        help="Output directory for the generated index (default: <repo>/source-index)",
+    )
+    parser.add_argument(
+        "--manifest-name",
+        default="manifest.json",
+        help="Manifest filename written inside the output directory (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--helper-script",
+        help="Path to oe-find-recipe-source-tree for helper-mode fallback (default: <repo-root>/scripts/oe-find-recipe-source-tree)",
+    )
+    parser.add_argument(
+        "--env-script",
+        help="Path to en_env.sh or equivalent bootstrap, passed to the helper backend",
+    )
+    parser.add_argument(
+        "--image",
+        help=(
+            "BitBake image target used to create pn-buildlist with 'bitbake -g' "
+            "when pn-buildlist is missing. If omitted, the generator tries to infer "
+            "one unambiguous image from deploy artifacts."
+        ),
+    )
+    parser.add_argument(
+        "--no-generate-pn-buildlist",
+        action="store_true",
+        help="Exit if pn-buildlist is missing instead of running 'bitbake -g <image>'.",
+    )
+    parser.add_argument(
+        "--metadata-backend",
+        choices=["auto", "tinfoil", "helper"],
+        default="auto",
+        help="Metadata loading backend (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--include-native",
+        action="store_true",
+        help="Include native and nativesdk recipes that are skipped by default",
+    )
+    parser.add_argument(
+        "--include-packagegroups",
+        action="store_true",
+        help="Include packagegroup recipes that are skipped by default",
+    )
+    parser.add_argument(
+        "--max-recipes",
+        type=int,
+        help="Limit the number of recipes processed after name-based filtering",
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Print progress information to stderr",
+    )
+    return parser.parse_args()
+
+
+def log(message: str, verbose: bool) -> None:
+    if verbose:
+        print(message, file=sys.stderr)
+
+
+def validate_paths(build_dir: Path, output_dir: Path) -> None:
+    if not build_dir.is_dir():
+        raise SystemExit(f"error: build directory does not exist: {build_dir}")
+    if output_dir == build_dir:
+        raise SystemExit(f"error: refusing to use build directory as output: {output_dir}")
+    if not output_dir.parent.exists():
+        raise SystemExit(f"error: output parent directory does not exist: {output_dir.parent}")
+
+
+def resolve_env_script(root: Path, env_script_arg: str | None) -> Path | None:
+    if env_script_arg:
+        return Path(env_script_arg).expanduser().resolve()
+
+    default_env_script = root / "en_env.sh"
+    if default_env_script.is_file():
+        return default_env_script.resolve()
+
+    return None
+
+
+def configured_machine(build_dir: Path) -> str | None:
+    local_conf = build_dir / "conf" / "local.conf"
+    if not local_conf.is_file():
+        return None
+
+    assignment = re.compile(r"^\s*MACHINE\s*(?:\?\?=|\?=|=)\s*['\"]?([^'\"\s#]+)")
+    for line in local_conf.read_text(encoding="utf-8").splitlines():
+        match = assignment.match(line)
+        if match:
+            return match.group(1)
+
+    return None
+
+
+def image_name_from_artifact(artifact_name: str, machine: str) -> str | None:
+    escaped_machine = re.escape(machine)
+    patterns = (
+        rf"^(.+)-image-update-{escaped_machine}-\d+\.tar$",
+        rf"^(.+)-{escaped_machine}(?:-\d+)?\.(?:manifest|qemuboot\.conf|spdx\.json|squashfs-xz|testdata\.json)$",
+    )
+
+    for pattern in patterns:
+        match = re.match(pattern, artifact_name)
+        if match:
+            return match.group(1)
+
+    return None
+
+
+def detect_image_from_deploy_artifacts(build_dir: Path) -> str | None:
+    deploy_root = build_dir / "tmp" / "deploy" / "images"
+    if not deploy_root.is_dir():
+        return None
+
+    machine = configured_machine(build_dir)
+    machine_dirs = []
+    if machine and (deploy_root / machine).is_dir():
+        machine_dirs.append(deploy_root / machine)
+    else:
+        machine_dirs.extend(path for path in deploy_root.iterdir() if path.is_dir())
+
+    candidates: set[str] = set()
+    for machine_dir in machine_dirs:
+        machine_name = machine_dir.name
+        for artifact in machine_dir.iterdir():
+            artifact_names = [artifact.name]
+            if artifact.is_symlink():
+                artifact_names.append(artifact.resolve(strict=False).name)
+
+            for artifact_name in artifact_names:
+                image_name = image_name_from_artifact(artifact_name, machine_name)
+                if image_name:
+                    candidates.add(image_name)
+
+    if len(candidates) == 1:
+        return next(iter(candidates))
+
+    if len(candidates) > 1:
+        formatted = ", ".join(sorted(candidates))
+        raise SystemExit(
+            "error: pn-buildlist is missing and the active image target is ambiguous "
+            f"from deploy artifacts: {formatted}. Pass --image <target>."
+        )
+
+    return None
+
+
+def generate_pn_buildlist(root: Path, build_dir: Path, env_script: Path, image: str, verbose: bool) -> None:
+    if not env_script.is_file():
+        raise SystemExit(f"error: environment script does not exist: {env_script}")
+
+    log(f"Generating pn-buildlist with bitbake -g {image}", verbose)
+    command = """
+set -e
+repo_root="$1"
+env_script="$2"
+build_dir="$3"
+image="$4"
+cd "$repo_root"
+shell_flags="$-"
+set +u
+set --
+source "$env_script" >/dev/null
+case "$shell_flags" in
+    *u*) set -u ;;
+esac
+cd "$build_dir"
+bitbake -g "$image"
+"""
+    proc = subprocess.run(
+        ["bash", "-c", command, "oe-build-source-index", str(root), str(env_script), str(build_dir), image],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    if proc.returncode != 0:
+        output = "\n".join(part.strip() for part in (proc.stderr, proc.stdout) if part.strip())
+        if len(output) > 4000:
+            output = output[-4000:]
+        raise SystemExit(
+            f"error: failed to generate pn-buildlist with 'bitbake -g {image}' "
+            f"(exit {proc.returncode})\n{output}"
+        )
+
+
+def ensure_pn_buildlist(
+    root: Path,
+    build_dir: Path,
+    env_script: Path | None,
+    image_arg: str | None,
+    generate_if_missing: bool,
+    verbose: bool,
+) -> tuple[Path, bool, str | None]:
+    pn_buildlist = build_dir / "pn-buildlist"
+    if pn_buildlist.is_file():
+        return pn_buildlist, False, None
+
+    if not generate_if_missing:
+        raise SystemExit(f"error: pn-buildlist was not found at {pn_buildlist}")
+
+    image = image_arg or detect_image_from_deploy_artifacts(build_dir)
+    if not image:
+        raise SystemExit(
+            f"error: pn-buildlist was not found at {pn_buildlist} and no image target could be inferred. "
+            "Pass --image <target> so the generator can run 'bitbake -g <target>'."
+        )
+
+    if env_script is None:
+        raise SystemExit(
+            f"error: pn-buildlist was not found at {pn_buildlist}, but no en_env.sh was found under {root}. "
+            "Pass --env-script /path/to/en_env.sh so the generator can run 'bitbake -g <target>'."
+        )
+
+    generate_pn_buildlist(root, build_dir, env_script, image, verbose)
+    if not pn_buildlist.is_file():
+        raise SystemExit(f"error: bitbake -g {image} completed but did not create {pn_buildlist}")
+
+    return pn_buildlist, True, image
+
+
+def load_recipes(pn_buildlist: Path) -> list[str]:
+    recipes = []
+    for line in pn_buildlist.read_text(encoding="utf-8").splitlines():
+        recipe = line.strip()
+        if recipe:
+            recipes.append(recipe)
+    return recipes
+
+
+def skip_reason(recipe: str, args: argparse.Namespace) -> str | None:
+    if not args.include_native:
+        if recipe.endswith("-native") or recipe.startswith("nativesdk-"):
+            return "filtered-native"
+
+    if recipe.endswith("-cross") or "-crosssdk" in recipe or "-cross-canadian" in recipe:
+        return "filtered-cross"
+
+    if not args.include_packagegroups and recipe.startswith("packagegroup-"):
+        return "filtered-packagegroup"
+
+    if recipe.endswith("-image") or recipe.startswith("image") or "-image-" in recipe:
+        return "filtered-image-like"
+
+    return None
+
+
+def filtered_entry(recipe: str, reason: str) -> dict:
+    return {
+        "recipe": recipe,
+        "status": "filtered",
+        "skip_reason": reason,
+        "link_name": None,
+        "link_path": None,
+        "source_dir": None,
+        "source_origin": None,
+        "workdir": None,
+        "recipe_file": None,
+        "src_uri": None,
+        "srcrev": None,
+        "exists": False,
+        "error": None,
+    }
+
+
+def classify_source_origin(source_dir: Path, build_dir: Path) -> str:
+    workspace_root = build_dir / "workspace"
+    tmp_work_root = build_dir / "tmp" / "work"
+
+    try:
+        source_dir.resolve().relative_to(workspace_root.resolve())
+        return "workspace"
+    except ValueError:
+        pass
+
+    try:
+        source_dir.resolve().relative_to(tmp_work_root.resolve())
+        return "tmp-work"
+    except ValueError:
+        pass
+
+    return "external"
+
+
+def unique_link_name(recipe: str, used_names: set[str]) -> str:
+    if recipe not in used_names:
+        used_names.add(recipe)
+        return recipe
+
+    suffix = 2
+    while True:
+        candidate = f"{recipe}-{suffix}"
+        if candidate not in used_names:
+            used_names.add(candidate)
+            return candidate
+        suffix += 1
+
+
+def query_recipe_metadata_with_helper(recipe: str, helper: Path, env_script: Path | None) -> dict[str, object]:
+    command = [str(helper), "--json"]
+    if env_script is not None:
+        command.extend(["--env-script", str(env_script)])
+    command.append(recipe)
+
+    proc = subprocess.run(
+        command,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    if proc.returncode != 0:
+        error_text = (proc.stderr or proc.stdout).strip() or f"helper exited with {proc.returncode}"
+        return {"recipe": recipe, "error": error_text}
+
+    stripped = proc.stdout.strip()
+    if not stripped:
+        return {"recipe": recipe, "error": "helper returned empty metadata"}
+
+    try:
+        return dict(json.loads(stripped))
+    except json.JSONDecodeError as exc:
+        return {"recipe": recipe, "error": f"helper returned invalid JSON: {exc}"}
+
+
+def load_recipe_metadata_with_helper(
+    recipes: list[str],
+    helper: Path,
+    env_script: Path | None,
+    verbose: bool,
+) -> dict[str, dict[str, object]]:
+    metadata: dict[str, dict[str, object]] = {}
+    total = len(recipes)
+
+    if not helper.is_file():
+        raise RuntimeError(f"helper script was not found at {helper}")
+
+    for index, recipe in enumerate(recipes, start=1):
+        log(f"Resolving [{index}/{total}] {recipe}", verbose)
+        metadata[recipe] = query_recipe_metadata_with_helper(recipe, helper, env_script)
+
+    return metadata
+
+
+def load_recipe_metadata_with_tinfoil(
+    recipes: list[str],
+    root: Path,
+    build_dir: Path,
+    verbose: bool,
+) -> dict[str, dict[str, object]]:
+    scripts_lib = root / "scripts" / "lib"
+    if not (scripts_lib / "scriptpath.py").is_file():
+        raise RuntimeError(f"scripts/lib/scriptpath.py was not found under {root}")
+    if str(scripts_lib) not in sys.path:
+        sys.path.insert(0, str(scripts_lib))
+
+    import scriptpath  # type: ignore[import-not-found]
+
+    if not scriptpath.add_bitbake_lib_path():
+        raise RuntimeError("unable to locate bitbake Python libraries")
+
+    import bb.tinfoil
+
+    metadata: dict[str, dict[str, object]] = {}
+    original_cwd = Path.cwd()
+    original_builddir = os.environ.get("BUILDDIR")
+    total = len(recipes)
+
+    try:
+        os.chdir(build_dir)
+        os.environ["BUILDDIR"] = str(build_dir)
+
+        with bb.tinfoil.Tinfoil() as tinfoil:
+            tinfoil.prepare(config_only=False)
+
+            for index, recipe in enumerate(recipes, start=1):
+                log(f"Resolving [{index}/{total}] {recipe}", verbose)
+                try:
+                    info = tinfoil.get_recipe_info(recipe)
+                    if not info:
+                        metadata[recipe] = {"recipe": recipe, "error": "recipe info not found"}
+                        continue
+
+                    append_files = tinfoil.get_file_appends(info.fn)
+                    data = tinfoil.parse_recipe_file(info.fn, True, append_files)
+                    tasks = tuple(data.getVar('__BBTASKS', False) or ())
+                    do_unpack_flags = data.getVarFlags('do_unpack', False) or {}
+                    has_do_unpack = 'do_unpack' in tasks
+                    unpack_enabled = has_do_unpack and 'noexec' not in do_unpack_flags
+                    source_text = data.getVar("S")
+                    source_exists = bool(source_text and Path(source_text).is_dir())
+                    if not has_do_unpack:
+                        status = "no-do-unpack"
+                    elif not unpack_enabled:
+                        status = "do-unpack-disabled"
+                    else:
+                        status = "ready" if source_exists else "source-not-unpacked"
+                    metadata[recipe] = {
+                        "recipe": recipe,
+                        "file": data.getVar("FILE"),
+                        "workdir": data.getVar("WORKDIR"),
+                        "source": source_text,
+                        "src_uri": data.getVar("SRC_URI"),
+                        "srcrev": data.getVar("SRCREV"),
+                        "exists": source_exists,
+                        "status": status,
+                    }
+                except Exception as exc:
+                    metadata[recipe] = {
+                        "recipe": recipe,
+                        "error": f"tinfoil metadata resolution failed: {exc}",
+                    }
+    finally:
+        os.chdir(original_cwd)
+        if original_builddir is None:
+            os.environ.pop("BUILDDIR", None)
+        else:
+            os.environ["BUILDDIR"] = original_builddir
+
+    return metadata
+
+
+def build_entry_from_metadata(
+    recipe: str,
+    parsed: dict[str, object],
+    build_dir: Path,
+    final_output_dir: Path,
+    staged_recipes_dir: Path,
+    used_names: set[str],
+) -> dict:
+    if "error" in parsed:
+        return {
+            "recipe": recipe,
+            "status": "error",
+            "skip_reason": "metadata-resolution-failed",
+            "link_name": None,
+            "link_path": None,
+            "source_dir": None,
+            "source_origin": None,
+            "workdir": None,
+            "recipe_file": None,
+            "src_uri": None,
+            "srcrev": None,
+            "exists": False,
+            "error": str(parsed.get("error") or "metadata resolution failed"),
+        }
+
+    source_text = str(parsed.get("source") or "")
+    workdir_text = str(parsed.get("workdir") or "")
+    source_dir = Path(source_text) if source_text else None
+    helper_exists = parsed.get("exists")
+    exists = bool(source_dir and source_dir.is_dir())
+    if isinstance(helper_exists, bool):
+        exists = helper_exists and bool(source_dir)
+
+    entry = {
+        "recipe": recipe,
+        "status": "missing-source",
+        "skip_reason": "source-not-unpacked",
+        "link_name": None,
+        "link_path": None,
+        "source_dir": source_text or None,
+        "source_origin": classify_source_origin(source_dir, build_dir) if source_dir else None,
+        "workdir": workdir_text or None,
+        "recipe_file": str(parsed.get("file") or "") or None,
+        "src_uri": str(parsed.get("src_uri") or "") or None,
+        "srcrev": str(parsed.get("srcrev") or "") or None,
+        "exists": exists,
+        "error": None,
+    }
+
+    parsed_status = str(parsed.get("status") or "")
+    if parsed_status == "no-do-unpack":
+        entry["skip_reason"] = "no-do-unpack"
+        return entry
+    if parsed_status == "do-unpack-disabled":
+        entry["skip_reason"] = "do-unpack-disabled"
+        return entry
+
+    if not exists:
+        return entry
+
+    link_name = unique_link_name(recipe, used_names)
+    staged_link_path = staged_recipes_dir / link_name
+    relative_target = Path(os.path.relpath(source_dir, staged_link_path.parent))
+    staged_link_path.symlink_to(relative_target, target_is_directory=True)
+
+    entry["status"] = "linked"
+    entry["skip_reason"] = None
+    entry["link_name"] = link_name
+    entry["link_path"] = str((final_output_dir / "recipes" / link_name).resolve())
+    return entry
+
+
+def build_summary(entries: list[dict]) -> dict:
+    filtered_count = sum(1 for entry in entries if entry["status"] == "filtered")
+    linked_count = sum(1 for entry in entries if entry["status"] == "linked")
+    missing_count = sum(1 for entry in entries if entry["status"] == "missing-source")
+    error_count = sum(1 for entry in entries if entry["status"] == "error")
+
+    return {
+        "total_candidates": len(entries),
+        "filtered_before_resolution": filtered_count,
+        "resolved": linked_count + missing_count,
+        "linked": linked_count,
+        "skipped_missing": missing_count,
+        "skipped_other": error_count,
+    }
+
+
+def write_skipped_report(staged_dir: Path, entries: list[dict]) -> None:
+    skipped_dir = staged_dir / "skipped"
+    skipped_dir.mkdir(parents=True, exist_ok=True)
+    lines = []
+
+    for status in ["filtered", "missing-source", "error"]:
+        group = [entry for entry in entries if entry["status"] == status]
+        if not group:
+            continue
+        lines.append(f"[{status}]")
+        for entry in group:
+            detail = entry["skip_reason"] or entry["error"] or "n/a"
+            lines.append(f"{entry['recipe']}: {detail}")
+        lines.append("")
+
+    (skipped_dir / "reasons.txt").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+
+
+def write_manifest(
+    staged_dir: Path,
+    manifest_name: str,
+    root: Path,
+    build_dir: Path,
+    output_dir: Path,
+    entries: list[dict],
+    metadata_backend: str,
+    helper_script: Path,
+    env_script: Path | None,
+    pn_buildlist_generated: bool,
+    pn_buildlist_image: str | None,
+) -> None:
+    manifest = {
+        "schema_version": 1,
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "repo_root": str(root.resolve()),
+        "build_dir": str(build_dir.resolve()),
+        "output_dir": str(output_dir.resolve()),
+        "pn_buildlist": str((build_dir / "pn-buildlist").resolve()),
+        "pn_buildlist_generated": pn_buildlist_generated,
+        "pn_buildlist_image": pn_buildlist_image,
+        "refresh_mode": "full-regeneration",
+        "metadata_backend": metadata_backend,
+        "helper_script": str(helper_script.resolve()),
+        "env_script": str(env_script.resolve()) if env_script is not None else None,
+        "summary": build_summary(entries),
+        "entries": entries,
+    }
+    manifest_path = staged_dir / manifest_name
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
+def replace_output_dir(staged_dir: Path, output_dir: Path) -> None:
+    if output_dir.exists() and not output_dir.is_dir():
+        raise SystemExit(f"error: output path exists and is not a directory: {output_dir}")
+
+    if not output_dir.exists():
+        staged_dir.rename(output_dir)
+        return
+
+    backup_dir = output_dir.parent / f".{output_dir.name}.bak.{os.getpid()}"
+    if backup_dir.exists():
+        shutil.rmtree(backup_dir)
+
+    output_dir.rename(backup_dir)
+    try:
+        staged_dir.rename(output_dir)
+    except Exception:
+        if backup_dir.exists() and not output_dir.exists():
+            backup_dir.rename(output_dir)
+        raise
+    else:
+        shutil.rmtree(backup_dir)
+
+
+def main() -> int:
+    args = parse_args()
+    root = Path(args.repo_root).expanduser().resolve() if args.repo_root else detect_repo_root()
+    build_dir = Path(args.build_dir).expanduser().resolve() if args.build_dir else root / "build"
+    output_dir = Path(args.output).expanduser().resolve() if args.output else root / "source-index"
+    helper_script = (
+        Path(args.helper_script).expanduser().resolve()
+        if args.helper_script
+        else root / "scripts" / "oe-find-recipe-source-tree"
+    )
+    env_script = resolve_env_script(root, args.env_script)
+    validate_paths(build_dir, output_dir)
+
+    pn_buildlist, pn_buildlist_generated, pn_buildlist_image = ensure_pn_buildlist(
+        root=root,
+        build_dir=build_dir,
+        env_script=env_script,
+        image_arg=args.image,
+        generate_if_missing=not args.no_generate_pn_buildlist,
+        verbose=args.verbose,
+    )
+    all_recipes = load_recipes(pn_buildlist)
+    entries: list[dict] = []
+    recipes_to_resolve: list[str] = []
+
+    for recipe in all_recipes:
+        reason = skip_reason(recipe, args)
+        if reason:
+            entries.append(filtered_entry(recipe, reason))
+            continue
+        recipes_to_resolve.append(recipe)
+
+    if args.max_recipes is not None:
+        recipes_to_resolve = recipes_to_resolve[: args.max_recipes]
+
+    staged_dir = Path(tempfile.mkdtemp(prefix=f".{output_dir.name}.tmp.", dir=str(output_dir.parent)))
+    staged_recipes_dir = staged_dir / "recipes"
+    staged_recipes_dir.mkdir(parents=True, exist_ok=True)
+
+    used_names: set[str] = set()
+
+    try:
+        metadata_backend = args.metadata_backend
+        if metadata_backend == "auto":
+            try:
+                log(
+                    f"Loading metadata for {len(recipes_to_resolve)} recipes in one Tinfoil session",
+                    args.verbose,
+                )
+                metadata_by_recipe = load_recipe_metadata_with_tinfoil(
+                    recipes_to_resolve,
+                    root,
+                    build_dir,
+                    args.verbose,
+                )
+                metadata_backend = "tinfoil"
+            except Exception as exc:
+                log(f"Falling back to helper metadata backend: {exc}", True)
+                metadata_by_recipe = load_recipe_metadata_with_helper(
+                    recipes_to_resolve,
+                    helper_script,
+                    env_script,
+                    args.verbose,
+                )
+                metadata_backend = "helper"
+        elif metadata_backend == "tinfoil":
+            metadata_by_recipe = load_recipe_metadata_with_tinfoil(
+                recipes_to_resolve,
+                root,
+                build_dir,
+                args.verbose,
+            )
+        else:
+            metadata_by_recipe = load_recipe_metadata_with_helper(
+                recipes_to_resolve,
+                helper_script,
+                env_script,
+                args.verbose,
+            )
+
+        for recipe in recipes_to_resolve:
+            entries.append(
+                build_entry_from_metadata(
+                    recipe=recipe,
+                    parsed=metadata_by_recipe.get(
+                        recipe,
+                        {"recipe": recipe, "error": "metadata backend returned no result"},
+                    ),
+                    build_dir=build_dir,
+                    final_output_dir=output_dir,
+                    staged_recipes_dir=staged_recipes_dir,
+                    used_names=used_names,
+                )
+            )
+
+        write_manifest(
+            staged_dir,
+            args.manifest_name,
+            root,
+            build_dir,
+            output_dir,
+            entries,
+            metadata_backend,
+            helper_script,
+            env_script,
+            pn_buildlist_generated,
+            pn_buildlist_image,
+        )
+        write_skipped_report(staged_dir, entries)
+        replace_output_dir(staged_dir, output_dir)
+    except Exception:
+        if staged_dir.exists():
+            shutil.rmtree(staged_dir)
+        raise
+
+    summary = build_summary(entries)
+    print(
+        "Generated source index at {output} (linked={linked}, missing={missing}, filtered={filtered}, errors={errors}, backend={backend})".format(
+            output=output_dir,
+            linked=summary["linked"],
+            missing=summary["skipped_missing"],
+            filtered=summary["filtered_before_resolution"],
+            errors=summary["skipped_other"],
+            backend=metadata_backend,
+        )
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

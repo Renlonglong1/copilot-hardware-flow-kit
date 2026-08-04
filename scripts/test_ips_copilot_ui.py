@@ -156,6 +156,28 @@ class TaskManagerTests(unittest.TestCase):
         self.assertTrue(proc.terminated)
         self.assertFalse(proc.killed)
 
+    def test_duplicate_active_query_is_rejected_before_worker_starts(self) -> None:
+        manager = ui.TaskManager(
+            {
+                "automation": {
+                    "taskDatabasePath": str(self.database),
+                    "perMachineConcurrency": {"default": 1},
+                    "retentionDays": 0,
+                },
+                "copilot": {"mode": "subprocess", "stage2Mode": "subprocess"},
+            }
+        )
+        existing = {
+            "id": "existing-task",
+            "query_id": "300",
+            "creator_name": "Alice",
+            "status": "running",
+        }
+        manager.store.find_active_query = lambda query_id: existing if query_id == "300" else None
+        with self.assertRaises(ui.DuplicateQueryTaskError) as raised:
+            manager.start("300", "Bob", 60, "")
+        self.assertEqual(existing, raised.exception.task)
+
 
 if __name__ == "__main__":
     unittest.main()

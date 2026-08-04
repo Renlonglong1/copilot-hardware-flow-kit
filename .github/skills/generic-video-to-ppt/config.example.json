@@ -1,0 +1,14 @@
+{
+  "_comment": "复制本文件为 config.json 并填入你自己的路径。config.json 已被 .gitignore 忽略，不会上传。使用时如缺字段，助手会主动询问。",
+  "video_path": "",
+  "video_name": "",
+  "template_path": "",
+  "output_dir": "",
+  "output_name": "",
+  "interval": 60,
+  "whisper_model": "small",
+  "language": "en",
+  "max_slides": 35,
+  "bilingual": true,
+  "keep_intermediate": true
+}

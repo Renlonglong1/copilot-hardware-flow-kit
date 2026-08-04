@@ -1,0 +1,23 @@
+{
+  "skill_name": "bios-use-pythonsv",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to read the mc_subch registers on socket0.imh0. Can you start pythonsv for me first? I'm on DMR, my pythonsv dir is C:\\pythonsv\\diamondrapids and venv python is C:\\pythonsv.venv\\diamondrapids_python3.10\\Scripts\\python.exe",
+      "expected_output": "Should ask user to confirm the platform config, initialize PythonSV in a persistent terminal with async mode, wait for IPython prompt, then execute the register read command and show output in chat. Should save the config for future use.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Search for all registers with 'err' in the name on cbb0",
+      "expected_output": "Should reuse the existing PythonSV terminal session (not create a new one), execute namednodes.sv.socket0.cbb0.search('err') and display the search results in a code block in the chat window.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "帮我初始化pythonsv然后读一下socket0.cbb0.base上面有哪些registers",
+      "expected_output": "Should handle Chinese language input, check for saved platform config, ask user to confirm or provide config if not saved, initialize PythonSV, then execute namednodes.sv.socket0.cbb0.base.registers and show the output.",
+      "files": []
+    }
+  ]
+}

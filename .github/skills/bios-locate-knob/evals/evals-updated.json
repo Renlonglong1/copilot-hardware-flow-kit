@@ -1,0 +1,35 @@
+{
+  "skill_name": "bios-locate-knob",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Find the EnumNumaNodes knob in MemDecodeSetup.hfr and show me all the constraints that affect it. I need to understand when it's hidden and when it's disabled.",
+      "expected_output": "Location report showing EnumNumaNodes with detailed constraint analysis including suppressif (CpuType check) and grayoutif (VirtualNumaEnable and GroupMbaMode checks), presented in hierarchical format with English translations.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I'm looking at a BIOS setup knob that controls memory frequency enforcement. Can you locate 'Enforce DDR Memory Frequency POR' and tell me what conditions control when this option appears and when it's available for editing?",
+      "expected_output": "Navigation path to knob, definition details, and a Constraints section showing all suppressif/grayoutif conditions in natural language format with logical operators clearly marked.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Find any knob related to 'NUMA' configuration in the memory decode setup. I want to understand the full constraint picture for that knob.",
+      "expected_output": "NUMA-related knob location with complete constraint hierarchy showing all visibility and interaction state rules.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Locate a simple knob (ideally with no conditions) in the Platform setup and show its location. I want to compare it with conditional knobs to see how the report differs.",
+      "expected_output": "Knob location report where Constraints section states 'None — knob is always visible and enabled' (if unconditional).",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "I have a complex nested condition in VFR: a suppressif around a grayoutif, with OR logic inside. Can you find an example of this in the BIOS code and show how the skill parses it?",
+      "expected_output": "Nested constraint analysis with proper indentation showing outer suppressif condition, inner grayoutif condition, and sub-conditions with OR operator clearly marked.",
+      "files": []
+    }
+  ]
+}

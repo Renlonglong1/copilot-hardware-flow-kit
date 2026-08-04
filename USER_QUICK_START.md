@@ -45,6 +45,14 @@ C:\Users\<your-user>\copilot-hardware-flow-kit
 
 Keep the directory structure unchanged.
 
+## GitHub 代码管理
+
+个人电脑开发上传、服务器拉取更新，以及 Git 命令解释请参阅：
+
+```text
+docs\git_usage_guide.md
+```
+
 ## Optional: Start the Local IPS/HSD Copilot UI
 
 The kit includes a portable local web UI for IPS/HSD analysis and hardware reproduction planning:

@@ -1,0 +1,18 @@
+{
+  "TicketId": "HSD_SAMPLE_ID",
+  "Date": "20260708",
+  "IssueTitle": "[PLATFORM][COMPONENT] Sample issue title",
+  "ProblemDescription": "Example problem description captured from an HSD ticket. Replace this text with the concise issue narrative from the target ticket.",
+  "SystemConfigurationAndReproductionStep": "Example reproduction setup, system configuration, software versions, and the minimum steps required to reproduce the issue.",
+  "RootCause": "Example root cause summary. Replace with the confirmed technical cause from the ticket, or state that it is not explicitly available.",
+  "FinalSolution": "Example fix or workaround summary from the ticket.",
+  "AffectedProducts": "Example platform or product list from the ticket.",
+  "Conclusion": "Suggested import",
+  "SourceSighting": "sighting_central.sighting / SOURCE_SIGHTING_ID_if_applicable",
+  "Severity": "Example severity or priority value from the ticket.",
+  "Owner": "Example ticket owner.",
+  "Component": "Example component name.",
+  "Status": "Example ticket status.",
+  "SubmittedDate": "2026-07-08",
+  "Comments": "Example comments or caveats. Use this field for supporting notes, limitations, or follow-up details from the ticket."
+}

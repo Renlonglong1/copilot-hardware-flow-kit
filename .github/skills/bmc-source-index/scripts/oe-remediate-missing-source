@@ -1,0 +1,212 @@
+#!/usr/bin/env python3
+"""
+OpenBMC Source Index Remediation Orchestrator
+
+This script remediates missing source trees in the source-index manifest by:
+    - Parsing source-index/manifest.json for recipes with status == "missing-source" and skip_reason == "source-not-unpacked"
+    - Batching and running bitbake -c unpack for those recipes
+    - Re-running the source index generator (oe-build-source-index) for a follow-up pass
+    - Writing remediation-report.md/json to source-index/
+
+NOTE: This script does NOT run the initial source index pass. You must run scripts/oe-build-source-index first to generate source-index/manifest.json.
+"""
+import argparse
+import json
+import subprocess
+import sys
+from pathlib import Path
+from datetime import UTC, datetime
+
+def run(cmd, cwd=None, check=True, capture_output=False):
+    print(f"[run] {cmd}")
+    use_shell = isinstance(cmd, str)
+    result = subprocess.run(
+        cmd,
+        shell=use_shell,
+        cwd=cwd,
+        check=check,
+        capture_output=capture_output,
+        text=True,
+    )
+    return result.stdout if capture_output else None
+
+def load_manifest(manifest_path):
+    with open(manifest_path) as f:
+        return json.load(f)
+
+def default_manifest_path(repo_root, output_arg):
+    output_dir = Path(output_arg) if output_arg else repo_root / 'source-index'
+    return output_dir.resolve() / 'manifest.json'
+
+def remediation_candidates(manifest):
+    unpackable = []
+    skipped_no_unpack = []
+
+    for entry in manifest['entries']:
+        if entry.get('status') != 'missing-source':
+            continue
+
+        recipe = entry.get('recipe')
+        reason = entry.get('skip_reason')
+
+        if reason == 'source-not-unpacked':
+            unpackable.append(recipe)
+        elif reason in {'no-do-unpack', 'do-unpack-disabled'}:
+            skipped_no_unpack.append(recipe)
+
+    return unpackable, skipped_no_unpack
+
+def batch(iterable, n):
+    l = list(iterable)
+    for i in range(0, len(l), n):
+        yield l[i:i+n]
+
+def run_in_oe_env(repo_root, env_script, command, cwd=None):
+    shell_cmd = f"source {env_script} && {' '.join(command)}"
+    return run(["bash", "-c", shell_cmd], cwd=cwd or repo_root)
+
+def unpack_recipes(repo_root, env_script, recipes):
+    run_in_oe_env(repo_root, env_script, ["bitbake", *recipes, "-c", "unpack"])
+
+def main():
+    parser = argparse.ArgumentParser(description="Remediate missing-source recipes in OpenBMC source-index.")
+    parser.add_argument('--repo-root', default='.', help='Repo root (default: .)')
+    parser.add_argument('--build-dir', default=None, help='Build dir (default: <repo-root>/build)')
+    parser.add_argument('--output', default=None, help='Source-index dir (default: <repo-root>/source-index)')
+    parser.add_argument('--env-script', default=None, help='Path to en_env.sh')
+    parser.add_argument('--image', default=None, help='BitBake image target (for pn-buildlist)')
+    parser.add_argument('--chunk-size', type=int, default=20, help='Batch size for bitbake -c unpack')
+    parser.add_argument('--max-recipes', type=int, default=None, help='Limit remediation to the first N missing-source recipes')
+    parser.add_argument('--dry-run', action='store_true', help='Show what would be unpacked, do not run bitbake (default: false)')
+    parser.add_argument('--continue-on-error', action='store_true', help='Continue on bitbake errors')
+    parser.add_argument('--verbose', action='store_true')
+    args = parser.parse_args()
+
+    repo_root = Path(args.repo_root).resolve()
+    manifest_path = default_manifest_path(repo_root, args.output)
+
+    manifest_defaults = None
+    if manifest_path.exists():
+        manifest_defaults = load_manifest(manifest_path)
+
+    build_dir = (
+        Path(args.build_dir).resolve()
+        if args.build_dir
+        else Path(manifest_defaults['build_dir']).resolve() if manifest_defaults and manifest_defaults.get('build_dir')
+        else repo_root / 'build'
+    )
+    output_dir = (
+        Path(args.output).resolve()
+        if args.output
+        else Path(manifest_defaults['output_dir']).resolve() if manifest_defaults and manifest_defaults.get('output_dir')
+        else repo_root / 'source-index'
+    )
+    env_script = (
+        Path(args.env_script).resolve()
+        if args.env_script
+        else Path(manifest_defaults['env_script']).resolve() if manifest_defaults and manifest_defaults.get('env_script')
+        else repo_root / 'en_env.sh'
+    )
+    manifest_path = output_dir / 'manifest.json'
+
+    dry_run = args.dry_run
+
+    if not env_script.exists():
+        print(f"Error: {env_script} does not exist. Please provide --env-script or ensure en_env.sh is present in the repo root.", file=sys.stderr)
+        return 1
+
+    if not manifest_path.exists():
+        print(f"Error: {manifest_path} does not exist. Run scripts/oe-build-source-index first.", file=sys.stderr)
+        return 1
+    manifestA = load_manifest(manifest_path)
+    missingA, skipped_no_unpack = remediation_candidates(manifestA)
+    if args.max_recipes is not None:
+        missingA = missingA[:args.max_recipes]
+    print(f"Found {len(missingA)} unpack-capable missing-source recipes.")
+    if not missingA:
+        print("No missing-source recipes to remediate.")
+        return 0
+    if skipped_no_unpack:
+        print(f"Skipping {len(skipped_no_unpack)} recipes without a usable do_unpack task from manifest.")
+
+    unpacked = []
+    failed = []
+    for group in batch(missingA, args.chunk_size):
+        print(f"Unpacking: {' '.join(group)}")
+        if dry_run:
+            print(f"[DRY RUN] Would run: source {env_script} && bitbake {' '.join(group)} -c unpack")
+            continue
+        try:
+            unpack_recipes(repo_root, env_script, group)
+            unpacked.extend(group)
+        except subprocess.CalledProcessError:
+            print(f"Batch failed, retrying individually: {' '.join(group)}")
+            for recipe in group:
+                print(f"Unpacking: {recipe}")
+                try:
+                    unpack_recipes(repo_root, env_script, [recipe])
+                    unpacked.append(recipe)
+                except subprocess.CalledProcessError:
+                    print(f"Failed to unpack: {recipe}")
+                    failed.append(recipe)
+
+    if dry_run:
+        print(f"[DRY RUN] Would run: {repo_root}/scripts/oe-build-source-index --repo-root {repo_root} --build-dir {build_dir} --output {output_dir} --env-script {env_script}" + (f" --image {args.image}" if args.image else ""))
+        manifestB = manifestA
+        missingB = missingA
+    else:
+        command = [
+            str(repo_root / 'scripts' / 'oe-build-source-index'),
+            "--repo-root",
+            str(repo_root),
+            "--build-dir",
+            str(build_dir),
+            "--output",
+            str(output_dir),
+            "--env-script",
+            str(env_script),
+        ]
+        if args.image:
+            command.extend(["--image", args.image])
+        run_in_oe_env(repo_root, env_script, command)
+        manifestB = load_manifest(manifest_path)
+        missingB, _ = remediation_candidates(manifestB)
+
+    report = {
+        'timestamp': datetime.now(UTC).isoformat().replace('+00:00', 'Z'),
+        'repo_root': str(repo_root),
+        'build_dir': str(build_dir),
+        'output_dir': str(output_dir),
+        'env_script': str(env_script),
+        'image': args.image,
+        'attempted': missingA,
+        'unpacked': unpacked,
+        'failed': failed,
+        'skipped_no_unpack': skipped_no_unpack,
+        'still_missing': missingB,
+        'remediated': [r for r in missingA if r not in missingB],
+        'manifestA_missing': len(missingA),
+        'manifestB_missing': len(missingB),
+    }
+    (output_dir / 'remediation-report.json').write_text(json.dumps(report, indent=2) + '\n')
+    with open(output_dir / 'remediation-report.md', 'w') as f:
+        f.write(f"# Source Index Remediation Report\n\n")
+        f.write(f"**Run at:** {report['timestamp']}\n\n")
+        f.write(f"**Attempted:** {len(missingA)} recipes\n")
+        f.write(f"**Unpacked:** {len(unpacked)}\n")
+        f.write(f"**Failed:** {len(failed)}\n")
+        f.write(f"**Skipped (no do_unpack):** {len(skipped_no_unpack)}\n")
+        f.write(f"**Still missing after remediation:** {len(missingB)}\n\n")
+        if unpacked:
+            f.write("## Unpacked\n\n" + '\n'.join(unpacked) + '\n\n')
+        if failed:
+            f.write("## Failed\n\n" + '\n'.join(failed) + '\n\n')
+        if skipped_no_unpack:
+            f.write("## Skipped (No do_unpack)\n\n" + '\n'.join(skipped_no_unpack) + '\n\n')
+        if missingB:
+            f.write("## Still Missing\n\n" + '\n'.join(missingB) + '\n\n')
+    print(f"Remediation report written to {output_dir}/remediation-report.md and .json")
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())

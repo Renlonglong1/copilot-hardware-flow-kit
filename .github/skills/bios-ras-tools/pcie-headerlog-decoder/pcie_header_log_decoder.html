@@ -1,0 +1,966 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PCIe Header Log Decoder</title>
+  <style>
+    :root {
+      --intel-blue: #0068B5;
+      --intel-blue-dark: #004A86;
+      --intel-blue-soft: #E8F3FC;
+      --bg: #F7FAFC;
+      --panel: #FFFFFF;
+      --ink: #1F2937;
+      --muted: #5B677A;
+      --line: #D7E3F0;
+      --accent: var(--intel-blue);
+      --accent-dark: var(--intel-blue-dark);
+      --bad: #C2410C;
+      --chip: #E8F3FC;
+      --shadow: 0 16px 42px rgba(0, 74, 134, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(0, 104, 181, 0.12), rgba(0, 104, 181, 0) 260px),
+        repeating-linear-gradient(90deg, rgba(0, 74, 134, 0.055) 0 1px, transparent 1px 80px),
+        repeating-linear-gradient(0deg, rgba(0, 74, 134, 0.04) 0 1px, transparent 1px 40px),
+        var(--bg);
+      font-family: "Aptos", "Segoe UI", sans-serif;
+    }
+
+    main {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 36px;
+    }
+
+    .app-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: stretch;
+      margin-bottom: 14px;
+      border: 1px solid var(--intel-blue-dark);
+      border-radius: 8px;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--intel-blue-dark), var(--intel-blue));
+      box-shadow: var(--shadow);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.45rem, 2.4vw, 2.35rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+      font-weight: 750;
+      color: #FFFFFF;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      max-width: 820px;
+      color: #DFF2FF;
+      font-size: 0.94rem;
+      line-height: 1.45;
+    }
+
+    .mode-panel,
+    .decoder-panel,
+    .output-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: var(--shadow);
+    }
+
+    .mode-panel {
+      display: grid;
+      align-content: center;
+      padding: 12px;
+      min-width: 260px;
+      box-shadow: none;
+    }
+
+    .byte-order-panel {
+      margin-bottom: 14px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #F8FBFE;
+    }
+
+    .mode-title {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .segmented label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      background: #F9FBFD;
+    }
+
+    .segmented input {
+      position: absolute;
+      opacity: 0;
+    }
+
+    .segmented label:has(input:checked) {
+      border-color: var(--accent);
+      color: var(--accent-dark);
+      background: var(--chip);
+      box-shadow: inset 0 -2px 0 var(--intel-blue);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .decoder-panel,
+    .output-panel {
+      padding: 16px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0;
+      color: var(--intel-blue-dark);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .inputs {
+      display: grid;
+      gap: 10px;
+    }
+
+    .field {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: var(--ink);
+      background: #FBFDFF;
+      font-family: "Cascadia Mono", Consolas, monospace;
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 104, 181, 0.16);
+    }
+
+    .disabled-field {
+      opacity: 0.48;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      min-height: 42px;
+      border: 1px solid var(--accent-dark);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: #ffffff;
+      background: var(--accent);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      border-color: var(--line);
+      color: var(--intel-blue-dark);
+      background: #F2F7FC;
+    }
+
+    .message {
+      min-height: 22px;
+      margin-top: 12px;
+      color: var(--bad);
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .summary div {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px;
+      background: linear-gradient(180deg, #F8FBFE, #EEF6FC);
+    }
+
+    .summary span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .summary strong {
+      display: block;
+      margin-top: 5px;
+      overflow-wrap: anywhere;
+      font-family: "Cascadia Mono", Consolas, monospace;
+      font-size: 0.92rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #FFFFFF;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+
+    th {
+      color: var(--intel-blue-dark);
+      background: #EAF3FB;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    td:first-child {
+      width: 42%;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .raw-line {
+      margin-top: 14px;
+      padding: 10px;
+      border-radius: 6px;
+      background: #062B49;
+      color: #DFF2FF;
+      font-family: "Cascadia Mono", Consolas, monospace;
+      font-size: 0.82rem;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 880px) {
+      .app-header,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="app-header">
+      <div>
+        <h1>PCIe Header Log decoder</h1>
+        <p class="subtitle">Paste HDR DW values, choose Non-Flit or Flit mode, and inspect decoded TLP fields without leaving the browser.</p>
+      </div>
+      <section class="mode-panel" aria-label="Decode mode">
+        <p class="mode-title">Mode</p>
+        <div class="segmented">
+          <label><input type="radio" name="mode" value="0" checked> Non-Flit</label>
+          <label><input type="radio" name="mode" value="1"> Flit</label>
+        </div>
+      </section>
+    </header>
+
+    <div class="grid">
+      <section class="decoder-panel">
+        <div class="panel-title">
+          <h2>Header DW Input</h2>
+          <span class="hint">Hex or decimal</span>
+        </div>
+        <section class="byte-order-panel" aria-label="DWORD byte order">
+          <p class="mode-title">DWORD Byte Order</p>
+          <div class="segmented">
+            <label><input type="radio" name="byteOrder" value="as-entered" checked> As entered</label>
+            <label><input type="radio" name="byteOrder" value="swap-dw-bytes"> Byte swap</label>
+          </div>
+        </section>
+        <div class="inputs" id="inputs"></div>
+        <div class="actions">
+          <button type="button" id="decodeBtn">Decode</button>
+          <button type="button" id="sampleBtn" class="secondary">Load Sample</button>
+        </div>
+        <div class="message" id="message" role="status"></div>
+      </section>
+
+      <section class="output-panel">
+        <div class="panel-title">
+          <h2>Decoded Result</h2>
+          <span class="hint" id="rowCount"></span>
+        </div>
+        <div class="summary" id="summary"></div>
+        <div id="tableHost"></div>
+        <div class="raw-line" id="rawLine"></div>
+      </section>
+    </div>
+  </main>
+
+  <script id="decoder-script">
+  (function () {
+    'use strict';
+
+    const requestType = {
+      0x0: ['No Operation (NOP)', 'Memory Read Request'],
+      0x1: 'Memory Read Request-Locked',
+      0x2: 'I/O Read Request',
+      0x3: 'Memory Read Request',
+      0x4: 'Configuration Read Request - Type 0',
+      0x5: 'Configuration Read Request - Type 1',
+      0xA: 'Completion Without Data',
+      0xB: 'Completion for locked memory read - without data',
+      0xE: 'UIO Write Completion',
+      0xF: 'UIO Read Completion, No Data',
+      0x20: 'Memory Read Request',
+      0x21: 'Memory Read Request-Locked',
+      0x22: 'UIO Memory Read Request',
+      0x30: 'Message Without Data',
+      0x40: 'Memory Write Request',
+      0x42: 'I/O Write Request',
+      0x44: 'Configuration Write Request - Type 0',
+      0x45: 'Configuration Write Request - Type 1',
+      0x48: 'UIO Read Completion, With Data',
+      0x4A: 'Completion With Data',
+      0x4B: 'Completion for locked memory read - with data',
+      0x4C: 'Fetch and Add AtomicOp Request',
+      0x4D: 'Unconditional Swap AtomicOp Request',
+      0x4E: 'Compare and Swap AtomicOp Request',
+      0x5B: 'Deferrable Memory Write Request',
+      0x60: 'Memory Write Request',
+      0x61: 'UIO Memory Write Request',
+      0x6C: 'Fetch and Add AtomicOp Request',
+      0x6D: 'Unconditional Swap AtomicOp Request',
+      0x6E: 'Compare and Swap AtomicOp Request',
+      0x70: 'Message With Data',
+      0x7B: 'Deferrable Memory Write Request',
+      0x8D: 'Flit Mode Local TLP Prefix',
+      0x8E: '1DW Prefix Vendor Defined Local 0',
+      0x8F: '1DW Prefix Vendor Defined Local 1',
+    };
+
+    const validTypesMem = new Set([0x0, 0x1, 0x2, 0x3, 0x20, 0x21, 0x22, 0x61, 0x40, 0x42, 0x60, 0x7B, 0x4C, 0x4D, 0x4E, 0x5B, 0x6C, 0x6D, 0x6E]);
+    const validTypesCfg = new Set([0x4, 0x5, 0x44, 0x45]);
+    const validTypesCpl = new Set([0xA, 0xB, 0x4A, 0x4B, 0x48, 0xE, 0xF]);
+    const validTypesPrefix = new Set([0x8D, 0x8E, 0x8F]);
+    const validTypesMsgNoData = new Set([0x30, 0x31, 0x32, 0x33, 0x34, 0x35]);
+    const validTypesMsgWithData = new Set([0x70, 0x71, 0x72, 0x73, 0x74, 0x75]);
+    const fmtNames = ['3 DW header, no data', '4 DW header, no data', '3 DW header, with data', '4 DW header, with data'];
+    const trailerNames = ['No Trailer', '1DW Trailer - Containing ECRC', '1DW Trailer - Content Reserved', '2DW Trailer - Content Reserved', '2DW Trailer - Content Reserved', '3DW Trailer with IDE MAC', '4DW Trailer with IDE MAC and PCRC', '5DW Trailer - Content Reserved'];
+
+    function u32(value) {
+      return Number(value) >>> 0;
+    }
+
+    function hex(value) {
+      if (value === null || value === undefined) return 'n/a';
+      return '0x' + (Number(value) >>> 0).toString(16).toUpperCase();
+    }
+
+    function swapDwBytes(value) {
+      const dw = u32(value);
+      return u32(((dw & 0xFF) << 24) | ((dw & 0xFF00) << 8) | ((dw >>> 8) & 0xFF00) | ((dw >>> 24) & 0xFF));
+    }
+
+    function parseHeaderValue(text, index) {
+      const trimmed = String(text || '').trim();
+      if (!trimmed) return null;
+      const value = /^0x/i.test(trimmed) ? Number.parseInt(trimmed, 16) : Number.parseInt(trimmed, 10);
+      if (!Number.isFinite(value) || value < 0 || value > 0xFFFFFFFF) {
+        throw new Error(`HDR${index + 1} must be a 32-bit value`);
+      }
+      return u32(value);
+    }
+
+    function bdf(id) {
+      const bus = (id >>> 8) & 0xFF;
+      const dev = (id >>> 3) & 0x1F;
+      const fun = id & 0x7;
+      const hexPart = (value, width) => value === 0 ? '0' : `0x${value.toString(16).toUpperCase().padStart(width, '0')}`;
+      const hexBus = hexPart(bus, 2);
+      const hexDev = hexPart(dev, 2);
+      const hexFun = hexPart(fun, 1);
+      return `${hexBus}:${hexDev}.${hexFun} | ${bus}:${dev}.${fun}`;
+    }
+
+    function createRows() {
+      const rows = [];
+      return {
+        rows,
+        add(parameter, value) {
+          rows.push({ parameter, value: value === null || value === undefined ? 'n/a' : String(value) });
+        },
+      };
+    }
+
+    function getRequestDescription(type, fmsts, add) {
+      if (Object.prototype.hasOwnProperty.call(requestType, type)) {
+        if (type === 0x0) return requestType[0][fmsts ? 0 : 1];
+        if (!fmsts && type === 0x3) {
+          add('Invalid TLP type (Non-Flit mode)', hex(type));
+          return 'Invalid';
+        }
+        return requestType[type];
+      }
+      if ([0x31, 0x32, 0x33, 0x34, 0x35].includes(type)) return requestType[0x30];
+      if ([0x71, 0x72, 0x73, 0x74, 0x75].includes(type)) return requestType[0x70];
+      add(fmsts ? 'Invalid TLP type (Flit-mode)' : 'Invalid TLP type (Non-Flit mode)', hex(type));
+      return 'Invalid';
+    }
+
+    function getOhcTypes(type, ohcValue, fmt, headers) {
+      const ohcTypes = [];
+      if (type === 0) return ['Invalid - (NOP) request type'];
+      if (ohcValue & 0x1) {
+        if ((validTypesMem.has(type) || [0x30, 0x31, 0x70, 0x71].includes(type)) && ![0x2, 0x42].includes(type)) ohcTypes.push('OHC-A1');
+        else if ([0x2, 0x42].includes(type)) ohcTypes.push('OHC-A2');
+        else if (validTypesCfg.has(type)) ohcTypes.push('OHC-A3');
+        else if ([0x32, 0x72].includes(type)) ohcTypes.push('OHC-A4');
+        else if (validTypesCpl.has(type)) ohcTypes.push('OHC-A5');
+      }
+      if (ohcValue & 0x2) {
+        const hasA = ohcTypes.some((item) => item.includes('A'));
+        const hvSource = hasA ? (fmt & 1 ? headers[5] : headers[4]) : (fmt & 1 ? headers[4] : headers[3]);
+        const hv = ((hvSource || 0) >>> 4) & 0x3;
+        if (hv === 1 || hv === 3) ohcTypes.push('OHC-B');
+      }
+      if (ohcValue & 0x4) ohcTypes.push('OHC-C');
+      if ((ohcValue & 0x8) && !(ohcValue & 0x10)) ohcTypes.push('OHC-E1');
+      if ((ohcValue & 0x10) && !(ohcValue & 0x8)) ohcTypes.push('OHC-E2');
+      if ((ohcValue & 0x18) === 0x18) ohcTypes.push('OHC-E4');
+      if ((ohcValue & 0xFF) === 0) ohcTypes.push('No OHC present');
+      else if ((ohcValue & 0x18) === 0) ohcTypes.push('No OHC-E present');
+      return ohcTypes;
+    }
+
+    function decodeHeaders(options) {
+      const byteOrder = options.byteOrder || 'as-entered';
+      const headers = (options.headers || []).map((value) => {
+        if (value === null || value === undefined) return null;
+        const dw = u32(value);
+        return byteOrder === 'swap-dw-bytes' ? swapDwBytes(dw) : dw;
+      });
+      const fmsts = Number(options.fmsts || 0);
+      if (headers.length < 4 || headers.slice(0, 4).some((value) => value === null)) {
+        throw new Error('HDR1-HDR4 are required');
+      }
+      if (headers[5] !== null && headers[5] !== undefined && fmsts === 0) {
+        throw new Error("Manual mode with more than 5 DWs requires Flit mode");
+      }
+
+      const HDR1 = headers[0];
+      const HDR2 = headers[1];
+      const HDR3 = headers[2];
+      const HDR4 = headers[3];
+      const output = createRows();
+      const add = output.add;
+      add('DWORD Byte Order', byteOrder === 'swap-dw-bytes' ? 'Byte-swapped per 32-bit DW' : 'As entered');
+      const fmt = (HDR1 >>> 29) & 0x7;
+      const type = (HDR1 >>> 24) & 0xFF;
+      const rawLength = HDR1 & 0x3FF;
+      const length = rawLength === 0 ? 1024 : rawLength;
+      const common = { fmt, type, fmsts, length, isRead: false, isWrite: false };
+
+      if (fmsts === 1) {
+        common.tc = (HDR1 >>> 21) & 0x7;
+        common.ts = (HDR1 >>> 13) & 0x7;
+        common.ohcValue = (HDR1 >>> 16) & 0x1F;
+        common.tag = HDR2 & 0x3FFF;
+        common.tph = 0;
+        common.poisoned = ((HDR2 >>> 15) & 0x1) ? 'Poisoned TLP' : 'No poisoned TLP';
+        common.ordering = ((HDR1 >>> 11) & 0x1) ? 'Relaxed Ordering' : 'Default ordering';
+        common.snoop = ((HDR1 >>> 10) & 0x1) ? 'No Snoop' : 'Default Snoop';
+      } else {
+        common.tc = (HDR1 >>> 20) & 0x7;
+        common.tph = (HDR1 >>> 16) & 0x1;
+        common.digest = ((HDR1 >>> 15) & 0x1) ? 'TLP with digest' : 'TLP without digest';
+        common.poisoned = ((HDR1 >>> 14) & 0x1) ? 'Poisoned TLP' : 'No poisoned TLP';
+        common.ordering = ((HDR1 >>> 13) & 0x1) ? 'Relaxed Ordering' : 'Default Ordering';
+        common.snoop = ((HDR1 >>> 12) & 0x1) ? 'No Snoop' : 'Default Snoop';
+        common.tag = ((HDR2 >>> 8) & 0xFF) | (((HDR1 >>> 19) & 0x1) << 8) | (((HDR1 >>> 23) & 0x1) << 9);
+      }
+
+      add('Mode', fmsts ? 'Flit-mode' : 'Non-Flit mode');
+      if (!fmsts) add('TLP Format', `${fmt} = ${fmtNames[fmt] || 'Unknown/Reserved'}`);
+      add('TLP Traffic class', common.tc);
+      if (!fmsts) add('Digest', common.digest);
+      else {
+        const ohcTypes = getOhcTypes(type, common.ohcValue, fmt, headers);
+        common.ohcTypes = ohcTypes;
+        add('Header content (OHC)', `${common.ohcValue} = ${ohcTypes.join(', ')}`);
+        add('Trailer size', `${common.ts} = ${trailerNames[common.ts] || 'Unknown'}`);
+      }
+      add('TPH', common.tph);
+      add('Poisoned TLP', common.poisoned);
+      add('Ordering', common.ordering);
+      add('Snoop', common.snoop);
+      add('TLP Length', validTypesMsgNoData.has(type) ? '0' : `${length} DWORDS`);
+      const description = getRequestDescription(type, fmsts, add);
+      add('TLP Type', HDR1 === 0 ? '0' : `${hex(type)} = ${description}`);
+
+      if (validTypesMem.has(type)) processMemoryIo(headers, common, add);
+      else if (validTypesCfg.has(type)) processCfg(headers, common, add);
+      else if (validTypesCpl.has(type)) processCpl(headers, common, add);
+      else if (validTypesMsgNoData.has(type) || validTypesMsgWithData.has(type) || [0x10, 0x11, 0x12, 0x13, 0x14, 0x15].includes(type & 0x1F)) processMsg(headers, common, add);
+      else if (validTypesPrefix.has(type)) processPrefix(headers, common, add);
+      else add('Invalid TLP type', hex(type));
+
+      if (!fmsts && headers[4] !== null && headers[4] !== undefined) processNonFlitPrefix(headers[4], add);
+
+      return {
+        rows: output.rows,
+        headers: headers.map((value) => value === null || value === undefined ? null : hex(value)),
+      };
+    }
+
+    function addRequesterInfo(HDR2, type, add) {
+      const rid = (HDR2 >>> 16) & 0xFFFF;
+      add(validTypesCpl.has(type) ? 'CompleterID (BDF hex/dec)' : 'RequesterID (BDF hex/dec)', bdf(rid));
+      return rid;
+    }
+
+    function processMemoryIo(headers, common, add) {
+      const HDR2 = headers[1];
+      const HDR3 = headers[2];
+      const HDR4 = headers[3];
+      const atDescription = ['Untranslated', 'Translation Request', 'Translated', 'Reserved'];
+      const thUsesSt = !common.fmsts && common.tph === 1 && ![0x2, 0x42].includes(common.type);
+      addRequesterInfo(HDR2, common.type, add);
+      common.isRead = [0x0, 0x3, 0x20, 0x5B, 0x7B].includes(common.type);
+      common.isWrite = [0x40, 0x60].includes(common.type);
+      const addrLow = (common.fmt & 1 ? HDR4 : HDR3) & 0xFFFFFFFC;
+      const addrHigh = common.fmt & 1 ? HDR3 : 0;
+      add('TAG', common.fmsts ? hex(common.tag) : common.tag);
+      if (!common.fmsts) {
+        const ldbe = (HDR2 >>> 4) & 0xF;
+        const fdbe = HDR2 & 0xF;
+        if (thUsesSt) add('ST', hex((ldbe << 4) | fdbe));
+        else {
+          add('Last DWORD Byte Enable', hex(ldbe));
+          add('First DWORD Byte Enable', hex(fdbe));
+        }
+        add('Address Low', hex(addrLow));
+        add('Address High', hex(addrHigh));
+        if (common.tph === 1 && ![0x2, 0x42].includes(common.type)) add('PH', common.fmt & 1 ? HDR4 & 0x3 : HDR3 & 0x3);
+      } else {
+        add('Address Low', hex(addrLow));
+        add('Address High', hex(addrHigh));
+        if (![0x2, 0x42].includes(common.type)) {
+          const at = common.fmt & 1 ? HDR4 & 0x3 : HDR3 & 0x3;
+          add('AT', `${hex(at)} = ${atDescription[at]}`);
+        }
+        processOhcContent(headers, common, add);
+      }
+    }
+
+    function processCfg(headers, common, add) {
+      const HDR2 = headers[1];
+      const HDR3 = headers[2];
+      addRequesterInfo(HDR2, common.type, add);
+      const targetId = (HDR3 >>> 16) & 0xFFFF;
+      add('TAG', hex(common.tag));
+      add('TargetID (BDF hex/dec)', bdf(targetId));
+      add('Register', hex(HDR3 & 0xFFF));
+      if (!common.fmsts) {
+        add('Last DWORD Byte Enable', hex((HDR2 >>> 4) & 0xF));
+        add('First DWORD Byte Enable', hex(HDR2 & 0xF));
+      } else {
+        processOhcContent(headers, common, add);
+      }
+    }
+
+    function processCpl(headers, common, add) {
+      const HDR2 = headers[1];
+      const HDR3 = headers[2];
+      const HDR4 = headers[3];
+      const cplStatus = { 0x0: 'Successful Completion (SC)', 0x1: 'Unsupported Request (UR)', 0x2: 'Request Retry Status (RRS)', 0x4: 'Completer Abort (CA)' };
+      addRequesterInfo(HDR2, common.type, add);
+      let comptype;
+      let byteCount;
+      let tag;
+      let lowerAddress;
+      let cdl = 0;
+      if (!common.fmsts) {
+        comptype = (HDR2 >>> 13) & 0x7;
+        byteCount = (HDR2 & 0xFFF) === 0 ? 4096 : HDR2 & 0xFFF;
+        tag = ((HDR3 >>> 8) & 0xFF) | (((headers[0] >>> 19) & 0x1) << 8) | (((headers[0] >>> 23) & 0x1) << 9);
+        lowerAddress = HDR3 & 0x7F;
+        add('bcm', (HDR2 >>> 12) & 0x1);
+      } else {
+        tag = HDR2 & 0x3FFF;
+        comptype = HDR4 & 0x7;
+        if ([0x48, 0xE, 0xF].includes(common.type)) {
+          lowerAddress = common.type === 0x48 ? ((HDR3 & 0x1F) << 7) | (((HDR2 >>> 14) & 0x1) << 6) | (((HDR3 >>> 12) & 0xF) << 2) : 0;
+          cdl = (HDR3 >>> 5) & 0x3;
+        } else {
+          byteCount = (HDR3 & 0xFFF) === 0 ? 4096 : HDR3 & 0xFFF;
+          lowerAddress = (((HDR2 >>> 14) & 0x1) << 6) | (((HDR3 >>> 12) & 0xF) << 2);
+        }
+      }
+      const requesterId = (HDR3 >>> 16) & 0xFFFF;
+      add('Byte count', byteCount);
+      add('RequesterID (BDF hex/dec)', bdf(requesterId));
+      add('TAG', hex(tag));
+      if ([0x48, 0xE, 0xF].includes(common.type)) add('CDL', hex(cdl));
+      if (!common.fmsts) {
+        add('Lower Address', hex(lowerAddress));
+        add('Completion Status', cplStatus[comptype] ? `${hex(comptype)} = ${cplStatus[comptype]}` : 'ERROR: Reserved value');
+      } else {
+        common.comptype = comptype;
+        common.cplStatus = cplStatus[comptype] || 'ERROR: Reserved value';
+        common.lowerAddress = lowerAddress;
+        processOhcContent(headers, common, add);
+      }
+    }
+
+    function processMsg(headers, common, add) {
+      const HDR2 = headers[1];
+      const HDR3 = headers[2];
+      const HDR4 = headers[3];
+      const routing = ['Routed to Root Complex', 'Routed by Address', 'Routed by ID', 'Broadcast from Root Complex', 'Local - Terminate at Receiver', 'Gathered and routed to Root Complex'];
+      const msgCodes = {
+        0x0: 'Unlock', 0x10: 'Latency Tolerance Reporting (LTR)', 0x12: 'Optimized Buffer Flush/Fill (OBFF)', 0x14: 'PM_Active_State_Nak',
+        0x18: 'PM_PME', 0x19: 'PME_Turn_Off', 0x1B: 'PME_TO_Ack', 0x20: 'Assert_INTA', 0x21: 'Assert_INTB', 0x22: 'Assert_INTC',
+        0x23: 'Assert_INTD', 0x24: 'Deassert_INTA', 0x25: 'Deassert_INTB', 0x26: 'Deassert_INTC', 0x27: 'Deassert_INTD',
+        0x30: 'ERR_COR', 0x31: 'ERR_NONFATAL', 0x32: 'ERR_FATAL', 0x50: 'Set_Slot_Power_Limit', 0x52: 'PTM Request',
+        0x53: 'PTM Response', 0x54: 'IDE Sync', 0x55: 'IDE Fail', 0x7E: 'Vendor_Defined Type 0', 0x7F: 'Vendor_Defined Type 1',
+      };
+      const msgCode = HDR2 & 0xFF;
+      const tag = (HDR2 >>> 8) & 0xFF;
+      add('Routing', routing[common.type & 0x7] || 'Reserved - Terminate at Receiver');
+      addRequesterInfo(HDR2, common.type, add);
+      add('TAG', hex(tag));
+      add('Message Code', `${hex(msgCode)} = ${msgCodes[msgCode] || 'Unknown'}`);
+      if ((common.type & 0x7) === 2) add('TargetID (BDF hex/dec)', bdf((HDR3 >>> 16) & 0xFFFF));
+      if ([0x7E, 0x7F].includes(msgCode)) {
+        const vendorId = HDR3 & 0xFFFF;
+        add('Vendor ID', hex(vendorId));
+        if (vendorId === 0x1AB4) add('VDM Type', 'MCTP');
+        add('Vendor message', HDR4);
+      } else if ([0x54, 0x55].includes(msgCode)) {
+        if (msgCode === 0x54) {
+          add('PR_Sent_Counter-CPL', (HDR4 >>> 16) & 0xFF);
+          add('PR_Sent_Counter-NPR', HDR4 & 0xFF);
+        } else {
+          add('Stream ID failed', HDR3 & 0xFF);
+        }
+      } else if (msgCode === 0x10) {
+        decodeLtr(HDR4, add);
+      } else if (msgCode === 0x12) {
+        const obff = { 0x0: 'Idle', 0x1: 'OBFF', 0xF: 'CPU Active' };
+        add('OBFF Code', obff[HDR4 & 0xF] || 'Reserved');
+      }
+      if (common.fmsts) processOhcContent(headers, common, add);
+    }
+
+    function decodeLtr(HDR4, add) {
+      const scale = { 0: 1, 1: 32, 2: 1024, 3: 32768, 4: 1048576, 5: 33554432, 6: 'Not permitted', 7: 'Not permitted' };
+      const snoop = HDR4 & 0xFFFF;
+      const noSnoop = (HDR4 >>> 16) & 0xFFFF;
+      const snoopScale = (snoop >>> 10) & 0x7;
+      const noSnoopScale = (noSnoop >>> 10) & 0x7;
+      const snoopValue = snoop & 0x3FF;
+      const noSnoopValue = noSnoop & 0x3FF;
+      add('No-Snoop Latency', hex(noSnoop));
+      add('Snoop Latency', hex(snoop));
+      add('Requirement (No-Snoop)', (noSnoop >>> 15) & 0x1);
+      add('Requirement (Snoop)', (snoop >>> 15) & 0x1);
+      add('Latency scale (No-Snoop)', `${noSnoopScale.toString(16).toUpperCase()} = ${scale[noSnoopScale]} ns`);
+      add('Latency scale (Snoop)', `${snoopScale.toString(16).toUpperCase()} = ${scale[snoopScale]} ns`);
+      add('Latency value (No-Snoop)', hex(noSnoopValue));
+      add('Latency value (Snoop)', hex(snoopValue));
+      add('Time value (No-Snoop)', noSnoopScale < 6 ? `${((noSnoopValue * scale[noSnoopScale]) / 1000).toFixed(3)} us` : 'N/A (Invalid scale: Not permitted)');
+      add('Time value (Snoop)', snoopScale < 6 ? `${((snoopValue * scale[snoopScale]) / 1000).toFixed(3)} us` : 'N/A (Invalid scale: Not permitted)');
+    }
+
+    function processPrefix(headers, common, add) {
+      if (common.fmsts) processOhcContent(headers, common, add);
+    }
+
+    function processNonFlitPrefix(HDR5, add) {
+      const prefixTypeId = (HDR5 >>> 24) & 0xFF;
+      if (prefixTypeId !== 0x92) return;
+      add('Prefix Type', `${hex(prefixTypeId)} = IDE TLP (NFM)`);
+      add('PR_Sent_Counter', hex((HDR5 >>> 16) & 0xFF));
+      add('Stream ID', hex((HDR5 >>> 8) & 0xFF));
+      add('Sub-Stream', hex((HDR5 >>> 4) & 0x7));
+      add('XT bit (Extended TEE)', (HDR5 >>> 7) & 0x1);
+      add('P bit (PCRC present)', (HDR5 >>> 3) & 0x1);
+      add('M bit (MAC present)', (HDR5 >>> 2) & 0x1);
+      add('K bit (Key set)', (HDR5 >>> 1) & 0x1);
+      add('T bit (TEE)', HDR5 & 0x1);
+      if (((HDR5 >>> 3) & 0x1) === 1 && ((HDR5 >>> 2) & 0x1) === 0) add('Prefix Warning', 'P bit set while M bit is clear');
+    }
+
+    function processOhcContent(headers, common, add) {
+      const ohcTypes = common.ohcTypes || getOhcTypes(common.type, common.ohcValue || 0, common.fmt, headers);
+      if (!common.ohcValue || common.type === 0) return;
+      let level = 0;
+      const slots = [{ lo: headers[3], hi: headers[4] }, { lo: headers[4], hi: headers[5] }, { lo: headers[5], hi: headers[6] }];
+      const selected = {};
+      ['A', 'B', '-C'].forEach((token) => {
+        ohcTypes.forEach((ohc) => {
+          if (ohc.includes(token)) {
+            level += 1;
+            const slot = slots[Math.max(0, level - 1)] || slots[0];
+            selected[token] = common.fmt & 1 ? slot.hi : slot.lo;
+          }
+        });
+      });
+      ohcTypes.forEach((ohc) => {
+        if (ohc === 'OHC-A1') {
+          const hdr = selected.A || 0;
+          add('NW', (hdr >>> 31) & 0x1);
+          add('PV', (hdr >>> 30) & 0x1);
+          add('PMR', (hdr >>> 29) & 0x1);
+          add('ER', (hdr >>> 28) & 0x1);
+          add('PASID', hex((hdr >>> 8) & 0xFFFFF));
+          add('Last DWORD Byte Enable', hex((hdr >>> 4) & 0xF));
+          add('First DWORD Byte Enable', hex(hdr & 0xF));
+        }
+        if (ohc === 'OHC-A2') {
+          add('Last DWORD Byte Enable', hex((headers[3] >>> 4) & 0xF));
+          add('First DWORD Byte Enable', hex(headers[3] & 0xF));
+        }
+        if (ohc === 'OHC-A3') {
+          add('Destination Segment', (headers[3] >>> 24) & 0xFF);
+          add('DSV', (headers[3] >>> 15) & 0x1);
+          add('Last DWORD Byte Enable', hex((headers[3] >>> 4) & 0xF));
+          add('First DWORD Byte Enable', hex(headers[3] & 0xF));
+        }
+        if (ohc === 'OHC-A5') {
+          const lower = (common.lowerAddress || 0) | ((headers[3] >>> 3) & 0x3);
+          add('Lower Address', hex(lower));
+          add('Destination Segment', hex((headers[3] >>> 24) & 0xFF));
+          add('Completer Segment', hex((headers[3] >>> 16) & 0xFF));
+          add('DSV', (headers[3] >>> 15) & 0x1);
+          add('Completion Status', `${hex(common.comptype || 0)} = ${common.cplStatus || 'Unknown'}`);
+        }
+        if (ohc === 'OHC-B') {
+          const hdr = selected.B || 0;
+          const ph = (hdr >>> 6) & 0x3;
+          const phDescription = ['Bi-directional data structure', 'Requester', 'Target', 'Target with priority'];
+          add('ST [15:0]', hex((hdr >>> 8) & 0xFFFF));
+          add('PH', `${ph} = ${phDescription[ph]}`);
+          add('AMA', (hdr >>> 1) & 0x7);
+          add('AV', hdr & 0x1);
+        }
+        if (ohc === 'OHC-C') {
+          const hdr = selected['-C'] || 0;
+          add('PR_Sent_Counter', (hdr >>> 16) & 0xFF);
+          add('Stream ID', hex((hdr >>> 8) & 0xFF));
+          add('Sub Stream', hex((hdr >>> 4) & 0xF));
+          add('Key set', hex((hdr >>> 1) & 0x1));
+          add('TDS', hdr & 0x1);
+          add('Requester Segment', (hdr >>> 24) & 0xFF);
+        }
+        if (ohc === 'OHC-E1' || ohc === 'OHC-E2' || ohc === 'OHC-E4') {
+          const start = ohcTypes.filter((item) => item.startsWith('OHC-A') || item === 'OHC-B' || item === 'OHC-C').length + (common.fmt & 1 ? 4 : 3);
+          add('Vendor defined content', [headers[start], headers[start + 1]].filter((value) => value !== null && value !== undefined).map(hex).join(', ') || '[ERROR: DW missing]');
+        }
+      });
+    }
+
+    window.PcieHeaderLogDecoder = { decodeHeaders, parseHeaderValue };
+  }());
+  </script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const sample = ['0x70000001', '0x3800107f', '0x00001ab4', '0x010000cc', '', '', '', '', ''];
+    const inputsHost = document.getElementById('inputs');
+    const tableHost = document.getElementById('tableHost');
+    const summaryHost = document.getElementById('summary');
+    const message = document.getElementById('message');
+    const rawLine = document.getElementById('rawLine');
+    const rowCount = document.getElementById('rowCount');
+
+    for (let index = 0; index < 9; index += 1) {
+      const field = document.createElement('div');
+      field.className = 'field';
+      field.dataset.index = index;
+      field.innerHTML = `<label for="hdr${index + 1}">HDR${index + 1}</label><input id="hdr${index + 1}" type="text" spellcheck="false" value="${sample[index]}">`;
+      inputsHost.appendChild(field);
+    }
+
+    function mode() {
+      return Number(document.querySelector('input[name="mode"]:checked').value);
+    }
+
+    function byteOrder() {
+      return document.querySelector('input[name="byteOrder"]:checked').value;
+    }
+
+    function syncFields() {
+      const flit = mode() === 1;
+      document.querySelectorAll('.field').forEach((field, index) => {
+        const input = field.querySelector('input');
+        const enabled = flit ? index < 9 : index < 5;
+        input.disabled = !enabled;
+        field.classList.toggle('disabled-field', !enabled);
+      });
+    }
+
+    function collectHeaders() {
+      const values = [];
+      document.querySelectorAll('.field input').forEach((input, index) => {
+        if (input.disabled) {
+          values.push(null);
+        } else {
+          values.push(window.PcieHeaderLogDecoder.parseHeaderValue(input.value, index));
+        }
+      });
+      return values;
+    }
+
+    function render(result) {
+      const byName = Object.fromEntries(result.rows.map((row) => [row.parameter, row.value]));
+      summaryHost.innerHTML = '';
+      [
+        ['Mode', byName.Mode],
+        ['TLP Type', byName['TLP Type']],
+        ['Length', byName['TLP Length']],
+      ].forEach(([label, value]) => {
+        const item = document.createElement('div');
+        item.innerHTML = `<span>${label}</span><strong>${value || 'n/a'}</strong>`;
+        summaryHost.appendChild(item);
+      });
+
+      const table = document.createElement('table');
+      table.innerHTML = '<thead><tr><th>Parameter</th><th>Decoded Value</th></tr></thead>';
+      const body = document.createElement('tbody');
+      result.rows.forEach((row) => {
+        const tr = document.createElement('tr');
+        const parameter = document.createElement('td');
+        const value = document.createElement('td');
+        parameter.textContent = row.parameter;
+        value.textContent = row.value;
+        tr.append(parameter, value);
+        body.appendChild(tr);
+      });
+      table.appendChild(body);
+      tableHost.replaceChildren(table);
+      rawLine.textContent = `TLP Header DW: ${result.headers.filter(Boolean).join(' ')}`;
+      rowCount.textContent = `${result.rows.length} rows`;
+    }
+
+    function decode() {
+      try {
+        message.textContent = '';
+        const result = window.PcieHeaderLogDecoder.decodeHeaders({ headers: collectHeaders(), fmsts: mode(), byteOrder: byteOrder() });
+        render(result);
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    }
+
+    document.querySelectorAll('input[name="mode"]').forEach((input) => input.addEventListener('change', () => {
+      syncFields();
+      decode();
+    }));
+    document.querySelectorAll('input[name="byteOrder"]').forEach((input) => input.addEventListener('change', decode));
+    document.getElementById('decodeBtn').addEventListener('click', decode);
+    document.getElementById('sampleBtn').addEventListener('click', () => {
+      document.querySelector('input[name="mode"][value="0"]').checked = true;
+      document.querySelector('input[name="byteOrder"][value="as-entered"]').checked = true;
+      document.querySelectorAll('.field input').forEach((input, index) => { input.value = sample[index]; });
+      syncFields();
+      decode();
+    });
+    document.querySelectorAll('.field input').forEach((input) => input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') decode();
+    }));
+
+    syncFields();
+    decode();
+  }());
+  </script>
+</body>
+</html>

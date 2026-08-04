@@ -1,0 +1,1427 @@
+{
+  "0x01": {
+    "description": "Xover Hwfsm Timeout",
+    "minors": {},
+    "name": "ERR_XOVER_HWFSM_TIMEOUT",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:151",
+    "type": "major"
+  },
+  "0x02": {
+    "description": "Temp Threshold Invalid",
+    "minors": {},
+    "name": "ERR_TEMP_THRESHOLD_INVALID",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:157",
+    "type": "major"
+  },
+  "0x03": {
+    "description": "Senseamp Hwfsm Timeout",
+    "minors": {},
+    "name": "ERR_SENSEAMP_HWFSM_TIMEOUT",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:153",
+    "type": "major"
+  },
+  "0x04": {
+    "description": "Senseamp Hwfsm Failure",
+    "minors": {},
+    "name": "ERR_SENSEAMP_HWFSM_FAILURE",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:154",
+    "type": "major"
+  },
+  "0x05": {
+    "description": "Senseamp Hwfsm Signal Error",
+    "minors": {},
+    "name": "ERR_SENSEAMP_HWFSM_SIGNAL_ERROR",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:155",
+    "type": "major"
+  },
+  "0x06": {
+    "description": "Invalid Read Reg Size",
+    "minors": {
+      "0x00": {
+        "description": "DeviceType - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_000",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:515"
+      },
+      "0x01": {
+        "description": "DramDieCount - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_001",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:516"
+      },
+      "0x02": {
+        "description": "NumColBits - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_002",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:517"
+      },
+      "0x03": {
+        "description": "NumRowBits - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_003",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:518"
+      },
+      "0x04": {
+        "description": "BankGroupBits - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_004",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:519"
+      },
+      "0x05": {
+        "description": "BankAddressBits - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_005",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:520"
+      },
+      "0x06": {
+        "description": "RcdVendor - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_006",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:521"
+      },
+      "0x07": {
+        "description": "RcdRevision - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_007",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:522"
+      },
+      "0x08": {
+        "description": "DramCapacity - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_008",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:523"
+      },
+      "0x09": {
+        "description": "DramIOWidth - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_009",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:524"
+      },
+      "0x0a": {
+        "description": "RankMixIndicator - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_010",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:525"
+      },
+      "0x0b": {
+        "description": "PackageRanks - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_011",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:526"
+      },
+      "0x0c": {
+        "description": "MiniCycleTime - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_012",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:527"
+      },
+      "0x0d": {
+        "description": "BaseModuleType - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_013",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:528"
+      },
+      "0x0e": {
+        "description": "OperableEndurant VDD - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_014",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:529"
+      },
+      "0x0f": {
+        "description": "RawCardRefDesign - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_015",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:530"
+      },
+      "0x10": {
+        "description": "RawCardRefDesignRev - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_016",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:531"
+      },
+      "0x11": {
+        "description": "NominalHeight - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_017",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:532"
+      },
+      "0x12": {
+        "description": "PrimaryBusWidth - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_018",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:533"
+      },
+      "0x13": {
+        "description": "BusWidthExtension - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_019",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:534"
+      },
+      "0x14": {
+        "description": "ChannelNumPerDimm - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_020",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:535"
+      },
+      "0x15": {
+        "description": "RcdDeviceType - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_021",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:536"
+      },
+      "0x16": {
+        "description": "DramStepping - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_022",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:537"
+      },
+      "0x17": {
+        "description": "PartNum - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_023",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:538"
+      },
+      "0x18": {
+        "description": "SpecRevision - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_024",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:539"
+      },
+      "0x19": {
+        "description": "ManufacturerId - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_025",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:540"
+      },
+      "0x1a": {
+        "description": "TrpVal - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_026",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:541"
+      },
+      "0x1b": {
+        "description": "Module SerialNumber - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_027",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:542"
+      },
+      "0x1c": {
+        "description": "ManufacturingDate - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_028",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:543"
+      },
+      "0x1d": {
+        "description": "TrasVal - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_029",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:544"
+      },
+      "0x1e": {
+        "description": "ManufacturingLocation - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_030",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:545"
+      },
+      "0x1f": {
+        "description": "TrcVal - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_031",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:546"
+      },
+      "0x20": {
+        "description": "TrcdVal - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_032",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:547"
+      },
+      "0x21": {
+        "description": "TaaVal - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_033",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:548"
+      },
+      "0x22": {
+        "description": "CasSup - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_034",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:549"
+      },
+      "0x23": {
+        "description": "SpdIsThermalSensorInstalled - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_035",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:550"
+      },
+      "0x24": {
+        "description": "Available",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_036",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:551"
+      },
+      "0x25": {
+        "description": "DramManufacturerId - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_037",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:552"
+      },
+      "0x26": {
+        "description": "Pmic0Vendor - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_038",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:553"
+      },
+      "0x27": {
+        "description": "Pmic0Revision - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_039",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:554"
+      },
+      "0x28": {
+        "description": "RFC - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_040",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:555"
+      },
+      "0x29": {
+        "description": "IsDdr5SpdCrcValid - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_041",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:556"
+      },
+      "0x2a": {
+        "description": "SPD Manufacturer ID - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_042",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:557"
+      },
+      "0x2b": {
+        "description": "SPD Device Revision Number - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_043",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:558"
+      },
+      "0x2c": {
+        "description": "TSOD Manufacturer ID - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_044",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:559"
+      },
+      "0x2d": {
+        "description": "TSOD Revision Number - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_045",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:560"
+      },
+      "0x2e": {
+        "description": "Get Beta Level - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_046",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:561"
+      },
+      "0x2f": {
+        "description": "Get SPD data through HUB - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_047",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:562"
+      },
+      "0x30": {
+        "description": "Pmic0DeviceType - SPD read Byte failed",
+        "name": "SPD_FATAL_ERROR_READ_MINOR_CODE_048",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:563"
+      },
+      "0x64": {
+        "description": "Unsupported DeviceType read from SPD",
+        "name": "SPD_FATAL_ERROR_UNSUPPORTED_MINOR_CODE_100",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:568"
+      },
+      "0x65": {
+        "description": "Unsupported DramDieCount read from SPD",
+        "name": "SPD_FATAL_ERROR_UNSUPPORTED_MINOR_CODE_101",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:569"
+      },
+      "0x66": {
+        "description": "Unsupported NumColBits read from SPD",
+        "name": "SPD_FATAL_ERROR_UNSUPPORTED_MINOR_CODE_102",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:570"
+      },
+      "0x67": {
+        "description": "Unsupported NumRowBits read from SPD",
+        "name": "SPD_FATAL_ERROR_UNSUPPORTED_MINOR_CODE_103",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:571"
+      },
+      "0x68": {
+        "description": "Unsupported Trfc read from SPD",
+        "name": "SPD_FATAL_ERROR_UNSUPPORTED_MINOR_CODE_104",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:572"
+      },
+      "0x69": {
+        "description": "Unsupported SensorIndex",
+        "name": "SPD_FATAL_ERROR_UNSUPPORTED_MINOR_CODE_105",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:573"
+      },
+      "0x6a": {
+        "description": "Available",
+        "name": "SPD_FATAL_ERROR_UNSUPPORTED_MINOR_CODE_106",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:574"
+      },
+      "0x6b": {
+        "description": "Unsupported RawCardRefDesign",
+        "name": "SPD_FATAL_ERROR_UNSUPPORTED_MINOR_CODE_107",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:575"
+      },
+      "0x6c": {
+        "description": "Unsupported RawCardRefDesignRev",
+        "name": "SPD_FATAL_ERROR_UNSUPPORTED_MINOR_CODE_108",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:576"
+      },
+      "0x6d": {
+        "description": "Unsupported NominalHeight",
+        "name": "SPD_FATAL_ERROR_UNSUPPORTED_MINOR_CODE_109",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:577"
+      }
+    },
+    "name": "ERR_INVALID_READ_REG_SIZE",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:109",
+    "type": "major"
+  },
+  "0x07": {
+    "description": "Unknown Reg Type",
+    "minors": {},
+    "name": "ERR_UNKNOWN_REG_TYPE",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:110",
+    "type": "major"
+  },
+  "0x08": {
+    "description": "Invalid Access Method",
+    "minors": {},
+    "name": "ERR_INVALID_ACCESS_METHOD",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:111",
+    "type": "major"
+  },
+  "0x09": {
+    "description": "Invalid Bit Access",
+    "minors": {},
+    "name": "ERR_INVALID_BIT_ACCESS",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:112",
+    "type": "major"
+  },
+  "0x0a": {
+    "description": "Smbus Read Failure",
+    "minors": {},
+    "name": "ERR_SMBUS_READ_FAILURE",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:85",
+    "type": "major"
+  },
+  "0x0b": {
+    "description": "Mixed Mem Aep And Udimm",
+    "minors": {},
+    "name": "ERR_MIXED_MEM_AEP_AND_UDIMM",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:86",
+    "type": "major"
+  },
+  "0x0c": {
+    "description": "Nvmdimm Not Supported",
+    "minors": {},
+    "name": "ERR_NVMDIMM_NOT_SUPPORTED",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:87",
+    "type": "major"
+  },
+  "0x0d": {
+    "description": "Cpu Cap Nvmdimm Not Supported",
+    "minors": {},
+    "name": "ERR_CPU_CAP_NVMDIMM_NOT_SUPPORTED",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:88",
+    "type": "major"
+  },
+  "0x70": {
+    "description": "Dimm Channel",
+    "minors": {},
+    "name": "ERR_DIMM_CHANNEL",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:118",
+    "type": "major"
+  },
+  "0x74": {
+    "description": "Bist Check",
+    "minors": {},
+    "name": "ERR_BIST_CHECK",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:119",
+    "type": "major"
+  },
+  "0x75": {
+    "description": "Ddr Freq Not Found",
+    "minors": {},
+    "name": "ERR_DDR_FREQ_NOT_FOUND",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:120",
+    "type": "major"
+  },
+  "0x76": {
+    "description": "Pipe",
+    "minors": {
+      "0x00": {
+        "description": "Invalid pipe type used",
+        "name": "RC_FATAL_ERROR_PIPE_MINOR_CODE_000",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:504"
+      },
+      "0x01": {
+        "description": "Pipe 001",
+        "name": "RC_FATAL_ERROR_PIPE_MINOR_CODE_001",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:505"
+      },
+      "0x02": {
+        "description": "Pipe 002",
+        "name": "RC_FATAL_ERROR_PIPE_MINOR_CODE_002",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:506"
+      },
+      "0x03": {
+        "description": "Pipe 003",
+        "name": "RC_FATAL_ERROR_PIPE_MINOR_CODE_003",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:507"
+      }
+    },
+    "name": "ERR_PIPE",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:121",
+    "type": "major"
+  },
+  "0xe0": {
+    "description": "Spd Decode",
+    "minors": {},
+    "name": "ERR_SPD_DECODE",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:52",
+    "type": "major"
+  },
+  "0xe1": {
+    "description": "Staggered Sync",
+    "minors": {
+      "0x00": {
+        "description": "Illegal execution from AP socket in ReleaseExecutionToSocketAp",
+        "name": "RC_FATAL_ERROR_STAGGERED_SYNC_MINOR_CODE_000",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:485"
+      },
+      "0x01": {
+        "description": "Illegal execution from SBSP socket in RespondReadyToSocketSbsp",
+        "name": "RC_FATAL_ERROR_STAGGERED_SYNC_MINOR_CODE_001",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:486"
+      },
+      "0x02": {
+        "description": "Illegal execution from SBSP socket in SendAckToSocketSbsp",
+        "name": "RC_FATAL_ERROR_STAGGERED_SYNC_MINOR_CODE_002",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:487"
+      },
+      "0x03": {
+        "description": "Illegal execution from AP socket in WaitAckFromSocketAp",
+        "name": "RC_FATAL_ERROR_STAGGERED_SYNC_MINOR_CODE_003",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:488"
+      },
+      "0x04": {
+        "description": "Illegal socket execution in GetDdrioNvDataPointer",
+        "name": "RC_FATAL_ERROR_STAGGERED_SYNC_MINOR_CODE_004",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:489"
+      },
+      "0x05": {
+        "description": "RcAllocatePool failed in SendNvramSocketToAps",
+        "name": "RC_FATAL_ERROR_STAGGERED_SYNC_MINOR_CODE_005",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:490"
+      },
+      "0x06": {
+        "description": "Illegal socket execution in GetDramNvDataPointer",
+        "name": "RC_FATAL_ERROR_STAGGERED_SYNC_MINOR_CODE_006",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:491"
+      },
+      "0x07": {
+        "description": "Available",
+        "name": "RC_FATAL_ERROR_STAGGERED_SYNC_MINOR_CODE_007",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:492"
+      },
+      "0x08": {
+        "description": "Illegal socket execution in GetRcdCwCache",
+        "name": "RC_FATAL_ERROR_STAGGERED_SYNC_MINOR_CODE_008",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:493"
+      },
+      "0x09": {
+        "description": "Illegal socket execution in GetDbCwCache",
+        "name": "RC_FATAL_ERROR_STAGGERED_SYNC_MINOR_CODE_009",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:494"
+      },
+      "0x0a": {
+        "description": "Illegal socket execution in GetFmcCache",
+        "name": "RC_FATAL_ERROR_STAGGERED_SYNC_MINOR_CODE_010",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:495"
+      },
+      "0x0b": {
+        "description": "PeiServicesAllocatePages failed to reserve memory",
+        "name": "RC_FATAL_ERROR_STAGGERED_SYNC_MINOR_CODE_011",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:496"
+      },
+      "0x0c": {
+        "description": "PeiServicesAllocatePages failed to reserve memory",
+        "name": "RC_FATAL_ERROR_STAGGERED_SYNC_MINOR_CODE_012",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:498"
+      }
+    },
+    "name": "ERR_STAGGERED_SYNC",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:53",
+    "type": "major"
+  },
+  "0xe2": {
+    "description": "Rc Internal2",
+    "minors": {
+      "0x00": {
+        "description": "RcAllocatePool failed in TrainDcaTco",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_000",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:582"
+      },
+      "0x01": {
+        "description": "RcAllocatePool failed in DcaDfeTrainingMarginDdr5",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_001",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:583"
+      },
+      "0x02": {
+        "description": "Group parameter is not valid when calling SetEyeSizeScalingDfeDdr5Sim",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_002",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:584"
+      },
+      "0x03": {
+        "description": "Group parameter is not valid when calling DfeTrainingDdr5",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_003",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:585"
+      },
+      "0x04": {
+        "description": "GroupInput parameter is not valid when calling EnableDfe",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_004",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:586"
+      },
+      "0x05": {
+        "description": "RcAllocatePool failed in DfeTrainingDdr5",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_005",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:587"
+      },
+      "0x06": {
+        "description": "GroupInput parameter is not valid when calling DfeTrainingDdr5",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_006",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:588"
+      },
+      "0x07": {
+        "description": "Null parameters in DisplayAndAdjustVrefCenteringResultsDdr5",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_007",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:589"
+      },
+      "0x08": {
+        "description": "RcAllocatePool failed in TrainTcoDqDqs",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_008",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:590"
+      },
+      "0x09": {
+        "description": "Rank out of range in GetMcrPerRankReg",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_009",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:591"
+      },
+      "0x0a": {
+        "description": "Unable to locate gEfiPeiReadOnlyVariable2PpiGuid at LoadImcS3RasData",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_010",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:592"
+      },
+      "0x0b": {
+        "description": "Unable to locate gMemoryPolicyPpiGuid at LoadMemNvram",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_011",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:593"
+      },
+      "0x0c": {
+        "description": "Unexpected LoadUncompressedVariable failure at LoadMemNvram",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_012",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:594"
+      },
+      "0x0d": {
+        "description": "Unable to locate gEfiPeiReadOnlyVariable2PpiGuid at LoadSysInfoNvram",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_013",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:595"
+      },
+      "0x0e": {
+        "description": "Unable to allocating memory at LoadSysInfoNvram",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_014",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:596"
+      },
+      "0x0f": {
+        "description": "Saved SysInfo in Nvram does not match size of struct at LoadSysInfoNvram",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_015",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:597"
+      },
+      "0x10": {
+        "description": "Failed to locate SysInfo pointer from table at LoadSysInfoNvram",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_016",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:598"
+      },
+      "0x11": {
+        "description": "Invalid boot mode at LoadNvramData",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_017",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:599"
+      },
+      "0x12": {
+        "description": "RankList Null pointer at SetCachedRxEq",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_018",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:600"
+      },
+      "0x13": {
+        "description": "RankList Null pointer at GetCachedRxEq",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_019",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:601"
+      },
+      "0x14": {
+        "description": "Null pointer at GetMemoryMode",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_020",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:602"
+      },
+      "0x15": {
+        "description": "Dimm number out of range at DetectLowMargin",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_021",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:603"
+      },
+      "0x16": {
+        "description": "Invalid Channel number at DetectLowMargin",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_022",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:604"
+      },
+      "0x17": {
+        "description": "Host Null pointer at DenormalizeRecvEnable",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_023",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:605"
+      },
+      "0x18": {
+        "description": "ChannelNvList Null pointer at DenormalizeRecvEnable",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_024",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:606"
+      },
+      "0x19": {
+        "description": "DimmNvList Null pointer at DenormalizeRecvEnable",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_025",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:607"
+      },
+      "0x1a": {
+        "description": "Host Null pointer at RenormalizeRecvEnable",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_026",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:608"
+      },
+      "0x1b": {
+        "description": "ChannelNvList Null pointer at RenormalizeRecvEnable",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_027",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:609"
+      },
+      "0x1c": {
+        "description": "DimmNvList Null pointer at RenormalizeRecvEnable",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_028",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:610"
+      },
+      "0x1d": {
+        "description": "unable to locate gMemoryPolicyPpiGuid at HandleAdrEvent",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_029",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:611"
+      },
+      "0x1e": {
+        "description": "RegIndex out of range at GetSetCmdDelay",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_030",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:612"
+      },
+      "0x1f": {
+        "description": "RegIndex out of rangeat GetSetCmdPieOffset",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_031",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:613"
+      },
+      "0x20": {
+        "description": "ClkMoveMode out of range at DdrtClockMovementWorker",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_032",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:614"
+      },
+      "0x21": {
+        "description": "MaxCmdGroupAll out of range at SetCombinedCmdGroupDutyCycleDdr5",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_033",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:615"
+      },
+      "0x22": {
+        "description": "Logical Rank out of range at GetSetRxDelayUnicast",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_034",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:616"
+      },
+      "0x23": {
+        "description": "Logical Rank out of range at GetSetRxStrobeInvertUnicast",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_035",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:617"
+      },
+      "0x24": {
+        "description": "Logical Rank out of range at GetSetRxDfeCoefficientTap",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_036",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:618"
+      },
+      "0x25": {
+        "description": "CcSignalsToTrain out of range at GetCcSignalsToTrain",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_037",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:619"
+      },
+      "0x26": {
+        "description": "Invalid input at BuildVrSvidList",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_038",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:620"
+      },
+      "0x27": {
+        "description": "SVID Map is missing an entry at BuildVrSvidList",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_039",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:621"
+      },
+      "0x28": {
+        "description": "SVID Map is built incorrectly at BuildVrSvidList",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_040",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:622"
+      },
+      "0x29": {
+        "description": "VR SVID list length out of range at SetVdd",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_041",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:623"
+      },
+      "0x2a": {
+        "description": "Completion delay out of bounds at SyncCompletionDelayResetCounts",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_042",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:624"
+      },
+      "0x2b": {
+        "description": "Invalid DIMM slot encountered during SetMcDdrtCfg",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_043",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:625"
+      },
+      "0x2c": {
+        "description": "Invalid PAGE_TIMER_STATE requested at SetPageTableTimer",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_044",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:626"
+      },
+      "0x2d": {
+        "description": "Null pointer at EnforceDcpmmFreqLimit",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_045",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:627"
+      },
+      "0x2e": {
+        "description": "Null pointer at EnforceDdr5FreqLimit",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_046",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:628"
+      },
+      "0x2f": {
+        "description": "Null pointer at ChipOverrideFreq",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_047",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:629"
+      },
+      "0x30": {
+        "description": "Null pointer at ValidateRasPolicy",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_048",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:630"
+      },
+      "0x31": {
+        "description": "Null pointer at SetPatrolScrub",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_049",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:631"
+      },
+      "0x32": {
+        "description": "Null pointer at DisableClockGatingAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_050",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:632"
+      },
+      "0x33": {
+        "description": "Socket number out of range DisableClockGatingAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_051",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:633"
+      },
+      "0x34": {
+        "description": "Null pointer at DisableAdddcColumnCorrectionAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_052",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:634"
+      },
+      "0x35": {
+        "description": "Socket number out of range DisableAdddcColumnCorrectionAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_053",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:635"
+      },
+      "0x36": {
+        "description": "Null pointer at SetLinkCfgRead1ReadDataBit18AsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_054",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:636"
+      },
+      "0x37": {
+        "description": "Socket number out of range SetLinkCfgRead1ReadDataBit18AsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_055",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:637"
+      },
+      "0x38": {
+        "description": "Null pointer at SetLinkCfgRead1ReaddataBit11AsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_056",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:638"
+      },
+      "0x39": {
+        "description": "Socket number out of range SetLinkCfgRead1ReaddataBit11AsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_057",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:639"
+      },
+      "0x3a": {
+        "description": "Null pointer at SetMc0DpChknBit3DisRrlPatsparUcmetaOverwriteAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_058",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:640"
+      },
+      "0x3b": {
+        "description": "Socket number out of range SetMc0DpChknBit3DisRrlPatsparUcmetaOverwriteAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_059",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:641"
+      },
+      "0x3c": {
+        "description": "Null pointer at Wa_14011241978",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_060",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:642"
+      },
+      "0x3d": {
+        "description": "Socket number out of range Wa_14011241978",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_061",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:643"
+      },
+      "0x3e": {
+        "description": "Null pointer at DisableApppErrorLogAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_062",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:644"
+      },
+      "0x3f": {
+        "description": "Socket number out of range DisableApppErrorLogAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_063",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:645"
+      },
+      "0x40": {
+        "description": "Null pointer at DisableWdbParityCheckAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_064",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:646"
+      },
+      "0x41": {
+        "description": "Socket number out of range DisableWdbParityCheckAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_065",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:647"
+      },
+      "0x42": {
+        "description": "Null pointer at DisablePerformanceBasedPreemptionAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_066",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:648"
+      },
+      "0x43": {
+        "description": "Socket number out of range DisablePerformanceBasedPreemptionAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_067",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:649"
+      },
+      "0x44": {
+        "description": "Null pointer at EnablePmon1ForLinkFailAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_068",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:650"
+      },
+      "0x45": {
+        "description": "Socket number out of range EnablePmon1ForLinkFailAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_069",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:651"
+      },
+      "0x46": {
+        "description": "Null pointer at SetMcmainChknBitsDisLclCkGateMcmainAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_070",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:652"
+      },
+      "0x47": {
+        "description": "Socket number out of range SetMcmainChknBitsDisLclCkGateMcmainAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_071",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:653"
+      },
+      "0x48": {
+        "description": "Null pointer at SetMc0DpChknBit2DisPersistToSmiForDdr",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_072",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:654"
+      },
+      "0x49": {
+        "description": "Socket number out of range SetMc0DpChknBit2DisPersistToSmiForDdr",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_073",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:655"
+      },
+      "0x4a": {
+        "description": "Dimm out of range at GetSetThermalRefreshEnables",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_074",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:656"
+      },
+      "0x4b": {
+        "description": "Invalid operation mode at GetSetThermalRefreshEnables",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_075",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:657"
+      },
+      "0x4c": {
+        "description": "Invalid throttle value at GetSetThermalRefreshEnables",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_076",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:658"
+      },
+      "0x4d": {
+        "description": "Dimm out of range at GetSetThermalRefreshThresholds",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_077",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:659"
+      },
+      "0x4e": {
+        "description": "Invalid operation mode at GetSetThermalRefreshThresholds",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_078",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:660"
+      },
+      "0x4f": {
+        "description": "Invalid throttle value at GetSetThermalRefreshThresholds",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_079",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:661"
+      },
+      "0x50": {
+        "description": "Failure read/write CSR at GetSetTurnaroundSettings",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_080",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:662"
+      },
+      "0x51": {
+        "description": "Null pointer at GetSetTurnaroundSettings",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_081",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:663"
+      },
+      "0x52": {
+        "description": "Invalid DIMM slot encountered during SwitchToDdrt2Mode",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_082",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:664"
+      },
+      "0x53": {
+        "description": "Unsupported NvmdimmPerfConfig value at ProgramNvmdimmPerf",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_083",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:665"
+      },
+      "0x54": {
+        "description": "Failure read/write CSR at GetSetDcpmmTurnaroundSettings",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_084",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:666"
+      },
+      "0x55": {
+        "description": "Null pointer at GetSetDcpmmTurnaroundSettings",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_085",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:667"
+      },
+      "0x56": {
+        "description": "MaxRoundTrip out of range at LimitRoundTripAsNeeded",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_086",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:668"
+      },
+      "0x57": {
+        "description": "Null pointer at IsSgxEnabled",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_087",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:669"
+      },
+      "0x58": {
+        "description": "No DDR and HBM memory populated in MemoryPopulationCheck",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_088",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:670"
+      },
+      "0x59": {
+        "description": "Socket number out of range GetRmtResultHobGuid",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_089",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:671"
+      },
+      "0x5a": {
+        "description": "More than one socket or no socket was enabeld in EV test configure",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_090",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:672"
+      },
+      "0x5b": {
+        "description": "IsCadbMcrModeEnabled() called with an invalid parameter",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_091",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:673"
+      },
+      "0x5c": {
+        "description": "CaHwAutoPiSweep() - signal is invalid",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_092",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:674"
+      },
+      "0x5d": {
+        "description": "CaSetHwSweepInit() - signal is invalid",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_093",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:675"
+      },
+      "0x5e": {
+        "description": "BitMargin Null pointer",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_094",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:676"
+      },
+      "0x5f": {
+        "description": "Illegal Max Valid Strobe",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_095",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:677"
+      },
+      "0x60": {
+        "description": "ReadDdrt2WrWrS is not supported",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_096",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:678"
+      },
+      "0x61": {
+        "description": "GetDdrtWriteLatency is not supported",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_097",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:679"
+      },
+      "0x62": {
+        "description": "Invalid condition during MMC pipe communication",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_098",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:680"
+      },
+      "0x63": {
+        "description": "Invalid parameter in RT/IO latency step function",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_099",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:681"
+      },
+      "0x64": {
+        "description": "Unsupported PI ticks per unit in RT/IO latency step function",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_100",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:682"
+      },
+      "0x65": {
+        "description": "Invalid test type in CaClkSetupPiSettingsParams",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_101",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:683"
+      },
+      "0x66": {
+        "description": "MTE IP Init failed",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_102",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:684"
+      },
+      "0x67": {
+        "description": "Unknown MTE pattern",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_103",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:685"
+      },
+      "0x68": {
+        "description": "Invalid mode for setting CADB_BUF",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_104",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:686"
+      },
+      "0x69": {
+        "description": "Invalid signal for setting CADB_BUF CA",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_105",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:687"
+      },
+      "0x6a": {
+        "description": "CachedSelectedId mismatched across subchannels in ProgramSnoopSettingsToDb",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_106",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:688"
+      },
+      "0x6b": {
+        "description": "DDR5_DATA_BUFFER_RW93_REG is tried to be accessed on strobe basis",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_107",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:689"
+      },
+      "0x6c": {
+        "description": "CachedPaged and target page mismatched in WriteDbCwCachePerDimm",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_108",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:690"
+      },
+      "0x6d": {
+        "description": "Invalid MrwAddress parameter in McrDbMr26Mr27Wa()",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_109",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:691"
+      },
+      "0x6e": {
+        "description": "SMBUS Reset during SMBUS read/write",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_110",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:692"
+      },
+      "0x6f": {
+        "description": "IpWrMteGetInst called before IpMteInstData pointer is allocated",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_111",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:693"
+      },
+      "0x70": {
+        "description": "ProgramRddataValidEarly invalid address for DDRINTF_DATA_TIMING1",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_112",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:694"
+      },
+      "0x71": {
+        "description": "ProgramRddataValidEarly unsupported rddata_valid_early level",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_113",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:695"
+      },
+      "0x72": {
+        "description": "ProgramSpidRddataValidEarly unsupported rddata_valid_early level",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_114",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:696"
+      },
+      "0x73": {
+        "description": "GetPhysicalMcIdLookup, invalid parameter",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_115",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:697"
+      },
+      "0x74": {
+        "description": "GetPhysicalMcIdLookup, unsupported or invalid SOC chop type",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_116",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:698"
+      },
+      "0x75": {
+        "description": "GetPhysicalMcId, invalid parameter",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_117",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:699"
+      },
+      "0x76": {
+        "description": "Invalid Mode Only GSM_COMBINE_EDGES mode is expected",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_118",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:700"
+      },
+      "0x77": {
+        "description": "External WL Fine Sweep (No Rising edge found)",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_119",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:701"
+      },
+      "0x78": {
+        "description": "Out of range row failure index in GetRowFailRange",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_120",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:702"
+      },
+      "0x79": {
+        "description": "GetCpgcPrintPatternEnum called with invalid TestType",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_121",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:703"
+      },
+      "0x7a": {
+        "description": "GetCapIdAddressWithErrorHandle() - Invalid input parameter",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_122",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:704"
+      },
+      "0x7b": {
+        "description": "FindBitMappedForGroupRmt() - invalid input Group",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_123",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:705"
+      },
+      "0x7c": {
+        "description": "CpgcMemTestRankSetupMATSRowRangeWithOffsetCmd() - not 8 BG interleave",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_124",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:706"
+      },
+      "0x7d": {
+        "description": "Input BcomVref value of ProgramBcomVref() out of range.",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_125",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:707"
+      },
+      "0x7e": {
+        "description": "DoComp timeout polling for DDRIO FSM completion",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_126",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:708"
+      },
+      "0x7f": {
+        "description": "Illegal SIGNATURE in PreSweepDca1DWorker",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_127",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:709"
+      },
+      "0x80": {
+        "description": "Illegal SIGNATURE in PreSweepDca1DComplex",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_128",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:710"
+      },
+      "0x81": {
+        "description": "Illegal SIGNATURE in PreSweepDca1DSimpleIsi",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_129",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:711"
+      },
+      "0x82": {
+        "description": "Illegal SIGNATURE in PreSweepDcaTco1DComplex",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_130",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:712"
+      },
+      "0x83": {
+        "description": "Value of write_err_latency overflow when WrCRC is disabled but CAP is enabled",
+        "name": "RC_FATAL_ERROR_INTERNAL2_MINOR_CODE_131",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:713"
+      }
+    },
+    "name": "ERR_RC_INTERNAL2",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:54",
+    "type": "major"
+  },
+  "0xe6": {
+    "description": "Rc Dca Dfe",
+    "minors": {},
+    "name": "ERR_RC_DCA_DFE",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:55",
+    "type": "major"
+  },
+  "0xe7": {
+    "description": "Rc Sweep Lib Internal",
+    "minors": {},
+    "name": "ERR_RC_SWEEP_LIB_INTERNAL",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:57",
+    "type": "major"
+  },
+  "0xe8": {
+    "description": "No Memory",
+    "minors": {},
+    "name": "ERR_NO_MEMORY",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:58",
+    "type": "major"
+  },
+  "0xe9": {
+    "description": "Lt Lock",
+    "minors": {},
+    "name": "ERR_LT_LOCK",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:62",
+    "type": "major"
+  },
+  "0xea": {
+    "description": "Ddr Init",
+    "minors": {},
+    "name": "ERR_DDR_INIT",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:63",
+    "type": "major"
+  },
+  "0xeb": {
+    "description": "Mem Test",
+    "minors": {},
+    "name": "ERR_MEM_TEST",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:69",
+    "type": "major"
+  },
+  "0xec": {
+    "description": "Vendor Specific",
+    "minors": {},
+    "name": "ERR_VENDOR_SPECIFIC",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:73",
+    "type": "major"
+  },
+  "0xed": {
+    "description": "Dimm Compat",
+    "minors": {},
+    "name": "ERR_DIMM_COMPAT",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:75",
+    "type": "major"
+  },
+  "0xef": {
+    "description": "Mrc Struct",
+    "minors": {},
+    "name": "ERR_MRC_STRUCT",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:91",
+    "type": "major"
+  },
+  "0xf0": {
+    "description": "Set Vdd",
+    "minors": {},
+    "name": "ERR_SET_VDD",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:98",
+    "type": "major"
+  },
+  "0xf1": {
+    "description": "Iot Mem Buffer",
+    "minors": {},
+    "name": "ERR_IOT_MEM_BUFFER",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:101",
+    "type": "major"
+  },
+  "0xf2": {
+    "description": "Rc Internal",
+    "minors": {},
+    "name": "ERR_RC_INTERNAL",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:102",
+    "type": "major"
+  },
+  "0xf3": {
+    "description": "Invalid Reg Access",
+    "minors": {},
+    "name": "ERR_INVALID_REG_ACCESS",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:103",
+    "type": "major"
+  },
+  "0xf4": {
+    "description": "Set Mc Freq",
+    "minors": {},
+    "name": "ERR_SET_MC_FREQ",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:113",
+    "type": "major"
+  },
+  "0xf5": {
+    "description": "Read Mc Freq",
+    "minors": {},
+    "name": "ERR_READ_MC_FREQ",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:116",
+    "type": "major"
+  },
+  "0xf6": {
+    "description": "Smbus",
+    "minors": {},
+    "name": "ERR_SMBUS",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:122",
+    "type": "major"
+  },
+  "0xf7": {
+    "description": "Pcu",
+    "minors": {},
+    "name": "ERR_PCU",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:127",
+    "type": "major"
+  },
+  "0xf8": {
+    "description": "Ngn",
+    "minors": {},
+    "name": "ERR_NGN",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:131",
+    "type": "major"
+  },
+  "0xf9": {
+    "description": "Interleave Failure",
+    "minors": {},
+    "name": "ERR_INTERLEAVE_FAILURE",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:138",
+    "type": "major"
+  },
+  "0xfa": {
+    "description": "Cpgc Timeout",
+    "minors": {},
+    "name": "ERR_CPGC_TIMEOUT",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:140",
+    "type": "major"
+  },
+  "0xfb": {
+    "description": "Car Limit",
+    "minors": {},
+    "name": "ERR_CAR_LIMIT",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:141",
+    "type": "major"
+  },
+  "0xfc": {
+    "description": "Cmi Failure",
+    "minors": {},
+    "name": "ERR_CMI_FAILURE",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:145",
+    "type": "major"
+  },
+  "0xfd": {
+    "description": "Value Out Of Range",
+    "minors": {},
+    "name": "ERR_VALUE_OUT_OF_RANGE",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:147",
+    "type": "major"
+  },
+  "0xfe": {
+    "description": "Ddrio Hwfsm",
+    "minors": {},
+    "name": "ERR_DDRIO_HWFSM",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:150",
+    "type": "major"
+  },
+  "0xff": {
+    "description": "Mrc Pointer",
+    "minors": {
+      "0x00": {
+        "description": "CheckValueForPda - invalid BestTapBias pointer",
+        "name": "RC_FATAL_ERROR_MRC_POINTER_MINOR_CODE_000",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:465"
+      },
+      "0x01": {
+        "description": "ProgramDfeTapBias - invalid BestTapBias pointer instance 1",
+        "name": "RC_FATAL_ERROR_MRC_POINTER_MINOR_CODE_001",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:466"
+      },
+      "0x02": {
+        "description": "ProgramDfeTapBias - invalid BestTapBias pointer instance 2",
+        "name": "RC_FATAL_ERROR_MRC_POINTER_MINOR_CODE_002",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:467"
+      },
+      "0x03": {
+        "description": "GetSetProtectedDcpmmRegister - Value pointer invalid",
+        "name": "RC_FATAL_ERROR_MRC_POINTER_MINOR_CODE_003",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:468"
+      },
+      "0x04": {
+        "description": "ConvertValueToDramDutyCycleAdjusterRegFormat - bad pointer",
+        "name": "RC_FATAL_ERROR_MRC_POINTER_MINOR_CODE_004",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:469"
+      },
+      "0x05": {
+        "description": "WriteProtectedDcpmmRegister - bad pointer",
+        "name": "RC_FATAL_ERROR_MRC_POINTER_MINOR_CODE_005",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:470"
+      },
+      "0x06": {
+        "description": "ProgramReadDfeTapBias - bad BestTapBias pointer instance 1",
+        "name": "RC_FATAL_ERROR_MRC_POINTER_MINOR_CODE_006",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:471"
+      },
+      "0x07": {
+        "description": "ProgramReadDfeTapBias - bad BestTapBias pointer instance 2",
+        "name": "RC_FATAL_ERROR_MRC_POINTER_MINOR_CODE_007",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:472"
+      },
+      "0x08": {
+        "description": "RcAllocatePool failed in DcsDcaQcsDdrioInitConfiguration",
+        "name": "RC_FATAL_ERROR_MRC_POINTER_MINOR_CODE_008",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:473"
+      },
+      "0x09": {
+        "description": "GetDdr5LrdimmTrainingData failed",
+        "name": "RC_FATAL_ERROR_MRC_POINTER_MINOR_CODE_009",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:474"
+      },
+      "0x0a": {
+        "description": "GetCsRange - TestRange null pointer",
+        "name": "RC_FATAL_ERROR_MRC_POINTER_MINOR_CODE_010",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:475"
+      },
+      "0x0b": {
+        "description": "RcAllocatePool failed in SetDdrioPowerSavings",
+        "name": "RC_FATAL_ERROR_MRC_POINTER_MINOR_CODE_011",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:476"
+      },
+      "0x0c": {
+        "description": "RestoreDdrioPowerSavings - SaveRestorePtr null pointer",
+        "name": "RC_FATAL_ERROR_MRC_POINTER_MINOR_CODE_012",
+        "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:477"
+      }
+    },
+    "name": "ERR_MRC_POINTER",
+    "source": "CpRcPkg/Include/ReferenceCodeFatalErrors.h:156",
+    "type": "major"
+  }
+}

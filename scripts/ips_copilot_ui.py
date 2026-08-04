@@ -38,6 +38,12 @@ ACTIVE_TASK_STATUSES = ("queued", "running", "waiting_resource", "cancelling")
 TERMINAL_TASK_STATUSES = ("completed", "failed", "cancelled", "interrupted")
 
 
+class DuplicateQueryTaskError(ValueError):
+    def __init__(self, task: dict[str, Any]) -> None:
+        self.task = task
+        super().__init__(f"Query {task['query_id']} is already active")
+
+
 def load_config(path: pathlib.Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8-sig") as f:
         cfg = json.load(f)
@@ -216,6 +222,23 @@ class TaskStore:
         with self._lock, closing(self._connect()) as conn:
             rows = conn.execute("SELECT * FROM query_tasks ORDER BY created_at DESC").fetchall()
             return [self._task(row) for row in rows if row is not None]
+
+    def find_active_query(self, query_id: str) -> dict[str, Any] | None:
+        with self._lock, closing(self._connect()) as conn:
+            row = conn.execute(
+                "SELECT * FROM query_tasks WHERE query_id=? AND status IN ('queued','running','waiting_resource','cancelling') "
+                "ORDER BY created_at DESC LIMIT 1",
+                (query_id,),
+            ).fetchone()
+            return self._task(row)
+
+    def list_machine_locks(self) -> list[dict[str, Any]]:
+        with self._lock, closing(self._connect()) as conn:
+            rows = conn.execute(
+                "SELECT ml.machine_key,ml.task_id,ml.acquired_at,qt.query_id,qt.creator_name,qt.status,qt.current_ips_id "
+                "FROM machine_locks ml LEFT JOIN query_tasks qt ON qt.id=ml.task_id ORDER BY ml.acquired_at DESC"
+            ).fetchall()
+            return [dict(row) for row in rows]
 
     def update(self, task_id: str, **fields: Any) -> dict[str, Any]:
         allowed = {"status", "started_at", "completed_at", "current_ips_id", "current_round", "manager_recipients", "report_base_url", "cancellation_reason", "processed_json", "error_text", "process_id", "report_path"}
@@ -433,9 +456,12 @@ class TaskManager:
         copilot_cfg = self.cfg.get("copilot", {})
         if copilot_cfg.get("mode") != "subprocess" or copilot_cfg.get("stage2Mode") != "subprocess":
             raise ValueError("全自动模式要求 copilot.mode 和 copilot.stage2Mode 均为 subprocess。")
-        task = self.store.create_task(query_id, creator_name, interval_minutes, safe_text(manager_recipients), safe_text(self.cfg.get("server", {}).get("reportBaseUrl")))
-        event = threading.Event()
         with self._lock:
+            existing = self.store.find_active_query(query_id)
+            if existing:
+                raise DuplicateQueryTaskError(existing)
+            task = self.store.create_task(query_id, creator_name, interval_minutes, safe_text(manager_recipients), safe_text(self.cfg.get("server", {}).get("reportBaseUrl")))
+            event = threading.Event()
             self._events[task["id"]] = event
         threading.Thread(target=self._worker, args=(task["id"], event), daemon=True).start()
         return task
@@ -445,6 +471,9 @@ class TaskManager:
 
     def get(self, task_id: str) -> dict[str, Any] | None:
         return self.store.get_task(task_id)
+
+    def resources(self) -> list[dict[str, Any]]:
+        return self.store.list_machine_locks()
 
     def cancel(self, task_id: str, reason: str = "Cancelled by user") -> dict[str, Any]:
         task = self.store.request_cancel(task_id, safe_text(reason) or "Cancelled by user")
@@ -1104,39 +1133,142 @@ HTML_PAGE = r"""<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>IPS/HSD Copilot UI</title>
+  <title>IPS/HSD Copilot 工作台</title>
   <style>
-    body { font-family: "Segoe UI", Arial, sans-serif; margin: 24px; color: #222; }
-    h1 { margin-bottom: 4px; }
-    .subtitle { color: #666; margin-top: 0; }
-    .grid { display: grid; grid-template-columns: 180px 1fr; gap: 10px 14px; max-width: 1120px; }
-    label { font-weight: 600; padding-top: 8px; }
-    input, select, textarea { font-family: Consolas, "Segoe UI", monospace; font-size: 14px; padding: 8px; border: 1px solid #bbb; border-radius: 4px; }
-    textarea { width: 100%; min-height: 110px; box-sizing: border-box; }
-    button { padding: 9px 14px; border: 0; border-radius: 4px; cursor: pointer; margin-right: 8px; }
-    button.primary { background: #0969da; color: white; }
-    button.danger { background: #d1242f; color: white; }
-    button.secondary { background: #eaeef2; color: #222; }
-    button:disabled { opacity: 0.45; cursor: not-allowed; }
-    .panel { border: 1px solid #d0d7de; border-radius: 6px; padding: 16px; margin-top: 18px; max-width: 1120px; }
-    .status { font-weight: 600; }
-    .warn { color: #9a6700; }
-    .ok { color: #1a7f37; }
-    .fail { color: #cf222e; }
-    pre { background: #f6f8fa; border: 1px solid #d0d7de; padding: 12px; overflow: auto; max-height: 420px; white-space: pre-wrap; }
+    :root {
+      --canvas: #f4f7fb;
+      --surface: #ffffff;
+      --surface-muted: #f8fafc;
+      --sidebar: #0d1b38;
+      --sidebar-muted: #9fb0d2;
+      --text: #15213b;
+      --muted: #64748b;
+      --border: #dbe3ef;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --success: #0f9f6e;
+      --warning: #c97708;
+      --danger: #dc3d4f;
+      --shadow: 0 8px 24px rgba(15, 35, 70, .08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; min-width: 320px; background: var(--canvas); color: var(--text); font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; }
+    body.dark {
+      --canvas: #0c1428; --surface: #13203a; --surface-muted: #182744; --sidebar: #091126;
+      --sidebar-muted: #9aacca; --text: #e5edf9; --muted: #aab9d1; --border: #2c3c5a;
+      --primary: #5a91ff; --primary-hover: #79a7ff; --success: #35c993; --warning: #f0ae45;
+      --danger: #fb7185; --shadow: 0 8px 28px rgba(0, 0, 0, .28);
+    }
+    .app-shell { display: grid; grid-template-columns: 252px minmax(0, 1fr); min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; padding: 26px 16px; background: var(--sidebar); color: white; display: flex; flex-direction: column; }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 0 10px 28px; font-weight: 700; font-size: 16px; letter-spacing: .2px; }
+    .brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #4f8dff, #63d6c4); box-shadow: 0 6px 16px rgba(68, 137, 255, .32); }
+    .brand small { display: block; margin-top: 2px; color: var(--sidebar-muted); font-size: 11px; font-weight: 500; letter-spacing: .5px; }
+    .nav-label { padding: 0 10px 9px; color: var(--sidebar-muted); font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+    .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px; margin: 2px 0; border-radius: 8px; color: #dce8ff; text-decoration: none; font-size: 14px; transition: background .18s ease, transform .18s ease; }
+    .nav-link:hover, .nav-link.active { background: rgba(126, 163, 230, .18); transform: translateX(2px); }
+    .nav-link span { width: 19px; color: #86adff; text-align: center; }
+    .sidebar-footer { margin-top: auto; padding: 16px 10px 0; border-top: 1px solid rgba(196, 215, 255, .14); color: var(--sidebar-muted); font-size: 12px; line-height: 1.6; }
+    .main-content { width: min(1440px, 100%); margin: 0 auto; padding: 24px 34px 42px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+    .breadcrumb { color: var(--muted); font-size: 13px; }
+    .connection { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); }
+    .connection-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--success); box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 15%, transparent); }
+    .theme-toggle { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; padding: 8px 11px; cursor: pointer; font-size: 13px; }
+    .hero { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding: 26px 30px; border-radius: 16px; background: linear-gradient(120deg, #173d83, #2563b8 58%, #247c8e); color: white; box-shadow: var(--shadow); }
+    .eyebrow { margin: 0 0 7px; color: #b9d6ff; font-size: 12px; font-weight: 700; letter-spacing: 1.1px; }
+    h1 { margin: 0; font-size: clamp(25px, 3vw, 34px); letter-spacing: -.5px; }
+    .subtitle { max-width: 680px; margin: 10px 0 0; color: #d7e8ff; line-height: 1.65; }
+    .hero-badge { min-width: 160px; padding: 13px 16px; border: 1px solid rgba(255,255,255,.22); border-radius: 11px; background: rgba(8, 28, 73, .19); }
+    .hero-badge strong { display: block; font-size: 13px; }
+    .hero-badge span { color: #cae3ff; font-size: 12px; }
+    .dashboard { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 20px 0; }
+    .metric { min-height: 104px; padding: 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: 0 3px 12px rgba(15, 35, 70, .035); }
+    .metric-label { color: var(--muted); font-size: 12px; font-weight: 600; }
+    .metric-value { margin-top: 8px; color: var(--text); font-size: 25px; font-weight: 700; }
+    .metric-note { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .metric.running .metric-value { color: var(--primary); }
+    .metric.success .metric-value { color: var(--success); }
+    .metric.warning .metric-value { color: var(--warning); }
+    .panel { max-width: none; margin-top: 18px; padding: 24px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); box-shadow: 0 3px 12px rgba(15, 35, 70, .035); }
+    .panel h2 { margin: 0 0 20px; color: var(--text); font-size: 18px; }
+    .panel h3 { margin: 24px 0 10px; font-size: 15px; }
+    .grid { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 13px 20px; max-width: 1120px; }
+    label { padding-top: 10px; color: var(--text); font-size: 14px; font-weight: 650; }
+    input, select, textarea { width: 100%; padding: 10px 11px; border: 1px solid var(--border); border-radius: 8px; outline: none; background: var(--surface-muted); color: var(--text); font-family: Consolas, "Microsoft YaHei", monospace; font-size: 13px; transition: border .18s ease, box-shadow .18s ease; }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent); }
+    input[type="checkbox"] { width: auto; accent-color: var(--primary); }
+    textarea { min-height: 118px; resize: vertical; }
+    button { margin-right: 8px; padding: 10px 14px; border: 1px solid transparent; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 650; transition: transform .16s ease, box-shadow .16s ease, background .16s ease; }
+    button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(25, 63, 130, .16); }
+    button.primary { background: var(--primary); color: white; }
+    button.primary:hover { background: var(--primary-hover); }
+    button.danger { background: var(--danger); color: white; }
+    button.secondary { border-color: var(--border); background: var(--surface-muted); color: var(--text); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .status { display: inline-flex; align-items: center; min-height: 25px; padding: 3px 9px; border-radius: 999px; background: var(--surface-muted); color: var(--muted); font-size: 12px; font-weight: 700; }
+    .warn { color: var(--warning); }
+    .ok { background: color-mix(in srgb, var(--success) 13%, var(--surface)); color: var(--success); }
+    .fail { background: color-mix(in srgb, var(--danger) 13%, var(--surface)); color: var(--danger); }
+    pre { max-height: 440px; margin: 12px 0; padding: 15px; overflow: auto; border: 1px solid var(--border); border-radius: 9px; background: #101a30; color: #dbeafe; font-family: Consolas, monospace; font-size: 12px; line-height: 1.65; white-space: pre-wrap; }
     #planText { min-height: 360px; }
-    .small { font-size: 12px; color: #666; }
-    .row { margin: 10px 0; }
-    .hidden { display: none; }
-    .auto-only { max-width: 720px; }
-    .report-link { margin-left: 12px; }
+    .small { color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .row { margin: 16px 0 0; }
+    .hidden { display: none !important; }
+    .auto-only { max-width: 1000px; }
+    .report-link { margin-left: 12px; color: var(--primary); font-size: 13px; font-weight: 650; }
+    .section-kicker { margin: -9px 0 18px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 900px) {
+      .app-shell { display: block; }
+      .sidebar { position: relative; height: auto; padding: 16px; }
+      .sidebar nav { display: none; }
+      .sidebar-footer { display: none; }
+      .brand { padding: 0; }
+      .main-content { padding: 18px; }
+      .dashboard { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 620px) {
+      .topbar, .hero { align-items: flex-start; flex-direction: column; }
+      .dashboard { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr; gap: 8px; }
+      .grid > label { padding-top: 8px; }
+      .panel { padding: 18px; }
+      .hero { padding: 22px; }
+    }
   </style>
 </head>
 <body>
-  <h1>IPS/HSD Copilot UI</h1>
-  <p class="subtitle">支持两阶段手动流程，以及按 HSD Query 自动处理 Open IPS 的全自动模式。</p>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">◆</span><span>IPS Copilot<small>HARDWARE FLOW WORKBENCH</small></span></div>
+    <nav>
+      <div class="nav-label">工作台</div>
+      <a class="nav-link active" href="/"><span>▣</span>任务工作台</a>
+      <a class="nav-link" href="/tasks"><span>◷</span>Query 任务中心</a>
+      <a class="nav-link" href="/reports" target="_blank" rel="noopener"><span>▤</span>报告中心</a>
+      <a class="nav-link" href="/guide"><span>?</span>用户指南</a>
+    </nav>
+    <div class="sidebar-footer">受控本地工具<br>请勿暴露到公网</div>
+  </aside>
+  <main class="main-content">
+    <header class="topbar">
+      <div><span class="breadcrumb">硬件流程 / IPS 与 HSD 自动化</span></div>
+      <div class="connection"><span class="connection-dot"></span>服务已就绪 <button class="theme-toggle" type="button" onclick="toggleTheme()">切换主题</button></div>
+    </header>
+    <section class="hero" id="workspace">
+      <div><p class="eyebrow">ENTERPRISE OPERATIONS WORKBENCH</p><h1>IPS/HSD Copilot 工作台</h1><p class="subtitle">以清晰的计划、受控执行和可追溯报告，支持两阶段手动流程及 HSD Query 自动化处理。</p></div>
+      <div class="hero-badge"><strong id="modeSummary">简洁模式</strong><span>当前操作模式</span></div>
+    </section>
+    <section class="dashboard" aria-label="任务概览">
+      <div class="metric"><span class="metric-label">当前模式</span><div class="metric-value" id="metricMode">简洁</div><span class="metric-note">按需切换执行方式</span></div>
+      <div class="metric running"><span class="metric-label">运行中任务</span><div class="metric-value" id="metricRunning">0</div><span class="metric-note">包括排队与资源等待</span></div>
+      <div class="metric success"><span class="metric-label">已完成任务</span><div class="metric-value" id="metricCompleted">0</div><span class="metric-note">当前已加载任务</span></div>
+      <div class="metric warning"><span class="metric-label">需要关注</span><div class="metric-value" id="metricAttention">0</div><span class="metric-note">失败、取消或中断任务</span></div>
+    </section>
 
-  <div class="panel">
+  <div class="panel" id="mode-selection">
+    <p class="section-kicker">选择适合当前工作的执行方式，模式切换不会丢失已输入的表单内容。</p>
     <div class="grid">
       <label for="uiMode">UI 模式</label>
       <select id="uiMode" onchange="updateUiMode()">
@@ -1147,8 +1279,22 @@ HTML_PAGE = r"""<!doctype html>
     </div>
   </div>
 
-  <div class="panel manual-only">
+  <div class="panel manual-only" id="new-task">
     <h2>1. 输入任务信息</h2>
+    <p class="section-kicker">填写最少必要信息；系统会根据所选模式决定是否需要计划确认。</p>
+    <div class="row">
+      <label for="taskTemplate" class="small">任务模板</label>
+      <select id="taskTemplate" onchange="applyTaskTemplate()" style="max-width:360px">
+        <option value="custom">自定义任务</option>
+        <option value="extract">仅提取 IPS 信息</option>
+        <option value="consult">问题咨询（无硬件动作）</option>
+        <option value="boot">启动验证（Debug / 验证）</option>
+        <option value="mlc">跨 NUMA MLC 验证</option>
+      </select>
+      <button class="secondary" type="button" onclick="saveDraft()">保存草稿</button>
+      <button class="secondary" type="button" onclick="clearDraft()">清除草稿</button>
+      <span id="draftStatus" class="small"></span>
+    </div>
     <div class="grid">
       <label for="ipsId">IPS/HSD ID</label>
       <input id="ipsId" placeholder="例如 14025984558">
@@ -1194,7 +1340,7 @@ HTML_PAGE = r"""<!doctype html>
     <p class="small">简洁模式会直接按输入生成默认计划并执行；详细模式可先编辑确认执行计划。阶段二完成后默认通知 HSD owner。</p>
   </div>
 
-  <div class="panel detailed-only manual-only">
+  <div class="panel detailed-only manual-only" id="plan-review">
     <h2>2. 阶段1 输出 / 执行计划</h2>
     <div>状态：<span id="planStatus" class="status">未开始</span></div>
     <pre id="planOutput"></pre>
@@ -1211,7 +1357,7 @@ HTML_PAGE = r"""<!doctype html>
     </div>
   </div>
 
-  <div class="panel detailed-only manual-only">
+  <div class="panel detailed-only manual-only" id="execution-confirm">
     <h2>3. 二次确认并执行</h2>
     <p class="warn">只有勾选确认并点击“确认并执行”后，UI 才会启动阶段二 Copilot subprocess，并在下方输出框实时显示信息。</p>
     <label><input type="checkbox" id="confirmCheck"> 我已经检查并确认最终文本计划。</label>
@@ -1221,9 +1367,9 @@ HTML_PAGE = r"""<!doctype html>
     </div>
   </div>
 
-  <div class="panel auto-only auto-run-only">
+  <div class="panel auto-only auto-run-only" id="automatic-tasks">
     <h2>全自动 Query 任务</h2>
-    <p class="warn">每次启动都会创建独立、持久化的 Query 任务；多个 Query 可并行运行。相同已登记机器的硬件操作会在完成预检后协调串行。</p>
+    <p class="warn">每次启动都会创建独立、持久化的 Query 任务；多个 Query 可并行运行。相同活动 Query 已在服务端阻止重复创建。</p>
     <div class="grid">
       <label for="autoCreatorName">创建人姓名</label>
       <input id="autoCreatorName" placeholder="必填，例如 Zhang San">
@@ -1241,23 +1387,32 @@ HTML_PAGE = r"""<!doctype html>
       <a class="report-link" href="/reports" target="_blank" rel="noopener">查看历史汇总报告</a></div>
   </div>
 
-  <div class="panel auto-only auto-run-only">
+  <div class="panel auto-only auto-run-only" id="task-queue">
     <h2>共享 Query 任务管理</h2>
-    <p class="small">所有浏览器会话看到相同的持久化状态。取消队列任务立即生效；运行中的 Copilot 子进程会先收到终止信号，超过配置宽限期后被强制结束。</p>
+    <p class="small">所有浏览器会话看到相同的持久化状态。取消队列任务立即生效；相同活动 Query 不会重复创建。完整筛选、资源状态和任务详情请前往 Query 任务中心。</p>
     <div id="taskList" class="small">正在加载任务…</div>
   </div>
 
-  <div class="panel manual-only">
+  <div class="panel manual-only" id="execution-console">
     <h2>执行输出</h2>
     <div>状态：<span id="execStatus" class="status">未开始</span></div>
     <pre id="execOutput"></pre>
     <button class="secondary" onclick="copyText('execOutput')">复制阶段2输出</button>
   </div>
+</main>
+</div>
 
 <script>
 let appConfig = null;
 let lastPlanJob = null;
 let lastExecJob = null;
+const DRAFT_KEY = "ips-copilot-ui-draft-v1";
+const TASK_TEMPLATES = {
+  extract: {task_type: "extract_ips", test_target: "仅提取 IPS/HSD 信息", notes: "仅生成结构化 IPS 摘要，不执行硬件动作。"},
+  consult: {task_type: "consult", test_target: "问题咨询与建议", notes: "仅分析 HSD/IPS 内容、历史经验和需要补充的信息，不执行硬件动作。"},
+  boot: {task_type: "debug_repro", test_target: "boot only", notes: "仅在确认计划后执行 BKC 匹配、烧录和启动日志验证；启动成功后不运行额外 MLC。"},
+  mlc: {task_type: "debug_repro", test_target: "跨NUMA MLC bandwidth_matrix", notes: "验证启动成功后运行 MLC v3.11b 跨 NUMA bandwidth_matrix。"}
+};
 
 async function api(path, payload) {
   const opts = payload === undefined ? {} : {
@@ -1306,7 +1461,10 @@ function setStatus(id, status) {
 
 async function loadConfig() {
   appConfig = await api("/api/config");
-  document.getElementById("uiMode").value = appConfig.defaults.uiMode || "simple";
+  const savedMode = localStorage.getItem("ips-copilot-ui-mode");
+  const configuredMode = appConfig.defaults.uiMode || "simple";
+  document.getElementById("uiMode").value = ["simple", "detailed", "automatic"].includes(savedMode)
+    ? savedMode : (configuredMode || "simple");
   const sshHost = document.getElementById("sshHost");
   sshHost.innerHTML = "";
   for (const machine of appConfig.machineOptions) {
@@ -1341,7 +1499,58 @@ async function loadConfig() {
   updateUiMode();
   updateMachineSelection();
   resetPlanTemplate();
+  restoreDraft();
+  registerDraftAutosave();
   refreshTasks();
+}
+
+function saveDraft() {
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(formData()));
+  document.getElementById("draftStatus").textContent = "草稿已保存在当前浏览器。";
+}
+
+function restoreDraft() {
+  const raw = localStorage.getItem(DRAFT_KEY);
+  if (!raw) return;
+  try {
+    const draft = JSON.parse(raw);
+    const fields = ["ips_id", "ssh_host", "task_type", "permission_level", "test_target", "output_dir", "notes"];
+    const ids = {ips_id:"ipsId", ssh_host:"sshHost", task_type:"taskType", permission_level:"permissionLevel", test_target:"testTarget", output_dir:"outputDir", notes:"notes"};
+    for (const field of fields) {
+      if (draft[field] !== undefined && document.getElementById(ids[field])) document.getElementById(ids[field]).value = draft[field];
+    }
+    document.getElementById("autoMachineMatch").checked = !!draft.auto_machine_match;
+    document.getElementById("searchSimilarIps").checked = !!draft.search_similar_ips;
+    document.getElementById("downloadAttachments").checked = !!draft.download_attachments;
+    document.getElementById("notifyAutoSend").checked = !!draft.notify_auto_send;
+    updateMachineSelection();
+    document.getElementById("draftStatus").textContent = "已恢复当前浏览器保存的草稿。";
+  } catch (error) {
+    localStorage.removeItem(DRAFT_KEY);
+    document.getElementById("draftStatus").textContent = "已移除无法读取的草稿。";
+  }
+}
+
+function clearDraft() {
+  localStorage.removeItem(DRAFT_KEY);
+  document.getElementById("draftStatus").textContent = "已清除浏览器草稿。";
+}
+
+function registerDraftAutosave() {
+  for (const field of document.querySelectorAll("#new-task input, #new-task select, #new-task textarea")) {
+    field.addEventListener("change", () => { if (document.getElementById("taskTemplate").value === "custom") saveDraft(); });
+  }
+}
+
+function applyTaskTemplate() {
+  const name = document.getElementById("taskTemplate").value;
+  const template = TASK_TEMPLATES[name];
+  if (!template) return;
+  document.getElementById("taskType").value = template.task_type;
+  document.getElementById("testTarget").value = template.test_target;
+  document.getElementById("notes").value = template.notes;
+  saveDraft();
+  document.getElementById("draftStatus").textContent = "已加载模板，可继续修改后执行。";
 }
 
 function updateMachineSelection() {
@@ -1366,35 +1575,66 @@ function updateUiMode() {
     el.classList.toggle("hidden", simple || automatic);
   }
   document.getElementById("simpleStartButton").classList.toggle("hidden", !simple || automatic);
+  const labels = {simple: "简洁模式", detailed: "详细模式", automatic: "全自动模式"};
+  document.getElementById("metricMode").textContent = labels[mode] || mode;
+  document.getElementById("modeSummary").textContent = labels[mode] || mode;
+  localStorage.setItem("ips-copilot-ui-mode", mode);
 }
 
-function taskHtml(task) {
-  const report = task.report_path ? `<a href="/reports/task/${task.id}/${task.query_id}/${task.current_round}" target="_blank">本轮索引</a>` : "—";
-  const cancel = ["queued", "running", "waiting_resource", "cancelling"].includes(task.status)
-    ? `<button class="secondary" onclick="cancelQueryTask('${task.id}')" ${task.status === "cancelling" ? "disabled" : ""}>取消</button>` : "";
-  return `<div class="panel" style="max-width:none;margin-top:10px"><b>${task.status}</b> · 创建人：${escapeHtml(task.creator_name)} · Query：${escapeHtml(task.query_id)} · 第 ${task.current_round} 轮 · 当前 IPS：${escapeHtml(task.current_ips_id || "—")} ${cancel}<br><span class="small">创建：${new Date(task.created_at * 1000).toLocaleString()}；原因：${escapeHtml(task.cancellation_reason || task.error_text || "—")}；${report}</span><pre>${escapeHtml(task.output || "")}</pre></div>`;
+function updateTaskMetrics(tasks) {
+  const active = new Set(["queued", "running", "waiting_resource", "cancelling"]);
+  const attention = new Set(["failed", "cancelled", "interrupted"]);
+  document.getElementById("metricRunning").textContent = tasks.filter(task => active.has(task.status)).length;
+  document.getElementById("metricCompleted").textContent = tasks.filter(task => task.status === "completed").length;
+  document.getElementById("metricAttention").textContent = tasks.filter(task => attention.has(task.status)).length;
 }
-function escapeHtml(value) { const div = document.createElement("div"); div.textContent = value || ""; return div.innerHTML; }
+
+function toggleTheme() {
+  const dark = !document.body.classList.contains("dark");
+  document.body.classList.toggle("dark", dark);
+  localStorage.setItem("ips-copilot-ui-theme", dark ? "dark" : "light");
+}
+
+function restoreUiPreferences() {
+  if (localStorage.getItem("ips-copilot-ui-theme") === "dark") document.body.classList.add("dark");
+  const savedMode = localStorage.getItem("ips-copilot-ui-mode");
+  if (savedMode && ["simple", "detailed", "automatic"].includes(savedMode)) {
+    document.getElementById("uiMode").value = savedMode;
+  }
+}
+
 async function refreshTasks() {
   const data = await api("/api/tasks");
-  document.getElementById("taskList").innerHTML = data.tasks.length ? data.tasks.map(taskHtml).join("") : "尚无 Query 任务。";
+  document.getElementById("taskList").innerHTML = data.tasks.length ? data.tasks.map(task => {
+    const detail = `<a href="/tasks/${task.id}">查看详情</a>`;
+    return `<div class="panel" style="max-width:none;margin-top:10px"><b>${task.status}</b> · 创建人：${escapeHtml(task.creator_name)} · Query：${escapeHtml(task.query_id)} · 第 ${task.current_round} 轮 · 当前 IPS：${escapeHtml(task.current_ips_id || "—")}<br><span class="small">${detail}；创建：${new Date(task.created_at * 1000).toLocaleString()}；原因：${escapeHtml(task.cancellation_reason || task.error_text || "—")}</span></div>`;
+  }).join("") : "尚无 Query 任务。";
+  updateTaskMetrics(data.tasks);
 }
+function escapeHtml(value) { const div = document.createElement("div"); div.textContent = value || ""; return div.innerHTML; }
 async function startQueryTask() {
   const queryId = document.getElementById("autoQueryId").value.trim();
   const creatorName = document.getElementById("autoCreatorName").value.trim();
   const intervalMinutes = Number(document.getElementById("autoIntervalMinutes").value);
   if (!creatorName) { alert("请输入创建人姓名。"); return; }
   if (!/^\d+$/.test(queryId)) { alert("请输入数字形式的 HSD Query ID。"); return; }
-  await api("/api/tasks", {query_id: queryId, creator_name: creatorName, interval_minutes: intervalMinutes, manager_recipients: document.getElementById("autoManagerRecipients").value.trim()});
-  refreshTasks();
+  try {
+    await api("/api/tasks", {query_id: queryId, creator_name: creatorName, interval_minutes: intervalMinutes, manager_recipients: document.getElementById("autoManagerRecipients").value.trim()});
+    refreshTasks();
+  } catch (error) {
+    try {
+      const detail = JSON.parse(error.message);
+      if (detail.error === "duplicate_query" && detail.existing_task) {
+        document.getElementById("taskList").innerHTML = `相同 Query 已在执行：<a href="/tasks/${detail.existing_task.id}">查看现有任务</a>`;
+        return;
+      }
+    } catch (_) {
+      // The standard API error text is not always JSON.
+    }
+    alert(`无法创建 Query 任务：${error.message}`);
+  }
 }
-async function cancelQueryTask(taskId) {
-  const reason = window.prompt("取消原因（会持久化记录）：", "Cancelled by user");
-  if (reason === null) return;
-  await api(`/api/tasks/${encodeURIComponent(taskId)}/cancel`, {reason});
-  refreshTasks();
-}
-setInterval(() => { if (document.getElementById("taskList")) refreshTasks().catch(() => {}); }, 1500);
+setInterval(() => { if (document.getElementById("taskList")) refreshTasks().catch(() => {}); }, 3000);
 
 async function resetPlanTemplate() {
   const data = await api("/api/plan-template", formData());
@@ -1499,6 +1739,7 @@ async function copyText(id) {
   await navigator.clipboard.writeText(document.getElementById(id).textContent);
 }
 
+restoreUiPreferences();
 loadConfig().catch(err => {
   document.body.innerHTML = "<pre>UI 初始化失败：" + err.message + "</pre>";
 });
@@ -1508,24 +1749,65 @@ loadConfig().catch(err => {
 """
 
 
-def report_layout(title: str, body: str) -> str:
+def report_layout(title: str, body: str, section: str = "报告中心") -> str:
     return f"""<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <title>{html.escape(title)}</title>
   <style>
-    body {{ font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; margin: 28px; color: #24292f; }}
-    table {{ border-collapse: collapse; width: 100%; margin-top: 16px; }}
-    th, td {{ border: 1px solid #d0d7de; padding: 9px; text-align: left; vertical-align: top; }}
-    th {{ background: #f6f8fa; }}
-    .muted {{ color: #57606a; }}
-    .status {{ font-weight: 600; }}
-    pre {{ white-space: pre-wrap; background: #f6f8fa; border: 1px solid #d0d7de; padding: 14px; }}
-    a {{ color: #0969da; }}
+    :root {{ --canvas:#f4f7fb; --surface:#fff; --text:#15213b; --muted:#64748b; --border:#dbe3ef; --primary:#2563eb; --success:#0f9f6e; --warning:#c97708; --danger:#dc3d4f; }}
+    * {{ box-sizing:border-box; }}
+    body {{ margin:0; background:var(--canvas); color:var(--text); font-family:"Segoe UI","Microsoft YaHei",Arial,sans-serif; }}
+    .topbar {{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px max(24px, calc((100vw - 1320px)/2)); background:#0d1b38; color:#e5efff; }}
+    .brand {{ display:flex; align-items:center; gap:9px; font-size:14px; font-weight:700; letter-spacing:.2px; }}
+    .brand-mark {{ display:grid; place-items:center; width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,#4f8dff,#63d6c4); }}
+    .topbar nav {{ display:flex; gap:16px; }}
+    .topbar a {{ color:#c9dcff; text-decoration:none; font-size:13px; }}
+    .topbar a:hover {{ color:white; }}
+    main {{ width:min(1320px,100%); margin:0 auto; padding:28px 26px 46px; }}
+    .hero {{ padding:25px 28px; border-radius:15px; background:linear-gradient(120deg,#173d83,#2563b8 60%,#247c8e); color:white; box-shadow:0 8px 24px rgba(15,35,70,.12); }}
+    .eyebrow {{ margin:0 0 7px; color:#b9d6ff; font-size:11px; font-weight:700; letter-spacing:1px; }}
+    h1 {{ margin:0; font-size:27px; letter-spacing:-.3px; }}
+    h2 {{ margin:0 0 15px; font-size:18px; }}
+    .muted {{ color:var(--muted); line-height:1.65; }}
+    .hero .muted {{ margin:8px 0 0; color:#d7e8ff; }}
+    .summary {{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:20px 0; }}
+    .metric, .panel {{ border:1px solid var(--border); border-radius:12px; background:var(--surface); box-shadow:0 3px 12px rgba(15,35,70,.035); }}
+    .metric {{ padding:17px; }}
+    .metric-label {{ color:var(--muted); font-size:12px; font-weight:600; }}
+    .metric-value {{ margin-top:7px; font-size:24px; font-weight:700; }}
+    .panel {{ padding:23px; }}
+    .notice {{ margin:16px 0; padding:12px 14px; border-radius:9px; background:#eef5ff; color:#24416f; font-size:13px; line-height:1.6; }}
+    .notice.warning {{ background:#fff4df; color:#855300; }}
+    .filter {{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }}
+    .filter input, .filter select {{ flex:1 1 180px; padding:9px 10px; border:1px solid var(--border); border-radius:8px; font:inherit; }}
+    .task-grid {{ display:grid; gap:12px; }}
+    .task-card {{ padding:16px; border:1px solid var(--border); border-radius:10px; background:#fbfdff; }}
+    .task-card h3 {{ margin:0 0 8px; font-size:15px; }}
+    .task-meta {{ display:flex; flex-wrap:wrap; gap:8px 16px; color:var(--muted); font-size:12px; line-height:1.6; }}
+    .task-card pre {{ max-height:180px; margin-top:12px; }}
+    .actions {{ display:flex; flex-wrap:wrap; gap:8px; margin-top:13px; }}
+    button {{ padding:9px 12px; border:1px solid var(--border); border-radius:8px; background:#fff; color:var(--text); font:inherit; font-weight:650; cursor:pointer; }}
+    button.primary {{ border-color:var(--primary); background:var(--primary); color:white; }}
+    button.danger {{ border-color:var(--danger); background:var(--danger); color:white; }}
+    table {{ width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border:1px solid var(--border); border-radius:9px; }}
+    th, td {{ padding:12px 13px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top; font-size:13px; }}
+    th {{ background:#f8fafc; color:#52617a; font-size:12px; letter-spacing:.15px; }}
+    tr:last-child td {{ border-bottom:0; }}
+    tbody tr:hover {{ background:#f8fbff; }}
+    .status-badge {{ display:inline-flex; padding:4px 9px; border-radius:999px; background:#eef2f7; color:#52617a; font-size:12px; font-weight:700; }}
+    .status-completed {{ background:#e7f8f0; color:var(--success); }}
+    .status-blocked, .status-skipped {{ background:#fff4df; color:var(--warning); }}
+    .status-failed, .status-cancelled, .status-interrupted {{ background:#ffebee; color:var(--danger); }}
+    pre {{ max-height:480px; margin:0; overflow:auto; padding:16px; border:1px solid var(--border); border-radius:9px; background:#101a30; color:#dbeafe; font-family:Consolas,monospace; font-size:12px; line-height:1.65; white-space:pre-wrap; }}
+    a {{ color:var(--primary); font-weight:650; text-decoration:none; }}
+    a:hover {{ text-decoration:underline; }}
+    .back-link {{ display:inline-block; margin-bottom:16px; font-size:13px; }}
+    @media (max-width:700px) {{ .topbar {{ padding:14px 18px; }} .topbar nav {{ gap:11px; }} main {{ padding:20px 14px 32px; }} .summary {{ grid-template-columns:1fr; }} .panel {{ padding:16px; }} .table-wrap {{ overflow-x:auto; }} }}
   </style>
 </head>
-<body>{body}</body>
+<body><header class="topbar"><div class="brand"><span class="brand-mark">◆</span>IPS Copilot · {html.escape(section)}</div><nav><a href="/">工作台</a><a href="/tasks">任务中心</a><a href="/reports">报告中心</a><a href="/guide">用户指南</a></nav></header><main>{body}</main></body>
 </html>"""
 
 
@@ -1534,9 +1816,16 @@ def status_summary(items: list[dict[str, Any]]) -> str:
     return f"完成 {counts['completed']}；阻塞 {counts['blocked']}；跳过 {counts['skipped']}；失败 {counts['failed']}"
 
 
+def report_status_badge(value: Any) -> str:
+    text = safe_text(value) or "未记录"
+    slug = re.sub(r"[^a-z0-9_-]+", "-", text.lower()).strip("-") or "unknown"
+    return f'<span class="status-badge status-{html.escape(slug)}">{html.escape(text)}</span>'
+
+
 def render_report_index() -> str:
+    records = list_auto_rounds()
     rows = []
-    for record in list_auto_rounds():
+    for record in records:
         query_id = html.escape(record["query_id"])
         task_id = html.escape(record["task_id"])
         round_number = record["round"]
@@ -1549,16 +1838,21 @@ def render_report_index() -> str:
             "<tr>"
             f"<td>{task_id or '旧记录'}</td><td>{query_id}</td><td>第 {round_number} 轮</td>"
             f"<td>{html.escape(record['started_at'])}</td><td>{html.escape(record['completed_at'])}</td>"
-            f"<td>{html.escape(record['status'])}</td><td>{record['item_count']}</td>"
+            f"<td>{report_status_badge(record['status'])}</td><td>{record['item_count']}</td>"
             f'<td><a href="{report_href}">查看汇总</a></td></tr>'
         )
     table = "".join(rows) or '<tr><td colspan="8" class="muted">尚无全自动处理报告。</td></tr>'
+    query_count = len({record["query_id"] for record in records})
+    completed_count = sum(record["status"] == "completed" for record in records)
     return report_layout(
         "全自动处理报告",
-        f"""<h1>全自动处理报告</h1>
-<p class="muted">每个 Query 轮次的处理结果会在本机保存，重启 UI 后仍可浏览。</p>
-<table><thead><tr><th>任务 ID</th><th>Query ID</th><th>轮次</th><th>开始时间</th><th>完成时间</th><th>状态</th><th>IPS 数</th><th>报告</th></tr></thead>
-<tbody>{table}</tbody></table>""",
+        f"""<section class="hero"><p class="eyebrow">AUTOMATION REPORT ARCHIVE</p><h1>全自动处理报告</h1>
+<p class="muted">每个 Query 轮次的处理结果会在本机保存，重启 UI 后仍可浏览。</p></section>
+<section class="summary"><div class="metric"><span class="metric-label">处理轮次</span><div class="metric-value">{len(records)}</div></div>
+<div class="metric"><span class="metric-label">关联 Query</span><div class="metric-value">{query_count}</div></div>
+<div class="metric"><span class="metric-label">完成轮次</span><div class="metric-value">{completed_count}</div></div></section>
+<section class="panel"><h2>处理历史</h2><div class="table-wrap"><table><thead><tr><th>任务 ID</th><th>Query ID</th><th>轮次</th><th>开始时间</th><th>完成时间</th><th>状态</th><th>IPS 数</th><th>报告</th></tr></thead>
+<tbody>{table}</tbody></table></div></section>""",
     )
 
 
@@ -1582,21 +1876,22 @@ def render_round_report(query_id: str, round_number: int, task_id: str = "") -> 
             f"<td>{ips_id}</td><td>{html.escape(safe_text(item.get('title')) or '未获取')}</td>"
             f"<td>{html.escape(safe_text(item.get('diagnostic_type')))}</td>"
             f"<td>{'是' if item.get('test_completed') else '否'}</td>"
-            f"<td class=\"status\">{html.escape(safe_text(item.get('status')))}</td>"
+            f"<td>{report_status_badge(item.get('status'))}</td>"
             f'<td><a href="{detail_href}">查看详情</a></td></tr>'
         )
     table = "".join(rows) or '<tr><td colspan="6" class="muted">本轮没有 Open IPS。</td></tr>'
     notification = record.get("manager_notification", {})
-    notification_text = html.escape(safe_text(notification.get("status"))) if isinstance(notification, dict) else "未记录"
+    notification_text = report_status_badge(notification.get("status")) if isinstance(notification, dict) else report_status_badge("未记录")
     return report_layout(
         f"Query {query_id} 第 {round_number} 轮处理报告",
-        f"""<p><a href="/reports">返回历史汇总</a></p>
-<h1>任务 {html.escape(task_id) or '旧记录'} · Query {html.escape(query_id)} · 第 {round_number} 轮处理报告</h1>
-<p class="muted">处理时间：{html.escape(safe_text(record.get('started_at')))} 至 {html.escape(safe_text(record.get('completed_at')) or '进行中')}</p>
-<p>整体状态：<span class="status">{html.escape(safe_text(record.get('status')))}</span>；{status_summary(items)}</p>
-<p>管理汇总通知：<span class="status">{notification_text}</span></p>
-<table><thead><tr><th>IPS ID</th><th>IPS 关键标题</th><th>诊断类型</th><th>是否完成测试</th><th>处理状态</th><th>详细报告</th></tr></thead>
-<tbody>{table}</tbody></table>""",
+        f"""<a class="back-link" href="/reports">← 返回历史汇总</a>
+<section class="hero"><p class="eyebrow">QUERY ROUND REPORT</p><h1>Query {html.escape(query_id)} · 第 {round_number} 轮处理报告</h1>
+<p class="muted">任务：{html.escape(task_id) or '旧记录'} · 处理时间：{html.escape(safe_text(record.get('started_at')))} 至 {html.escape(safe_text(record.get('completed_at')) or '进行中')}</p></section>
+<section class="summary"><div class="metric"><span class="metric-label">整体状态</span><div class="metric-value">{report_status_badge(record.get('status'))}</div></div>
+<div class="metric"><span class="metric-label">处理结果</span><div class="metric-value">{len(items)}</div><span class="muted">{status_summary(items)}</span></div>
+<div class="metric"><span class="metric-label">管理通知</span><div class="metric-value">{notification_text}</div></div></section>
+<section class="panel"><h2>IPS 处理明细</h2><div class="table-wrap"><table><thead><tr><th>IPS ID</th><th>IPS 关键标题</th><th>诊断类型</th><th>是否完成测试</th><th>处理状态</th><th>详细报告</th></tr></thead>
+<tbody>{table}</tbody></table></div></section>""",
     )
 
 
@@ -1620,19 +1915,92 @@ def render_report_detail(query_id: str, round_number: int, ips_id: str, task_id:
     )
     return report_layout(
         f"IPS {ips_id} 自动化处理详情",
-        f"""<p><a href="{round_href}">返回本轮汇总</a></p>
-<h1>IPS {html.escape(ips_id)} 自动化处理详情</h1>
-<table><tbody>
+        f"""<a class="back-link" href="{round_href}">← 返回本轮汇总</a>
+<section class="hero"><p class="eyebrow">IPS EXECUTION DETAIL</p><h1>IPS {html.escape(ips_id)} 自动化处理详情</h1>
+<p class="muted">查看诊断结果、通知状态和关联 Markdown 报告。</p></section>
+<section class="panel"><h2>处理摘要</h2><div class="table-wrap"><table><tbody>
 <tr><th>关键标题</th><td>{html.escape(safe_text(item.get('title')) or '未获取')}</td></tr>
 <tr><th>诊断类型</th><td>{html.escape(safe_text(item.get('diagnostic_type')))}</td></tr>
-<tr><th>处理状态</th><td>{html.escape(safe_text(item.get('status')))}</td></tr>
+<tr><th>处理状态</th><td>{report_status_badge(item.get('status'))}</td></tr>
 <tr><th>是否完成测试</th><td>{'是' if item.get('test_completed') else '否'}</td></tr>
 <tr><th>Owner</th><td>{html.escape(safe_text(item.get('owner')) or '未获取')}</td></tr>
 <tr><th>Owner 邮件状态</th><td>{html.escape(safe_text(item.get('owner_notification_status')))}</td></tr>
 <tr><th>Markdown 报告</th><td>{report_link}</td></tr>
-</tbody></table>
-<h2>Owner 邮件正文</h2>
-<pre>{html.escape(safe_text(item.get('owner_email_body')) or '未记录')}</pre>""",
+</tbody></table></div></section>
+<section class="panel"><h2>Owner 邮件正文</h2><pre>{html.escape(safe_text(item.get('owner_email_body')) or '未记录')}</pre></section>""",
+    )
+
+
+def format_task_time(value: Any) -> str:
+    try:
+        return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(float(value)))
+    except (TypeError, ValueError):
+        return "未记录"
+
+
+def render_task_detail(task: dict[str, Any]) -> str:
+    report_path = safe_text(task.get("report_path"))
+    report_link = f'<a href="/reports/task/{html.escape(task["id"])}/{html.escape(task["query_id"])}/{task["current_round"]}">查看当前轮次报告</a>' if report_path else "尚未生成"
+    return report_layout(
+        f"Query {task['query_id']} 任务详情",
+        f"""<a class="back-link" href="/tasks">← 返回任务中心</a>
+<section class="hero"><p class="eyebrow">QUERY TASK DETAIL</p><h1>Query {html.escape(task['query_id'])} 任务详情</h1>
+<p class="muted">创建人：{html.escape(task['creator_name'])} · 创建时间：{format_task_time(task.get('created_at'))}</p></section>
+<section class="summary"><div class="metric"><span class="metric-label">任务状态</span><div class="metric-value">{report_status_badge(task.get('status'))}</div></div>
+<div class="metric"><span class="metric-label">当前轮次</span><div class="metric-value">{task.get('current_round', 0)}</div></div>
+<div class="metric"><span class="metric-label">当前 IPS</span><div class="metric-value">{html.escape(safe_text(task.get('current_ips_id')) or '—')}</div></div></section>
+<section class="panel"><h2>任务参数</h2><div class="table-wrap"><table><tbody>
+<tr><th>任务 ID</th><td>{html.escape(task['id'])}</td></tr>
+<tr><th>轮询间隔</th><td>{int(task.get('interval_seconds', 0)) // 60} 分钟</td></tr>
+<tr><th>汇总通知者</th><td>{html.escape(safe_text(task.get('manager_recipients')) or '未填写')}</td></tr>
+<tr><th>取消/失败原因</th><td>{html.escape(safe_text(task.get('cancellation_reason')) or safe_text(task.get('error_text')) or '无')}</td></tr>
+<tr><th>报告</th><td>{report_link}</td></tr>
+</tbody></table></div></section>
+<section class="panel"><h2>实时输出</h2><pre>{html.escape(safe_text(task.get('output')) or '尚无输出。')}</pre></section>""",
+        section="任务中心",
+    )
+
+
+def render_task_center() -> str:
+    return report_layout(
+        "Query 任务中心",
+        """<section class="hero"><p class="eyebrow">SHARED QUERY OPERATIONS</p><h1>Query 任务中心</h1>
+<p class="muted">集中创建、追踪和取消所有用户的自动 Query 任务；相同活动 Query 会在服务端拒绝重复创建。</p></section>
+<section class="panel"><h2>创建自动 Query 任务</h2>
+<div class="notice">创建前会检查相同 Query ID 是否已处于排队、运行、等待资源或取消中状态。发现重复时将跳转到现有任务，而不会启动第二个任务。</div>
+<div class="filter"><input id="creator" placeholder="创建人姓名（必填）"><input id="queryId" inputmode="numeric" placeholder="HSD Query ID（仅数字）"><input id="interval" type="number" min="60" value="60" aria-label="轮询间隔（分钟）"><input id="recipients" placeholder="汇总通知者（可选）"></div>
+<div class="actions"><button class="primary" onclick="createTask()">创建并启动任务</button><span id="createStatus" class="muted"></span></div></section>
+<section class="summary"><div class="metric"><span class="metric-label">活动任务</span><div class="metric-value" id="activeCount">0</div></div><div class="metric"><span class="metric-label">已完成任务</span><div class="metric-value" id="completedCount">0</div></div><div class="metric"><span class="metric-label">资源占用</span><div class="metric-value" id="resourceCount">0</div></div></section>
+<section class="panel"><h2>共享任务队列</h2><div class="filter"><input id="search" placeholder="按 Query ID、创建人或当前 IPS 搜索" oninput="renderTasks()"><select id="statusFilter" onchange="renderTasks()"><option value="">全部状态</option><option value="queued">排队</option><option value="running">运行中</option><option value="waiting_resource">等待资源</option><option value="completed">已完成</option><option value="failed">失败</option><option value="cancelled">已取消</option><option value="interrupted">已中断</option></select></div><div id="taskList" class="task-grid">正在加载任务…</div></section>
+<section class="panel"><h2>硬件资源状态</h2><p class="muted">仅展示已被自动任务锁定的已登记控制机；不显示连接凭据或敏感配置。</p><div id="resourceList" class="task-grid">正在加载资源状态…</div></section>
+<script>
+let tasks = [];
+const activeStatuses = new Set(["queued", "running", "waiting_resource", "cancelling"]);
+function escapeHtml(value) { const div = document.createElement("div"); div.textContent = value || ""; return div.innerHTML; }
+function badge(status) { return `<span class="status-badge status-${escapeHtml(status)}">${escapeHtml(status || "未记录")}</span>`; }
+async function request(path, payload) { const response = await fetch(path, payload ? {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)} : {}); const body = await response.json(); if (!response.ok) { const error = new Error(body.message || body.error || "请求失败"); error.body = body; throw error; } return body; }
+function taskCard(task) { const report = task.report_path ? `<a href="/reports/task/${task.id}/${task.query_id}/${task.current_round}">本轮报告</a>` : "尚未生成报告"; const cancel = activeStatuses.has(task.status) ? `<button class="danger" onclick="cancelTask('${task.id}')">取消任务</button>` : ""; return `<article class="task-card"><h3>Query ${escapeHtml(task.query_id)} · ${badge(task.status)}</h3><div class="task-meta"><span>创建人：${escapeHtml(task.creator_name)}</span><span>轮次：${task.current_round}</span><span>当前 IPS：${escapeHtml(task.current_ips_id || "—")}</span><span>创建时间：${new Date(task.created_at * 1000).toLocaleString()}</span></div><div class="actions"><a href="/tasks/${task.id}">查看详情</a><span>${report}</span>${cancel}</div>${task.error_text || task.cancellation_reason ? `<div class="notice warning">${escapeHtml(task.error_text || task.cancellation_reason)}</div>` : ""}</article>`; }
+function renderTasks() { const term = document.getElementById("search").value.trim().toLowerCase(); const status = document.getElementById("statusFilter").value; const filtered = tasks.filter(task => (!status || task.status === status) && (!term || [task.query_id,task.creator_name,task.current_ips_id].join(" ").toLowerCase().includes(term))); document.getElementById("taskList").innerHTML = filtered.length ? filtered.map(taskCard).join("") : "<p class='muted'>没有符合条件的任务。</p>"; }
+async function loadTasks() { const data = await request("/api/tasks"); tasks = data.tasks; document.getElementById("activeCount").textContent = tasks.filter(task => activeStatuses.has(task.status)).length; document.getElementById("completedCount").textContent = tasks.filter(task => task.status === "completed").length; renderTasks(); }
+async function loadResources() { const data = await request("/api/resources"); document.getElementById("resourceCount").textContent = data.resources.length; document.getElementById("resourceList").innerHTML = data.resources.length ? data.resources.map(resource => `<article class="task-card"><h3>${escapeHtml(resource.machine_key)}</h3><div class="task-meta"><span>Query：${escapeHtml(resource.query_id || "—")}</span><span>创建人：${escapeHtml(resource.creator_name || "—")}</span><span>当前 IPS：${escapeHtml(resource.current_ips_id || "—")}</span><span>${badge(resource.status)}</span></div></article>`).join("") : "<p class='muted'>当前没有自动任务占用硬件资源。</p>"; }
+async function createTask() { const queryId = document.getElementById("queryId").value.trim(); const creatorName = document.getElementById("creator").value.trim(); if (!creatorName || !/^\\d+$/.test(queryId)) { document.getElementById("createStatus").textContent = "请填写创建人和数字形式的 Query ID。"; return; } try { const task = await request("/api/tasks", {query_id:queryId,creator_name:creatorName,interval_minutes:Number(document.getElementById("interval").value),manager_recipients:document.getElementById("recipients").value.trim()}); window.location.assign(`/tasks/${task.id}`); } catch (error) { if (error.body && error.body.error === "duplicate_query") { document.getElementById("createStatus").innerHTML = `相同 Query 已在运行：<a href="/tasks/${error.body.existing_task.id}">查看现有任务</a>`; return; } document.getElementById("createStatus").textContent = error.message; } }
+async function cancelTask(id) { const reason = window.prompt("取消原因（会永久记录）：", "用户取消任务"); if (reason === null) return; await request(`/api/tasks/${id}/cancel`, {reason}); await loadTasks(); await loadResources(); }
+Promise.all([loadTasks(), loadResources()]).catch(error => { document.getElementById("taskList").textContent = error.message; }); setInterval(() => { loadTasks().catch(() => {}); loadResources().catch(() => {}); }, 3000);
+</script>""",
+        section="任务中心",
+    )
+
+
+def render_user_guide() -> str:
+    return report_layout(
+        "用户指南",
+        """<section class="hero"><p class="eyebrow">GET STARTED SAFELY</p><h1>用户指南</h1><p class="muted">帮助新用户选择工作模式、完成配置、创建任务并理解安全限制。</p></section>
+<section class="panel"><h2>选择工作模式</h2><div class="table-wrap"><table><thead><tr><th>模式</th><th>适用场景</th><th>操作方式</th></tr></thead><tbody><tr><td>简洁模式</td><td>已有明确任务，愿意按默认计划直接执行</td><td>填写 IPS/HSD ID 与测试目标，点击开始执行。</td></tr><tr><td>详细模式</td><td>需要审阅、修改并确认执行计划</td><td>先生成阶段 1 计划，编辑后勾选确认，再启动阶段 2。</td></tr><tr><td>自动 Query</td><td>需要持续处理同一 HSD Query 的 Open IPS</td><td>前往任务中心创建任务；系统会阻止相同活动 Query 重复运行。</td></tr></tbody></table></div></section>
+<section class="panel"><h2>首次配置</h2><ol><li>从仓库根目录启动 UI：<code>powershell -ExecutionPolicy Bypass -File .\\scripts\\Start-IpsCopilotUi.ps1</code>。</li><li>复制并填写硬件配置模板；服务器专用配置应放在仓库外。</li><li>确认 Copilot CLI 已登录、SSH 已按本手册配置，且 UI 仅在受控网络使用。</li></ol></section>
+<section class="panel"><h2>标准操作步骤</h2><ol><li>在工作台选择简洁或详细模式，填写任务信息。</li><li>详细模式下，仅阶段 1 生成计划，不访问 HSD、不连接 SSH、也不执行硬件动作。</li><li>检查阶段 2 计划；涉及烧录、供电、串口或 MLC 时必须明确确认。</li><li>在执行控制台查看输出，在报告中心查看保存的结果。</li></ol></section>
+<section class="panel"><h2>Query 任务与资源协调</h2><p>任务中心展示所有创建人的任务、运行状态、当前 IPS 和硬件资源锁。相同 Query 在活动状态下只允许一个任务；请进入已有任务查看进展，而不是重复创建。</p><p>资源等待表示其他自动任务正在使用相同已登记控制机。等待期间不会执行硬件副作用。</p></section>
+<section class="panel"><h2>安全边界与常见问题</h2><div class="notice warning">咨询和提取任务不应烧录、开关机、控制串口或运行 MLC。Debug/验证任务必须在 BKC、平台和机器匹配后才允许硬件动作；烧录失败后不得继续抓启动日志或运行 MLC。</div><p>完整部署、配置和网络访问说明请参阅 <code>docs\\ips_copilot_ui.md</code>；Git 拉取和服务器更新请参阅 <code>docs\\git_usage_guide.md</code>。</p></section>""",
+        section="用户指南",
     )
 
 
@@ -1666,6 +2034,20 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         if parsed.path == "/":
             self._send_text(HTML_PAGE, content_type="text/html; charset=utf-8")
+            return
+        if parsed.path == "/tasks":
+            self._send_text(render_task_center(), content_type="text/html; charset=utf-8")
+            return
+        task_page_match = re.fullmatch(r"/tasks/([0-9a-f-]+)", parsed.path)
+        if task_page_match:
+            task = TASK_MANAGER.get(task_page_match.group(1)) if TASK_MANAGER else None
+            if task is None:
+                self._send_text("任务不存在或已被清理。", status=404)
+            else:
+                self._send_text(render_task_detail(task), content_type="text/html; charset=utf-8")
+            return
+        if parsed.path == "/guide":
+            self._send_text(render_user_guide(), content_type="text/html; charset=utf-8")
             return
         if parsed.path == "/reports":
             self._send_text(render_report_index(), content_type="text/html; charset=utf-8")
@@ -1731,6 +2113,12 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json({"error": "task manager is unavailable"}, status=503)
             else:
                 self._send_json({"tasks": TASK_MANAGER.list()})
+            return
+        if parsed.path == "/api/resources":
+            if TASK_MANAGER is None:
+                self._send_json({"error": "task manager is unavailable"}, status=503)
+            else:
+                self._send_json({"resources": TASK_MANAGER.resources()})
             return
         task_match = re.fullmatch(r"/api/tasks/([0-9a-f-]+)", parsed.path)
         if task_match:
@@ -1818,6 +2206,15 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json(TASK_MANAGER.cancel(cancel_match.group(1), safe_text(body.get("reason"))))
                 return
             self._send_json({"error": "not found"}, status=404)
+        except DuplicateQueryTaskError as exc:
+            self._send_json(
+                {
+                    "error": "duplicate_query",
+                    "message": "相同 Query 已有活动任务，未创建重复任务。",
+                    "existing_task": exc.task,
+                },
+                status=409,
+            )
         except Exception as exc:
             self._send_json({"error": f"{type(exc).__name__}: {exc}"}, status=400)
 

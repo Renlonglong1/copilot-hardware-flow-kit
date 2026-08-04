@@ -1,0 +1,32 @@
+{
+  "TicketId": "HSD_SAMPLE_ID",
+  "Date": "20260708",
+  "TenantSubject": "tenant.subject",
+  "TicketUrl": "https://hsdes.intel.com/appstore/article-one/#/article/HSD_SAMPLE_ID",
+  "ParentId": "PARENT_WRITEUP_ID_if_applicable",
+  "SourceSightingId": "SOURCE_SIGHTING_ID_if_applicable",
+  "SourceSightingTenantSubject": "sighting_central.sighting",
+  "SourceSightingUrl": "https://hsdes.intel.com/appstore/article-one/#/article/SOURCE_SIGHTING_ID_if_applicable",
+  "IssueTitle": "[PLATFORM][COMPONENT] Sample issue title",
+  "Domain": "TDX",
+  "ProblemDescription": "Concise issue description from the HSD ticket.",
+  "FailureSignature": "Short failure signature or symptom summary.",
+  "SystemConfigurationAndReproductionStep": "System configuration and minimum reproduction steps.",
+  "RootCause": "Confirmed root cause from the HSD ticket.",
+  "FinalSolution": "Confirmed fix direction, workaround, or closure rationale.",
+  "AffectedProducts": "Platform or product impact summary.",
+  "Conclusion": "Need import",
+  "Release": "Release value if available.",
+  "Severity": "Severity or priority if available.",
+  "Owner": "Ticket owner.",
+  "Component": "Component name if available.",
+  "Status": "Ticket status.",
+  "Reason": "Ticket reason if available.",
+  "SubmittedDate": "2026-07-08",
+  "Comments": "Additional concise comments.",
+  "Notes": [
+    "Optional note 1",
+    "Optional note 2"
+  ],
+  "ConversationId": "00000000-0000-4000-8000-000000000000"
+}

@@ -11,6 +11,7 @@ Read this first to choose the smallest needed context. Do not read every documen
 | IPS/HSD debug reproduction | `.github\skills\ips-hsd-repro-flow\SKILL.md` |
 | BHS flash / boot / MLC flow | `.github\skills\bhs-hardware-flow\SKILL.md` |
 | Need PS/PY command syntax | `.github\skills\common-ps-py-commands\SKILL.md` |
+| GitHub clone, commit, push, or server update | `docs\git_usage_guide.md` |
 | Oak Stream CScripts discovery or usage | `docs\cscripts_oak_stream_usage.md` |
 | Select a lab machine for IPS/HSD reproduction | `docs\lab_machine_inventory.md`, then `config\lab-machine-inventory.json` |
 | UI operation/config | `docs\ips_copilot_ui.md` |

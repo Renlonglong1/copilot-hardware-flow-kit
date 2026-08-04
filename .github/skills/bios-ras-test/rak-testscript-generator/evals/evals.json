@@ -1,0 +1,53 @@
+{
+  "skill_name": "rak-testscript-generator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Generate a RAK test script for BHS platform (GNR-AP, GNR-SP) to validate the Online Spare memory RAS feature. The test should: use CScripts to inject a correctable memory error into hardware.dimm_1 at threshold=2 to trigger sparing, verify that the spare operation completes by checking sparing_control CSR registers, and confirm OS recovery via dmesg. Use FFM execution mode and the standard CScripts injection method.",
+      "expected_output": "A valid, directly executable RAK Python script with: correct ConfigInfo block (Automation-Level:3, target_platform: GNR-AP/GNR-SP, required BIOS knobs including DfxEvMode/DfxDisableBiosDone/SpareIntSelect etc.), OS readiness checks, RAK_SHOW_HWCONFIG/RAK_CHECK_HWCONFIG, RAK_UEFI_KNOBS, halt()/go() semantics, CScripts error injection using hardware.dimm_1 topology, RAK_ASSERT_CSR for sparing_control register verification. No invented APIs, no URLs, English only.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Convert this test recipe into a runnable RAK script for BHS (GNR-AP/GNR-SP/SRF-SP/SRF-AP) platform:\n\n---\nTest: Patrol Scrub CE detection\nGoal: Verify that patrol scrub detects and logs a correctable memory error.\nSteps:\n1. Set BIOS knobs: enable patrol scrub, enable system errors, set correctable error threshold=1, enable RAS logging at MAX level\n2. Boot to OS\n3. Inject a correctable memory error into DIMM1 on socket 0\n4. Wait for patrol scrub to detect the error (wait ~120 seconds)\n5. Check that correrrorstatus register on the injected channel is non-zero\n6. Check dmesg for memory error messages (keywords: 'Hardware Error', 'EDAC')\n---\n\nUse CScripts injection. The dmesg keywords are explicitly listed in the recipe above.",
+      "expected_output": "A compliant RAK Python script that preserves all recipe intent: ConfigInfo with Automation-Level:3, PatrolScrub=0x2 and other required BIOS knobs, OS readiness flow, halt()/go() for injection and pre-go() register reads, RAK_ASSERT_CSR on correrrorstatus, RAK_DMESG_ANALYSE using only the explicitly provided keywords ('Hardware Error', 'EDAC'). No invented register addresses or log keywords beyond what the recipe specifies.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Review this RAK script for compliance issues and provide specific fixes:\n\n```python\n##############ConfigInfo##############\nAutomation-Level: 2\nrepeat_time: 1\ntarget_platform: GNR-AP\nUEFI_BIOS_knobs:\n  - DfxEvMode=0x1\n  - DfxDisableBiosDone=0x1\n############End ConfigInfo###############\n\n##############CscriptsCommand##############\nprint(\"Starting UPI error injection test\")\nRAK_WAIT_SYSTEM_STATUS(SYS_STATUS.OS.OS_READY, timeout=1000)\n\ninject_socket = hardware.upi.socket\ninject_port = hardware.upi.port\n\nhalt()\nei.upi.injectUpiError(socket=inject_socket, port=inject_port, errType='ce')\nRAK_DELAY(10)\ngo()\n\n# Verify from BIOS spec section 7.3.2 page 45\n# See: https://sharepoint.intel.com/sites/docs/bhs_ras_ivg.pdf\nRAK_ASSERT_MSR(sv.socket0.upi.ktimiscstatus, 0x1)\nprint(\"Test PASSED - see IVG document for details\")\n##############End CscriptsCommand##############\n```",
+      "expected_output": "A compliance review identifying all violations with exact locations and proposed fixes, including: (1) Automation-Level should be 3 not 2; (2) missing LockChipset=0x0 knob required for CScripts injection; (3) missing RAK_CHECK_OS_READY()/itp.resettarget() guard; (4) missing RAK_SHOW_HWCONFIG/RAK_CHECK_HWCONFIG; (5) URL (sharepoint link) must be removed per output purity rules; (6) document/spec reference ('IVG document', 'section 7.3.2 page 45') must be removed; (7) missing go() before MSR assertion is questionable or MSR read should happen before go().",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Generate a RAK test script for BHS platform (GNR-AP, GNR-SP, SRF-SP, SRF-AP, CWF-AP) to validate PCIe Uncorrectable Non-Fatal Error (UCE) handling with OS recovery using EINJ injection method. The PCIe device is at hardware.pcie. The test should verify: (1) AER uncorrectable error status register shows the UCE after injection, (2) OS reports AER recovery via dmesg keyword 'AER: device recovery successful', (3) link recovers to original speed. WHEA and PCIe EINJ BIOS knobs are required.",
+      "expected_output": "A valid RAK Python script with: ConfigInfo Automation-Level:3, target_platform covering all BHS variants, WHEA BIOS knobs (WheaSupportEn, WheaErrorInjSupportEn, WheaPcieErrInjEn, PcieErrInjActionTable, IioErrorEn, OsNativeAerSupport=0x0, McaBankErrInjEn=0x1, RasLogLevel=0x3), EINJ-based injection (not CScripts ei.*), hardware.pcie topology usage, pre-injection link speed capture, RAK_ASSERT_CSR on AER error registers, RAK_DMESG_ANALYSE for the provided keyword, link speed recovery assertion. No CScripts injection commands since EINJ was explicitly requested.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "I need a RAK script to test runtime PPR (Post Package Repair) on BHS GNR-AP platform. The flow is: inject enough CEs on a DIMM rank to hit the PPR threshold, then verify that the PPR row sparing event occurs. Target DIMM is hardware.dimm_1. Please also verify that the retry_rd_err_log shows the failed device and that the pprType is set correctly to soft PPR.",
+      "expected_output": "A valid RAK Python script for runtime sPPR: ConfigInfo with Automation-Level:3, target_platform GNR-AP (NOT SRF since runtime sPPR is unsupported there), required BIOS knobs (DfxEvMode, DfxDisableBiosDone, RtRowSparing=0x1, pprType=0x1, SpareIntSelect, spareErrTh, SystemErrorEn, RasLogLevel), correct OS readiness flow, CScripts CE injection loop using hardware.dimm_1 topology, RAK_ASSERT_CSR checks on retry_rd_err_log_address1.failed_dev and ppr-related registers. Must NOT include SRF in target_platform due to sPPR constraint.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "Derive the corresponding OKS ADDDC RAK case from the existing BHS ADDDC case. The currently available OKS references only clearly define the inject command, show_ecc_mode, adddc_status_check, and some error dump commands, but they do not explicitly specify which registers or key strings should be checked. First generate a runnable initial version of the case, and do not invent register checks.",
+      "expected_output": "The skill should trigger Mode E and produce a conservative OKS/DMR-AP ADDDC derivation: start from the BHS source case, translate APIs and knobs to OKS forms, keep only grounded OKS validation checks, and avoid inventing target-platform registers or log keywords.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "Derive the BHS eDPC TC01 case into an OKS version. The goal is to preserve the validation intent of CTO trigger DPC, but switch the API, port naming, BIOS knobs, and error check commands to OKS platform forms.",
+      "expected_output": "The skill should trigger Mode E and derive an OKS/DMR-AP IIO eDPC case by preserving the BHS test intent while translating to OKS injection APIs, OKS port_id naming, OKS BIOS knobs, and OKS dump/check commands. It should not reuse BHS register paths or BHS-only helper logic without evidence.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "I have already derived an initial OKS RAK case from a BHS case, but I do not yet know which registers, logs, and key strings should be checked after injection. Please run this case on the remote machine and continue optimizing it based on the returned result logs. By default, run at most three attempts; if it is still incomplete after three attempts, stop and ask me.",
+      "expected_output": "The skill should trigger Mode E with remote iteration active, recognize the default 3-attempt budget, communicate attempt numbers, and refine the derived case only from remote result-log evidence instead of guessing target-platform register checks or key strings.",
+      "files": []
+    }
+  ]
+}

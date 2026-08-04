@@ -1,0 +1,35 @@
+{
+  "skill_name": "bios-manipulate-fit",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to change the flash component 1 size to 64MB in my IFWI image at D:\\builds\\oks\\outimage.bin. FITm is in C:\\Tools\\FITm.",
+      "expected_output": "Should prompt to confirm FITm path and IFWI path, export before.xml, modify descriptor:FlashComponent1Size=0x4000000 in tomodify.xml, show the change for confirmation, build new image, export after.xml, and open diff in VS Code.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Change the boot guard profile to profile 3 in my IFWI binary. The FITm tool should already be saved from last time.",
+      "expected_output": "Should load saved FITm path from .fitm_config.json, ask user to confirm, prompt for IFWI path, export before.xml, modify btg:Boot_Profile=3 in tomodify.xml, show change for confirmation, build, export after.xml, open diff.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I want to set NumberOfSpiComponents to 1 and change the read clock frequency to 50MHz in descriptor settings. My IFWI is at C:\\workspace\\platform.bin.",
+      "expected_output": "Should handle multiple setting changes: descriptor:NumberOfSpiComponents=1 and descriptor:ReadClockFrequency=0x5. Export before.xml, apply both changes to tomodify.xml, show summary of both changes, ask for confirmation, build, export after.xml, diff.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "What's the current boot guard profile and flash component size in my IFWI at D:\\builds\\oks\\outimage.bin?",
+      "expected_output": "Should use query workflow: decompose the IFWI to XML, parse for btg:Boot_Profile and descriptor:FlashComponent1Size, display current values in a clear table. Should NOT attempt to modify or rebuild anything.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Show me all the descriptor container settings for this IFWI image. FITm path should be saved already.",
+      "expected_output": "Should load saved FITm path, ask to confirm, prompt for IFWI path, decompose to XML, then show all settings under the descriptor container. May also run fit_cmd.py -h descriptor to provide descriptions alongside values.",
+      "files": []
+    }
+  ]
+}
