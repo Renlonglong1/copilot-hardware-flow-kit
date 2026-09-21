@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Non-operational example. Copy to the ignored lab-machine-inventory.json and configure approved assets before hardware use.",
+  "machines": [
+    {
+      "id": "CONFIGURE_BEFORE_USE",
+      "ssh": {
+        "user": "REPLACE_WITH_APPROVED_USER",
+        "host": "configure-before-use.invalid"
+      },
+      "model": "REPLACE_WITH_APPROVED_MODEL",
+      "platformFamily": "UNCONFIGURED",
+      "platformAliases": [],
+      "capabilities": {},
+      "paths": {}
+    }
+  ],
+  "selectionRules": [
+    "UNCONFIGURED is not an available platform.",
+    "Never substitute an unknown or incompatible platform.",
+    "Require approved inventory, explicit hardware profile and authorization before any hardware action."
+  ]
+}

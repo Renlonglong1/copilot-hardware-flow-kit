@@ -1,0 +1,69 @@
+{
+  "ssh": {
+    "user": "debug",
+    "host": "REPLACE_WITH_SERVER_IP",
+    "connectTimeoutSeconds": 10,
+    "identityFile": "OPTIONAL_LOCAL_PATH_TO_TARGET_SSH_KEY",
+    "hostKeyAlias": "OPTIONAL_VERIFIED_HOST_KEY_ALIAS"
+  },
+  "remote": {
+    "emulator": {
+      "exe": "C:\\Program Files (x86)\\DediProg\\Emulator\\smucmd.exe",
+      "shortcut": "C:\\Users\\debug\\Desktop\\smucmd.exe - Shortcut.lnk",
+      "manual": "C:\\Program Files (x86)\\DediProg\\EM100\\help.pdf",
+      "defaultChip": "MX66U1G45G",
+      "expectedDeviceSerial": "REPLACE_WITH_APPROVED_DEVICE_SERIAL",
+      "guiProcessNamesToAvoid": ["EM100.exe", "Emulator.exe"]
+    },
+    "powerSplitter": {
+      "exe": "C:\\Users\\debug\\Desktop\\PowerSplitterWithCycleScript 1\\PowerSplitterWithCycleScript\\PowerSplitterCL.exe"
+    },
+    "serial": {
+      "baudRate": 115200,
+      "dataBits": 8,
+      "parity": "None",
+      "stopBits": "One",
+      "ports": {
+        "cpu": "COM3",
+        "bmc": "COM4"
+      }
+    }
+  },
+  "flow": {
+    "defaultBinFile": "REPLACE_WITH_REMOTE_BIN_PATH",
+    "captureSeconds": 600,
+    "logRoot": "C:\\Users\\debug\\Desktop\\flow_logs",
+    "failFastBeforeSerialCapture": true,
+    "maxRecoverableFlashRetries": 2,
+    "requiredFlashSuccessKeywords": [
+      "Download Complete",
+      "Verify Pass",
+      "Emulator is in Emulation mode",
+      "Authentication Pass"
+    ],
+    "flashFailureKeywords": [
+      "No device is connected!",
+      "Verify Fail",
+      "Authentication Fail",
+      "Download failed",
+      "ERROR"
+    ],
+    "cpuSuccessKeywords": [
+      "CentOS Stream 9",
+      "gnr-bkc login",
+      "ScktId",
+      "Training"
+    ],
+    "bmcSuccessKeywords": [
+      "U-Boot",
+      "Linux",
+      "OpenBMC",
+      "login:"
+    ]
+  },
+  "hostOs": {
+    "serialLoginUser": "root",
+    "mlcDir": "/root/mlc_v3.11b",
+    "validatedMlcResultDirs": []
+  }
+}
