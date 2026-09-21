@@ -1,6 +1,6 @@
 # Copilot Hardware Flow Kit 系统任务交接文档
 
-版本：1.0 | 编制日期：2026-09-21 | 状态：技术交接稿，待责任人签收
+版本：1.1 | 编制日期：2026-09-21 | 状态：技术交接稿，待责任人签收
 
 本文面向接任开发者、部署运维人员与实验室负责人。内容依据编制时的本地工作区代码和配套文档整理，不代表已经完成真实硬件验收、账号转移或 GitHub 发布。文中不包含凭据、客户工单正文或实际实验室接入信息。
 
@@ -127,7 +127,7 @@ Debug / 验证需要先核对目标平台、机器、镜像、测试意图及资
 ### 6.1 获取代码与核对基线
 
 ```powershell
-git clone https://github.com/Renlonglong1/copilot-hardware-flow-kit.git
+git clone --branch handover/2026-09-21-portable --single-branch https://github.com/Renlonglong1/copilot-hardware-flow-kit.git
 Set-Location .\copilot-hardware-flow-kit
 git status --short
 git log -1 --oneline
@@ -162,6 +162,185 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Start-IpsCopilotUi
 默认访问 http://127.0.0.1:8765/。先确认工作台、任务中心、报告中心和使用指南可打开，再做“仅生成计划”的无外部副作用验收。不要为了检查 UI 能否启动而提交真实 Debug 或自动 Query 任务。
 
 UI 没有自带身份认证。保持本机监听；确需内网共享时，使用批准的访问控制/认证代理并限制防火墙来源，同时正确配置 server.reportBaseUrl。不得直接暴露公网。
+
+### 6.4 新电脑迁移：系统功能与 SSH 配置是两回事
+
+项目代码可迁移到新电脑，非硬件部分通常不需要重新开发，但不能理解为“复制目录后所有功能零配置可用”。Python、Copilot 登录、HSD 企业身份、Outlook 及本机配置仍需按各自要求准备。SSH 是远程硬件上机链路的独立前置条件，不是整个系统的统一登录方式。
+
+新电脑默认不应被视为已经拥有旧电脑的 SSH 能力。GitHub 不携带原维护人的私钥、known_hosts 信任记录、ssh-agent 状态、个人 SSH 配置或忽略的本机运行配置；服务器也不会因为接收人能登录 GitHub 就自动允许其 SSH 登录。接收人应新建自己的身份并由控制机管理员授权，而不是复制离职人员的私钥。
+
+| 功能 | 是否依赖硬件 SSH | 新电脑上的其他前提 |
+| --- | --- | --- |
+| 打开本地 UI、填写表单、查看本地指南 | 不依赖 | Python、有效 UI 配置和可读取的机器清单 |
+| 阶段一生成计划 | 不依赖 | Copilot CLI、本人登录及所选执行模式 |
+| HSD 提取、咨询、只读共性分析 / Top IPS | 不依赖 | 企业网络、HSD 权限；AI 分析另需 Copilot |
+| 查看历史报告 | 不依赖 | 单独迁移获准的报告和索引；Git 不包含 out 数据 |
+| Outlook 草稿 / 通知 | 不依赖 | 当前 Windows 用户的 Outlook 与邮箱配置 |
+| 远端设备预检、烧录、电源、串口和 MLC | 依赖 | 新电脑 SSH 身份、控制机授权、网络、主机信任和硬件配置 |
+| 包含 Open IPS 硬件 Debug 的自动 Query | 硬件步骤依赖 | 除 Query 所需身份外，还需完成 SSH 和硬件前置条件 |
+
+因此，没有 SSH 配置时可以先开展已具备前提的非硬件功能；不要通过提交一次 Debug 来“顺便测试 SSH”。SSH 就绪也只代表远程连接成立，不代表 EM100、PowerSplitter、串口、镜像或 MLC 已可用。
+
+对本次 GitHub 脱敏交付分支，UI 模板提供的是不可用于上机的示例机器清单。首次部署时，另将 config\lab-machine-inventory.template.json 复制到已忽略的 config\lab-machine-inventory.json，填写批准的真实机器，并在本地 UI 配置中将 machineMatching.inventoryPath 改为 config\\lab-machine-inventory.json。这一步登记机器，但不会生成 SSH 密钥或授予服务器权限。
+
+### 6.5 新电脑首次 SSH 配置与验收
+
+以下是供接收人和控制机管理员执行的配置说明，本次更新文档不执行这些操作。连接对象通常是安装 EM100 / PowerSplitter 工具的 Windows 控制机，并非默认直连被测 Linux Host OS。先确认获准的控制机地址、登录账号、网络/VPN、资源负责人和 SSH 端口。当前核心包装默认使用端口 22；不能只在 JSON 随意添加 ssh.port 就假定所有 SSH/SCP 脚本支持非默认端口。
+
+**步骤一：新电脑安装或确认 OpenSSH Client。**
+
+在新电脑 PowerShell 中检查：
+
+```powershell
+Get-Command ssh, scp, ssh-keygen, ssh-add
+ssh -V
+```
+
+未安装时，由 IT 或获准管理员在新电脑的管理员 PowerShell 中安装 Windows 可选组件：
+
+```powershell
+Get-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
+Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
+```
+
+安装完成后重新打开终端。新电脑只作为客户端时，不需要为此启用 OpenSSH Server。若同时安装了 Git 自带 SSH，确认终端与 UI 子进程使用同一套批准的 OpenSSH；不同实现可能无法复用同一 ssh-agent。
+
+**步骤二：接收人在自己的 Windows 账号下生成专用密钥。**
+
+```powershell
+New-Item -ItemType Directory -Path "$HOME\.ssh" -Force
+$keyPath = Join-Path $HOME '.ssh\hardware_flow_ed25519'
+if ((Test-Path $keyPath) -or (Test-Path "$keyPath.pub")) {
+    throw 'Key file already exists; do not overwrite it.'
+}
+ssh-keygen -t ed25519 -a 64 -f $keyPath
+```
+
+按本机交互提示设置密钥保护口令，不写入命令参数、脚本、Git 或聊天。如果企业政策不允许 Ed25519，由 IT 指定获准算法，不绕过策略。无扩展名文件是私钥，仅留在接收人的受控本机目录；.pub 文件是公钥，可通过批准渠道交给控制机管理员。不得把私钥当作附件发送。
+
+脚本使用 BatchMode=yes，不会等待输入登录密码或私钥保护口令。对于有保护口令的密钥，应使用批准的 ssh-agent：由管理员按策略启用服务，再由实际运行 UI 的用户装载密钥。
+
+```powershell
+# 新电脑：仅由获准管理员配置服务
+Set-Service -Name ssh-agent -StartupType Automatic
+Start-Service ssh-agent
+```
+
+```powershell
+# 新电脑：回到接收人自己的普通 PowerShell
+ssh-add "$HOME\.ssh\hardware_flow_ed25519"
+ssh-add -l
+```
+
+只在本机提示框输入保护口令。UI、命令行和 agent 应使用同一 Windows 用户身份；换账号、用另一管理员账号启动 UI、迁移电脑或重启后，应重新确认密钥是否可用。不要为图方便关闭密钥保护或把 agent 转发给远端。
+
+**步骤三：控制机管理员安装公钥并核对服务端。**
+
+管理员先确认目标控制机已有 OpenSSH Server、sshd 服务和正确登录账号，且防火墙只向批准的来源网络开放。已有共享控制机不要擅自重装或重启 SSH 服务；尚未部署时由 IT 安装 OpenSSH.Server 可选组件并按企业流程配置服务和访问规则。
+
+公钥要授权给“将要登录的那个远端账号”，不能只放在管理员自己的目录。Windows OpenSSH 常见位置如下，最终以实际 sshd_config 的有效规则为准：
+
+| 远端账号情况 | 公钥授权位置 | 管理员注意事项 |
+| --- | --- | --- |
+| 普通 Windows 用户 | 该用户配置文件目录下的 .ssh\authorized_keys | 追加公钥为独立一行；保留已有公钥；核对该用户及必要系统主体的 ACL |
+| 命中管理员组专用规则的账号 | C:\ProgramData\ssh\administrators_authorized_keys | 常见默认 Match Group administrators 使用此文件；仅 SYSTEM 和 Administrators 应拥有相应访问权限 |
+| 企业定制部署 | sshd_config 实际指定的位置 | 核对公钥认证、账号限制和 Match 规则，不能假设上面两种路径必然生效 |
+
+必须写入完整的 .pub 公钥单行，不能折行、贴入私钥或覆盖其他人的公钥。管理员同时检查 OpenSSH 日志及授权文件权限；若修改 sshd_config，先验证配置并安排批准的服务维护窗口。公钥授权完成不等于客户端已信任该服务器，还需下一步核对主机指纹。
+
+**步骤四：核对控制机主机指纹，建立专用 known_hosts。**
+
+管理员应从控制机本地控制台或可信资产记录提供 SSH 主机公钥的 SHA256 指纹。客户端采集到的公钥只有与该可信指纹一致后才能被信任；ssh-keyscan 的输出本身不证明服务器身份。
+
+以下示例在接收人新电脑执行，仅获取主机公钥，不登录或操作硬件。把占位地址替换为获准主机名或 IP；后续 JSON 的 ssh.host 必须使用同一个值。
+
+```powershell
+$serverHost = 'REPLACE_WITH_APPROVED_HOST'
+$candidate = Join-Path $HOME '.ssh\hardware_host_candidate'
+$knownHosts = Join-Path $HOME '.ssh\known_hosts.hardware'
+if (Test-Path $candidate) {
+    throw 'Candidate file already exists; review it before another scan.'
+}
+ssh-keyscan -T 10 -t ed25519 $serverHost |
+    Set-Content -LiteralPath $candidate -Encoding ascii
+ssh-keygen -lf $candidate
+```
+
+上面选择的是服务端 Ed25519 主机密钥，与用户登录密钥是两个不同概念；若服务端使用其他获准主机密钥算法，按管理员提供的类型调整 -t。扫描无输出、解析失败或指纹不一致时停止，不写入信任文件。
+
+只有通过独立渠道逐项核对候选公钥指纹后，才执行下面的追加操作。如果 known_hosts.hardware 已有同一主机的不同密钥，先让管理员确认原因，不删除旧记录来绕过告警。
+
+```powershell
+Get-Content -LiteralPath $candidate |
+    Add-Content -LiteralPath $knownHosts -Encoding ascii
+Remove-Item -LiteralPath $candidate
+```
+
+在新电脑的 $HOME\.ssh\config 中添加或合并该目标专用 Host 段，不覆盖原文件。下面是 OpenSSH 配置文本，不是 PowerShell 命令；替换主机和用户目录占位值。带引号路径中的双反斜杠用于 OpenSSH 配置转义，不能照搬 JSON 格式或写入私钥内容。
+
+```text
+Host REPLACE_WITH_APPROVED_HOST
+    BatchMode yes
+    IdentitiesOnly yes
+    PreferredAuthentications publickey
+    PasswordAuthentication no
+    KbdInteractiveAuthentication no
+    StrictHostKeyChecking yes
+    UserKnownHostsFile "C:\\Users\\YOUR_USER\\.ssh\\known_hosts.hardware"
+    GlobalKnownHostsFile NUL
+```
+
+让该目标专用配置优先于可能冲突的宽泛 Host * 配置，并核对最终生效值。禁止使用 StrictHostKeyChecking=no 或 accept-new 代替指纹核对。首次缺少可信主机记录时应停止，不能让批处理自动接受未知主机。
+
+**步骤五：把新电脑身份接入本系统的本地硬件配置。**
+
+只修改 config\local\hardware-flow.json 内的 ssh 对象，保留 remote、flow、hostOs 等其他配置。下面的路径应改为接收人本机实际私钥文件路径；它不是私钥内容。
+
+```json
+{
+  "ssh": {
+    "user": "REPLACE_WITH_APPROVED_USER",
+    "host": "REPLACE_WITH_APPROVED_HOST",
+    "connectTimeoutSeconds": 10,
+    "identityFile": "C:\\Users\\YOUR_USER\\.ssh\\hardware_flow_ed25519",
+    "hostKeyAlias": ""
+  }
+}
+```
+
+这里将 hostKeyAlias 留空，是因为专用 known_hosts 已按同一 ssh.host 登记。如果确需别名，只能使用已经核对并登记过的那个别名；不能把旧电脑的别名直接当作信任证明。机器清单中的账号和地址也应与该配置一致。
+
+当前脚本读取 JSON 中的 identityFile / hostKeyAlias，但不读取任意新增的 knownHostsFile 字段。因此，专用 known_hosts 路径和严格校验策略放在上述本机 OpenSSH config 中；JSON 提供目标和登录身份，两者共同生效，均不提交 Git。
+
+**步骤六：先检查生效配置和连接，再开放硬件操作。**
+
+ssh -G 只展开配置、不发起远程登录；Test-NetConnection 会向获准目标进行网络端口探测。先在同一接收人账号下运行：
+
+```powershell
+ssh -G REPLACE_WITH_APPROVED_HOST |
+    Select-String '^(hostname|userknownhostsfile|stricthostkeychecking|batchmode|identitiesonly) '
+Test-NetConnection -ComputerName REPLACE_WITH_APPROVED_HOST -Port 22
+```
+
+TCP 可达只证明端口连通，不证明身份认证成功。最后，在仓库根目录运行系统自带的无硬件动作预检：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Test-SshAccess.ps1 -ConfigPath .\config\local\hardware-flow.json
+$LASTEXITCODE
+```
+
+通过标准为同时出现 SSH_OK 且退出码为 0。这个脚本只在远端执行 echo SSH_OK，不烧录、不关电、不抓串口，也不运行 MLC。通过后才能在另行批准的窗口进入硬件流程；不能以 SSH 成功代替镜像、USB、电源、串口和测试工具的检查。
+
+| 配置阶段现象 | 定位方向 |
+| --- | --- |
+| 找不到 ssh / scp | 安装客户端、重新打开终端、检查 UI 的 PATH |
+| TCP 连接超时 / 拒绝 | 企业网络/VPN、目标地址、sshd 服务、获准防火墙规则 |
+| Host key verification failed | 专用 known_hosts 路径、实际匹配的 Host 段、主机指纹或别名 |
+| Permission denied (publickey) | 远端账号、公钥授权文件、ACL、Match 规则及本机 identityFile |
+| 手工可登录但系统预检失败 | 手工可能依赖密码/口令交互；核对 agent、BatchMode、Windows 用户和 SSH 实现 |
+| SSH_OK 后硬件命令仍失败 | 远端工具路径、Windows 账号权限、设备占用及硬件配置，不再混同于 SSH 配置 |
+
+接收人签收时登记“客户端安装、个人公钥授权、指纹核对、本机配置、SSH_OK / 退出码、控制机负责人”六项结果即可；记录中不要附加私钥、保护口令或其他凭据。Windows 公钥部署参考：https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement 。
 
 ## 7. 主要业务操作规程
 
