@@ -2,7 +2,9 @@
   "ssh": {
     "user": "debug",
     "host": "REPLACE_WITH_SERVER_IP",
-    "connectTimeoutSeconds": 10
+    "connectTimeoutSeconds": 10,
+    "identityFile": "OPTIONAL_LOCAL_PATH_TO_TARGET_SSH_KEY",
+    "hostKeyAlias": "OPTIONAL_VERIFIED_HOST_KEY_ALIAS"
   },
   "remote": {
     "emulator": {

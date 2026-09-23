@@ -140,6 +140,21 @@ function ConvertTo-EmlSafe {
     return (($Value -replace "`r", ' ') -replace "`n", ' ')
 }
 
+function ConvertTo-NotificationHtmlText {
+    param([Parameter(Mandatory = $true)][string]$Text)
+
+    $encoded = [System.Net.WebUtility]::HtmlEncode($Text)
+    return [regex]::Replace(
+        $encoded,
+        'https?://[^\s<]+',
+        {
+            param($match)
+            $url = $match.Value
+            "<a href=""$url"" style=""color:#0969da;"">$url</a>"
+        }
+    )
+}
+
 function ConvertTo-NotificationHtml {
     param([Parameter(Mandatory = $true)][string]$Text)
 
@@ -162,7 +177,7 @@ function ConvertTo-NotificationHtml {
                 [void]$html.Append('</ul>')
                 $listOpen = $false
             }
-            [void]$html.AppendFormat('<h2 style="font-size:12pt;margin:18px 0 6px;border-bottom:1px solid #d0d7de;padding-bottom:4px;">{0}</h2>', [System.Net.WebUtility]::HtmlEncode($line))
+            [void]$html.AppendFormat('<h2 style="font-size:12pt;margin:18px 0 6px;border-bottom:1px solid #d0d7de;padding-bottom:4px;">{0}</h2>', (ConvertTo-NotificationHtmlText -Text $line))
             continue
         }
 
@@ -171,7 +186,7 @@ function ConvertTo-NotificationHtml {
                 [void]$html.Append('<ul style="margin:4px 0 10px;padding-left:22px;">')
                 $listOpen = $true
             }
-            [void]$html.AppendFormat('<li style="margin:3px 0;">{0}</li>', [System.Net.WebUtility]::HtmlEncode($Matches[1]))
+            [void]$html.AppendFormat('<li style="margin:3px 0;">{0}</li>', (ConvertTo-NotificationHtmlText -Text $Matches[1]))
             continue
         }
 
@@ -184,10 +199,10 @@ function ConvertTo-NotificationHtml {
             [void]$html.AppendFormat(
                 '<p style="margin:3px 0;"><strong>{0}:</strong> {1}</p>',
                 [System.Net.WebUtility]::HtmlEncode($Matches[1]),
-                [System.Net.WebUtility]::HtmlEncode($Matches[2])
+                (ConvertTo-NotificationHtmlText -Text $Matches[2])
             )
         } else {
-            [void]$html.AppendFormat('<p style="margin:6px 0;">{0}</p>', [System.Net.WebUtility]::HtmlEncode($line))
+            [void]$html.AppendFormat('<p style="margin:6px 0;">{0}</p>', (ConvertTo-NotificationHtmlText -Text $line))
         }
     }
 

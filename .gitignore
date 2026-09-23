@@ -24,6 +24,10 @@ id_ecdsa
 known_hosts
 known_hosts.*
 
+# Local runtime profiles; retain only portable templates in Git
+config/local/
+*.local.json
+
 # Operating-system files
 Thumbs.db
 Desktop.ini

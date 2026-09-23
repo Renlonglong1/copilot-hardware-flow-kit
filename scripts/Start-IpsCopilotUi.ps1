@@ -13,7 +13,12 @@ $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $My
 $kitRoot = Split-Path -Parent $scriptRoot
 
 if (-not $ConfigPath) {
-    $ConfigPath = Join-Path $kitRoot 'config\ips-copilot-ui.template.json'
+    $localConfig = Join-Path $kitRoot 'config\local\ips-copilot-ui.json'
+    $ConfigPath = if (Test-Path -LiteralPath $localConfig -PathType Leaf) {
+        $localConfig
+    } else {
+        Join-Path $kitRoot 'config\ips-copilot-ui.template.json'
+    }
 }
 
 $argsList = @(

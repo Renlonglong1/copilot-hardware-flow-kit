@@ -16,19 +16,21 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-if (-not $ConfigPath) {
-    $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
-    $ConfigPath = Join-Path $scriptRoot '..\config\hardware-flow.json'
-}
+$scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+. (Join-Path $scriptRoot 'Resolve-LocalConfig.ps1')
+$ConfigPath = Resolve-HardwareFlowConfigPath -ConfigPath $ConfigPath -ScriptRoot $scriptRoot
 
 $config = Get-Content -LiteralPath $ConfigPath -Raw | ConvertFrom-Json
 $target = "$($config.ssh.user)@$($config.ssh.host)"
-$timeout = [int]$config.ssh.connectTimeoutSeconds
+$sshArguments = Get-HardwareSshArguments -Config $config
 $exe = $config.remote.emulator.exe
 $dir = $config.remote.emulator.dir
-
 if (-not $Chip) {
     $Chip = $config.remote.emulator.defaultChip
+    if ([string]::IsNullOrWhiteSpace($Chip)) {
+        throw 'Chip is required for program. Supply -Chip or configure remote.emulator.defaultChip.'
+    }
+    Write-Output "EMULATOR_CHIP_CONFIG_DEFAULT=$Chip"
 }
 
 $parts = @()
@@ -93,14 +95,23 @@ if ($DeviceSerialNumber) {
 
 $escapedArgs = ($parts | ForEach-Object { '"' + ($_ -replace '"', '\"') + '"' }) -join ' '
 $remoteScript = @"
+`$ErrorActionPreference = 'Stop'
+if (-not (Test-Path -LiteralPath '$dir' -PathType Container)) {
+    throw "Emulator directory does not exist: $dir"
+}
+if (-not (Test-Path -LiteralPath '$exe' -PathType Leaf)) {
+    throw "Emulator executable does not exist: $exe"
+}
 Set-Location -LiteralPath '$dir'
 & '$exe' $escapedArgs
-exit `$LASTEXITCODE
+`$exitCode = `$LASTEXITCODE
+if (`$exitCode -ne 0) { exit `$exitCode }
+exit 0
 "@
 $encodedRemoteScript = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($remoteScript))
 $remote = "powershell -NoProfile -EncodedCommand $encodedRemoteScript"
 Write-Host "Running on ${target}: $exe $($parts -join ' ')"
-$output = ssh -o BatchMode=yes -o ConnectTimeout=$timeout $target $remote 2>&1
+$output = ssh @sshArguments $target $remote 2>&1
 $sshExitCode = $LASTEXITCODE
 $output | ForEach-Object { Write-Output $_ }
 if ($sshExitCode -ne 0) {

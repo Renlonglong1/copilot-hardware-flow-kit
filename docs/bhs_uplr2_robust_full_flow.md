@@ -171,13 +171,18 @@ Use this order:
 $power = 'C:\Users\debug\Desktop\PowerSplitterWithCycleScript 1\PowerSplitterWithCycleScript\PowerSplitterCL.exe'
 $smu = 'C:\Program Files (x86)\DediProg\Emulator\smucmd.exe'
 $bin = 'C:\Users\debug\Desktop\BKC\uPLR2\BHSDCRB1.IPC.3545.P03.2511062122_GB01000405_GA10000680_SC03000393_RB0A000133_SP_IP_Clean_Debug_PRQ_DAM_Enabled_1.bin'
-$chip = 'MX66U1G45G'
 
 & $smu --stop
 & $power poweroff
 Start-Sleep -Seconds 2
-& $smu --stop --set $chip -d $bin -v --start
+& $smu --stop --set MX66U1G45G -d $bin -v --start
 ```
+
+The automation selects a chip configuration before every program operation. Unless
+the caller explicitly supplies `-Chip`, it scans
+`config\EM100Pro-G2` and chooses the alphabetically first available `MX66*.cfg`
+model, recording `EMULATOR_CHIP_AUTO_SELECTED=<model>` in the flash output. It
+fails before power-on when no matching configuration is available.
 
 Expected successful programming output:
 
@@ -382,7 +387,7 @@ Validated login method:
 
 ```text
 username: root
-password: dcpae_123
+password: supplied only by an approved runtime secret mechanism
 ```
 
 After login, the following commands were tested successfully through COM3 serial interaction:
@@ -415,6 +420,34 @@ summary.txt
 
 Operational note: if COM3 returns `Access to the port 'COM3' is denied`, do not power on yet. Stop and diagnose the serial-port conflict first. In the validated run, retrying COM3 open after the handle was released succeeded, then the flow continued from the already successful flash state.
 
+## Serial Port Conflict Recovery
+
+If opening COM3/COM4 returns `Access to the port '<COMx>' is denied`, keep the
+board powered off and resolve the conflict before starting boot capture. The most
+common lab cause is a running `MobaXterm.exe` serial session.
+
+1. Confirm MobaXterm is running on the control server:
+
+   ```powershell
+   Get-CimInstance Win32_Process |
+     Where-Object { $_.Name -match '^MobaXterm.*\.exe$' } |
+     Select-Object ProcessId, Name, CommandLine
+   ```
+
+2. Close the MobaXterm window that owns the serial session. If the process is
+   confirmed to be the conflicting serial client, close only its specific PID:
+
+   ```powershell
+   Stop-Process -Id <PID>
+   ```
+
+3. Retry opening both configured serial ports. Continue only after both capture
+   helpers create their ready markers; otherwise do not power on.
+
+Do not terminate unrelated terminal sessions merely because MobaXterm is present.
+If closing the confirmed MobaXterm serial session does not release the port, collect
+the capture error logs and identify the actual handle owner before retrying.
+
 ## MLC Validation After Boot
 
 Validated MLC result directories:
@@ -436,3 +469,8 @@ Validated logs:
 ```
 
 Automation caution: serial command echo can contain the same marker string that the script is waiting for. Do not report MLC success only because a marker appeared; wait for the real root shell prompt and verify saved host log files contain `EXIT:0`.
+
+When COM3 is already at a root shell, `Invoke-RemoteMlcSerial.ps1` runs without a
+credential. If COM3 is at a login prompt, its credential must be supplied by an
+approved runtime secret mechanism through `MLC_SERIAL_PASSWORD`; never place it in a
+script, repository configuration, or documentation.

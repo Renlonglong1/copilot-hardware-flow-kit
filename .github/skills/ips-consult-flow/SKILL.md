@@ -75,6 +75,28 @@ Never ask for or store passwords, cookies, SSO tokens, service tokens, or Kerber
 - comments and customer blog history
 - fix description / root cause / workaround, if available
 
+## Common-Issue Reuse Fields
+
+When the consultation may be used to compare, group, or share IPS experience,
+extract these fields explicitly. They separate the customer's actual problem
+from the handling information another team needs to judge reuse:
+
+| Evidence role | Prefer these fields |
+|---|---|
+| Reported problem | `description`, failure signature, root cause, comments, reproduction/debug details |
+| Handling outcome | `bug.fix_description`, workaround, `server_platf_ae.bug.conclusion_type`, `server_platf_ae.bug.ext_cust_blog_hist` |
+| Scope | `family`, `release`, `component`, `server_platf_ae.bug.customer_project_name`, priority |
+| Classification | `server_platf_ae.bug.article_type`, `server_platf_ae.bug.ext_issue_type` |
+| Evidence link | `server_platf_ae.bug.int_sighting_url` |
+
+Use customer-reported symptoms, trigger/configuration, impact, and failure
+signature to decide whether IPS are genuinely similar. Treat project, platform,
+release, component, and customer as applicability context, not grouping proof.
+Same verified `int_sighting_url` is strong support. Different sighting URLs are
+useful references but do not prove a shared root cause. Strip rich HTML/CSS and
+ignore routing metadata, URLs, IDs, dates, names, and email headers when
+extracting semantic problem text.
+
 ## Analysis Contract
 
 The report should answer:

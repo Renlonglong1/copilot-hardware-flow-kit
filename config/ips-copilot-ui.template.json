@@ -1,8 +1,8 @@
 {
   "server": {
-    "host": "10.239.79.61",
+    "host": "127.0.0.1",
     "port": 8765,
-    "reportBaseUrl": "http://10.239.79.61:8765",
+    "reportBaseUrl": "http://127.0.0.1:8765",
     "openBrowser": true
   },
   "copilot": {
@@ -12,9 +12,11 @@
     "prependCommands": [],
     "command": [
       "copilot",
-      "--allow-all"
+      "--allow-all",
+      "--silent",
+      "-p"
     ],
-    "passPrompt": "stdin",
+    "passPrompt": "argument",
     "timeoutSeconds": 7200,
     "workingDirectory": ".",
     "promptFileEncoding": "utf-8",
@@ -22,14 +24,12 @@
   },
   "defaults": {
     "uiMode": "simple",
-    "sshHost": "debug@10.239.84.53",
+    "sshHost": "",
     "autoMachineMatch": false,
     "taskType": "debug_repro",
     "permissionLevel": "standard",
     "searchSimilarIps": false,
     "downloadAttachments": false,
-    "notifyAutoSend": false,
-    "outputDirectory": "out",
     "planOnlyNoHardwareText": "阶段1只能根据UI表单字段生成执行计划，严禁访问HSD database、SSH连接、读取BKC、烧录、power cycle、串口控制或任何硬件动作。"
   },
   "automation": {
@@ -42,6 +42,41 @@
     "perMachineConcurrency": {
       "default": 1
     }
+  },
+  "commonIssueAnalysis": {
+    "maxDateRangeDays": 90,
+    "defaultResultLimit": 50,
+    "maxResultLimit": 200,
+    "requestTimeoutSeconds": 120,
+    "autoQueryArticleFetchMaxCount": 100,
+    "autoQueryArticleFetchConcurrency": 6,
+    "autoQueryArticleFetchTimeoutSeconds": 45,
+    "autoQuerySightingFetchMaxCount": 100,
+    "aiEnrichmentEnabled": true,
+    "aiTimeoutSeconds": 120,
+    "referenceAiBatchSize": 5,
+    "referenceTopCount": 20,
+    "eqlFields": {
+      "id": "id",
+      "title": "title",
+      "description": "description",
+      "platform": "family",
+      "customer": "server_platf_ae.bug.ext_account_name",
+      "component": "component",
+      "submittedDate": "submitted_date",
+      "sighting": "server_platf_ae.bug.int_sighting_url",
+      "closeReason": "bug.closed_reason"
+    },
+    "platformAliases": {
+      "BHS": ["Birch Stream Platform"],
+      "OKS": ["Oak Stream DMR Platforms"],
+      "EGS": ["Eagle Stream Platforms"]
+    },
+    "customerAliases": {
+      "maginfra": ["Maginfra Co., Ltd."],
+      "h3c": ["New H3C Information Technologies Co., Ltd"]
+    },
+    "reportDirectory": "out\\common_issue_reports"
   },
   "machineMatching": {
     "inventoryPath": "config\\lab-machine-inventory.json"

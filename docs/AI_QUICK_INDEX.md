@@ -6,14 +6,16 @@ Read this first to choose the smallest needed context. Do not read every documen
 
 | User task | Read/use |
 | --- | --- |
+| System handover / successor onboarding | `docs\SYSTEM_HANDOVER.zh-CN.md` (Word copy: `docs\SYSTEM_HANDOVER.zh-CN.v1.1.docx`; new-PC SSH setup: sections 6.4-6.5) |
 | UI stage 1 planning | `.github\skills\ips-ui-plan-stage\SKILL.md` |
 | IPS/HSD consult / extract only | `.github\skills\ips-consult-flow\SKILL.md` |
 | IPS/HSD debug reproduction | `.github\skills\ips-hsd-repro-flow\SKILL.md` |
 | BHS flash / boot / MLC flow | `.github\skills\bhs-hardware-flow\SKILL.md` |
 | Need PS/PY command syntax | `.github\skills\common-ps-py-commands\SKILL.md` |
 | GitHub clone, commit, push, or server update | `docs\git_usage_guide.md` |
+| Personal-PC development / deployment-machine configuration boundary | `docs\development_deployment_contract.md`, then `docs\local_runtime_profiles.md` |
 | Oak Stream CScripts discovery or usage | `docs\cscripts_oak_stream_usage.md` |
-| Select a lab machine for IPS/HSD reproduction | `docs\lab_machine_inventory.md`, then `config\lab-machine-inventory.json` |
+| Select or read-only audit a lab machine | `docs\lab_machine_readonly_audit_2026-08-06.md`, then `docs\lab_machine_inventory.md` and `config\lab-machine-inventory.json` |
 | UI operation/config | `docs\ips_copilot_ui.md` |
 | HSD API details only when needed | `docs\hsd_python_api_notes.md` |
 | BHS RAS, hang/MCE, performance/power, or Oak Stream collateral reference | `docs\bhs_platform_reference_knowledge.md`, then its linked PDF section |

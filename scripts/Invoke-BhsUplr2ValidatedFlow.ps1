@@ -7,14 +7,12 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
-if (-not $ConfigPath) {
-    $ConfigPath = Join-Path $scriptRoot '..\config\hardware-flow.dbgsh05.json'
-}
+. (Join-Path $scriptRoot 'Resolve-LocalConfig.ps1')
+$ConfigPath = Resolve-HardwareFlowConfigPath -ConfigPath $ConfigPath -ScriptRoot $scriptRoot
 
 $config = Get-Content -LiteralPath $ConfigPath -Raw | ConvertFrom-Json
 $target = "$($config.ssh.user)@$($config.ssh.host)"
-$timeout = [int]$config.ssh.connectTimeoutSeconds
-$chip = $config.remote.emulator.defaultChip
+$sshArguments = Get-HardwareSshArguments -Config $config
 $bin = $config.flow.defaultBinFile
 $logRoot = $config.flow.logRoot
 $remoteCaptureScript = "$logRoot\Invoke-RemoteBootCapture.ps1"
@@ -23,13 +21,13 @@ $remoteMlcScript = "$logRoot\Invoke-RemoteMlcSerial.ps1"
 
 function Invoke-RemoteScriptText {
     param([string]$ScriptText)
-    $ScriptText | ssh -o BatchMode=yes -o ConnectTimeout=$timeout $target "powershell -NoProfile -ExecutionPolicy Bypass -Command -"
+    $ScriptText | ssh @sshArguments $target "powershell -NoProfile -ExecutionPolicy Bypass -Command -"
     return $LASTEXITCODE
 }
 
 function Copy-RemoteFile {
     param([string]$LocalPath, [string]$RemotePath)
-    scp -o BatchMode=yes -o ConnectTimeout=$timeout $LocalPath "${target}:$($RemotePath -replace '\\','/')"
+    scp @sshArguments $LocalPath "${target}:$($RemotePath -replace '\\','/')"
     if ($LASTEXITCODE -ne 0) { throw "scp failed: $LocalPath -> $RemotePath" }
 }
 
@@ -78,7 +76,7 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Output '=== FLASH ==='
 $flashLog = Join-Path $env:TEMP "bhs_uplr2_flash_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
-& (Join-Path $scriptRoot 'Invoke-Emulator.ps1') -Action program -Chip $chip -BinFile $bin -ConfigPath $ConfigPath 2>&1 | Tee-Object -FilePath $flashLog
+& (Join-Path $scriptRoot 'Invoke-Emulator.ps1') -Action program -BinFile $bin -ConfigPath $ConfigPath 2>&1 | Tee-Object -FilePath $flashLog
 $flashExit = $LASTEXITCODE
 $flashText = Get-Content -LiteralPath $flashLog -Raw
 $required = @('Download Complete', 'Verify Pass', 'Emulator is in Emulation mode', 'Authentication Pass')
@@ -97,7 +95,12 @@ Copy-RemoteFile (Join-Path $scriptRoot 'Capture-SerialPort.ps1') $remotePortScri
 Copy-RemoteFile (Join-Path $scriptRoot 'Invoke-RemoteBootCapture.ps1') $remoteCaptureScript
 
 Write-Output '=== BOOT CAPTURE ==='
-ssh -o BatchMode=yes -o ConnectTimeout=$timeout $target "powershell -NoProfile -ExecutionPolicy Bypass -File $remoteCaptureScript -LogRoot '$logRoot' -CaptureScript '$remotePortScript' -PowerDir '$($config.remote.powerSplitter.dir)' -PowerExe '$($config.remote.powerSplitter.exe)' -CpuPort '$($config.remote.serial.ports.cpu)' -BmcPort '$($config.remote.serial.ports.bmc)' -CaptureSeconds $($config.flow.captureSeconds) -BaudRate $($config.remote.serial.baudRate)"
+$bootCaptureCommand = @"
+& '$remoteCaptureScript' -LogRoot '$logRoot' -CaptureScript '$remotePortScript' -PowerDir '$($config.remote.powerSplitter.dir)' -PowerExe '$($config.remote.powerSplitter.exe)' -CpuPort '$($config.remote.serial.ports.cpu)' -BmcPort '$($config.remote.serial.ports.bmc)' -CaptureSeconds $($config.flow.captureSeconds) -BaudRate $($config.remote.serial.baudRate)
+exit `$LASTEXITCODE
+"@
+$bootCaptureEncoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($bootCaptureCommand))
+ssh @sshArguments $target "powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand $bootCaptureEncoded"
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 if ($RunMlc) {
@@ -105,7 +108,12 @@ if ($RunMlc) {
     Copy-RemoteFile (Join-Path $scriptRoot 'Invoke-RemoteMlcSerial.ps1') $remoteMlcScript
     $mlcDir = '/root/mlc_v3.11b'
     if ($config.hostOs -and $config.hostOs.mlcDir) { $mlcDir = $config.hostOs.mlcDir }
-    ssh -o BatchMode=yes -o ConnectTimeout=$timeout $target "powershell -NoProfile -ExecutionPolicy Bypass -File $remoteMlcScript -PortName '$($config.remote.serial.ports.cpu)' -BaudRate $($config.remote.serial.baudRate) -WindowsLogRoot '$logRoot' -MlcDir '$mlcDir'"
+    $mlcCommand = @"
+& '$remoteMlcScript' -PortName '$($config.remote.serial.ports.cpu)' -BaudRate $($config.remote.serial.baudRate) -WindowsLogRoot '$logRoot' -MlcDir '$mlcDir'
+exit `$LASTEXITCODE
+"@
+    $mlcEncoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($mlcCommand))
+    ssh @sshArguments $target "powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand $mlcEncoded"
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
 

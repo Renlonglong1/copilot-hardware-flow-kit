@@ -4,7 +4,7 @@ param(
     [string]$WindowsLogRoot = 'C:\Users\debug\Desktop\flow_logs',
     [string]$MlcDir = '/root/mlc_v3.11b',
     [string]$UserName = 'root',
-    [string]$Password = 'dcpae_123',
+    [string]$Password = $env:MLC_SERIAL_PASSWORD,
     [int]$CommandTimeoutSeconds = 1200
 )
 
@@ -98,6 +98,9 @@ try {
     Send-Line $serial $writer ''
     $loginProbe = Read-SerialUntil $serial @('gnr-bkc login:', 'login:', '[root@gnr-bkc mlc_v3.11b]#', '[root@gnr-bkc ~]#') 90 $writer
     if ($loginProbe.Pattern -match 'login:') {
+        if ([string]::IsNullOrWhiteSpace($Password)) {
+            throw 'COM3 is at a login prompt. MLC_SERIAL_PASSWORD must be provided by the remote process environment, or run MLC only from an existing root shell.'
+        }
         Send-Line $serial $writer $UserName
         $passwordProbe = Read-SerialUntil $serial @('Password:') 30 $writer
         if (-not $passwordProbe.Found) { throw 'PASSWORD_PROMPT_NOT_FOUND' }

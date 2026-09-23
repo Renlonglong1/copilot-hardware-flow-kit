@@ -252,6 +252,26 @@ server_platf_ae.bug.ext_cust_blog
 server_platf_ae.bug.ext_cust_blog_rich
 ```
 
+## IPS Common-Issue Grouping Fields
+
+For common-issue analysis, use the problem content first and use metadata only
+to decide whether a previously handled case is applicable. A local audit of 15
+server-platform IPS articles confirmed these useful fields:
+
+| Purpose | Fields | Use |
+|---|---|---|
+| Customer-reported problem | `description`, `comments`, `failure_signature`, `root_cause`, `repro`/`debug` | Primary evidence for the reported symptom, trigger, impact, and failure signature. |
+| Reusable handling experience | `bug.fix_description`, `workaround_description`, `server_platf_ae.bug.conclusion_type`, `server_platf_ae.bug.ext_cust_blog_hist` | State only explicit fix, workaround, conclusion, or history; do not infer a root cause. |
+| IPS type | `server_platf_ae.bug.article_type`, `server_platf_ae.bug.ext_issue_type` | Prefer `debug_request`/Debug records for weekly problem sharing. A Question-only set is context, not a common defect group. |
+| Environment applicability | `family`, `release`, `component`, `server_platf_ae.bug.customer_project_name`, `priority` | Explain scope and whether another team can reuse the handling experience; do not group from metadata alone. |
+| Customer presentation | `server_platf_ae.bug.customer_company` | Prefer as the displayed customer company name. |
+| Sighting evidence | `server_platf_ae.bug.int_sighting_url` | Same verified URL is strong evidence. Different URLs are an association/reference category only and do not establish one root cause. |
+
+Article content is often rich HTML. Strip tags, CSS, URLs, IDs, dates, and
+formatting tokens before lexical fallback grouping; retain the cleaned text for
+AI analysis. Keep bounded raw-derived text only in local reports and do not
+treat routing-rule comments, names, or email headers as problem evidence.
+
 ## Validated Example: Article 14027920810
 
 Basic fields:

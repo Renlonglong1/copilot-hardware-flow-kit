@@ -15,11 +15,25 @@ known good run: C:\Users\debug\Desktop\flow_logs\20260623_093722
 
 ## Start Here
 
+For system ownership transfer and successor onboarding, see
+`docs\SYSTEM_HANDOVER.zh-CN.md` and the matching Word document
+`docs\SYSTEM_HANDOVER.zh-CN.v1.1.docx`.
+
 For a new Copilot environment, read in this order:
 
 1. `docs\AI_QUICK_INDEX.md`
 2. `.github\copilot-instructions.md`
 3. Only the skill/doc matching the task
+
+For a strict no-hardware-action machine inventory, start with
+`docs\lab_machine_readonly_audit_2026-08-06.md`. It records the dedicated-identity
+and host-key policy, reachable hosts, and explicit audit blockers.
+
+For the split between portable repository files and this computer's untracked runtime
+profiles, read `docs\local_runtime_profiles.md`.
+
+For the development rules that keep personal-PC code changes independent from
+deployment-machine settings, read `docs\development_deployment_contract.md`.
 
 ## Directory Structure
 

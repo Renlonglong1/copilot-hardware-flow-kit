@@ -135,10 +135,11 @@ For token savings, read `docs\AI_QUICK_INDEX.md` first and only open the detaile
 
 ## 3. Configure Server-Specific Settings
 
-Copy the template:
+Copy the template to the local runtime profile directory (this directory is ignored by Git):
 
 ```powershell
-Copy-Item .\config\hardware-flow.template.json .\config\hardware-flow.<server-name>.json
+New-Item -ItemType Directory -Path .\config\local -Force
+Copy-Item .\config\hardware-flow.template.json .\config\local\hardware-flow.json
 ```
 
 Update these fields:
@@ -146,6 +147,8 @@ Update these fields:
 ```text
 ssh.user
 ssh.host
+ssh.identityFile (optional local path only)
+ssh.hostKeyAlias (optional verified host-key alias)
 remote.emulator.exe
 remote.powerSplitter.exe
 remote.serial.ports.cpu

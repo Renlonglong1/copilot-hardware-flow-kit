@@ -4,15 +4,14 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-if (-not $ConfigPath) {
-    $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
-    $ConfigPath = Join-Path $scriptRoot '..\config\hardware-flow.json'
-}
+$scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+. (Join-Path $scriptRoot 'Resolve-LocalConfig.ps1')
+$ConfigPath = Resolve-HardwareFlowConfigPath -ConfigPath $ConfigPath -ScriptRoot $scriptRoot
 
 $config = Get-Content -LiteralPath $ConfigPath -Raw | ConvertFrom-Json
 $target = "$($config.ssh.user)@$($config.ssh.host)"
-$timeout = [int]$config.ssh.connectTimeoutSeconds
+$sshArguments = Get-HardwareSshArguments -Config $config
 
 Write-Host "Testing SSH access to $target ..."
-ssh -o BatchMode=yes -o ConnectTimeout=$timeout $target "cd & echo SSH_OK"
+ssh @sshArguments $target "echo SSH_OK"
 exit $LASTEXITCODE

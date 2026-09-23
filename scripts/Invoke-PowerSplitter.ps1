@@ -12,14 +12,13 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-if (-not $ConfigPath) {
-    $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
-    $ConfigPath = Join-Path $scriptRoot '..\config\hardware-flow.json'
-}
+$scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+. (Join-Path $scriptRoot 'Resolve-LocalConfig.ps1')
+$ConfigPath = Resolve-HardwareFlowConfigPath -ConfigPath $ConfigPath -ScriptRoot $scriptRoot
 
 $config = Get-Content -LiteralPath $ConfigPath -Raw | ConvertFrom-Json
 $target = "$($config.ssh.user)@$($config.ssh.host)"
-$timeout = [int]$config.ssh.connectTimeoutSeconds
+$sshArguments = Get-HardwareSshArguments -Config $config
 $exe = $config.remote.powerSplitter.exe
 $dir = $config.remote.powerSplitter.dir
 
@@ -32,12 +31,21 @@ switch ($Action) {
 }
 
 $remoteScript = @"
+`$ErrorActionPreference = 'Stop'
+if (-not (Test-Path -LiteralPath '$dir' -PathType Container)) {
+    throw "PowerSplitter directory does not exist: $dir"
+}
+if (-not (Test-Path -LiteralPath '$exe' -PathType Leaf)) {
+    throw "PowerSplitter executable does not exist: $exe"
+}
 Set-Location -LiteralPath '$dir'
 & '$exe' $argsText
-exit `$LASTEXITCODE
+`$exitCode = `$LASTEXITCODE
+if (`$exitCode -ne 0) { exit `$exitCode }
+exit 0
 "@
 $encodedRemoteScript = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($remoteScript))
 $remote = "powershell -NoProfile -EncodedCommand $encodedRemoteScript"
 Write-Host "Running on ${target}: $exe $argsText"
-ssh -o BatchMode=yes -o ConnectTimeout=$timeout $target $remote
+ssh @sshArguments $target $remote
 exit $LASTEXITCODE

@@ -12,12 +12,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-if (-not $ConfigPath) {
-    $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
-    $ConfigPath = Join-Path $scriptRoot '..\config\hardware-flow.json'
-} else {
-    $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
-}
+$scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+. (Join-Path $scriptRoot 'Resolve-LocalConfig.ps1')
+$ConfigPath = Resolve-HardwareFlowConfigPath -ConfigPath $ConfigPath -ScriptRoot $scriptRoot
 
 if (-not $SkipPowerOff) {
     & (Join-Path $scriptRoot 'Invoke-PowerSplitter.ps1') -Action poweroff -ConfigPath $ConfigPath

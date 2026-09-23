@@ -26,7 +26,7 @@ scripts\*.ps1
 
 ## New Server Setup Checklist
 
-1. Configure passwordless SSH from the Copilot machine to the Windows hardware server.
+1. Configure passwordless SSH from the Copilot machine to the Windows hardware server. If the target uses a dedicated local private key, configure its `IdentityFile` and `IdentitiesOnly yes` in the local (uncommitted) `C:\Users\<user>\.ssh\config`; do not assume the default `id_ed25519` is authorized.
 2. Confirm `smucmd.exe` exists on the remote server.
 3. Confirm `PowerSplitterCL.exe` exists on the remote server.
 4. Confirm the target `.bin` file path.
@@ -35,9 +35,10 @@ scripts\*.ps1
    - COM3 = GNR CPU
    - COM4 = BMC
    - 115200 8N1
-7. Copy `config\hardware-flow.template.json` to a server-specific config file.
+7. Copy `config\hardware-flow.template.json` to `config\local\hardware-flow.json`; this local runtime profile is ignored by Git.
 8. Replace SSH host, bin path, expected device serial, and tool paths as needed.
 9. Ask Copilot to read `docs\bhs_uplr2_robust_full_flow.md` before running the flow.
+10. Read `docs\local_runtime_profiles.md` to keep deployment-only settings separate from portable files.
 
 ## Recommended One-Pass Validation
 
@@ -90,6 +91,7 @@ MLC_OK=True
 - Keep the known good logs for comparison.
 - Do not rely on marker strings echoed by the serial console; verify the real prompt and saved result files.
 - If remote command text gets too long, copy a `.ps1` helper to the remote server and run it with `powershell -File`.
+- If SSH reports public-key denial after a migration, inspect `ssh -G debug@<host>` and test the already provisioned target-specific key explicitly before any hardware action. For the safe host-key procedure, see `docs\ssh_passwordless.md`.
 
 ## MLC Migration Notes
 
